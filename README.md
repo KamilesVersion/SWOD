@@ -1,1 +1,2 @@
-# S.W.O.D.
+# SWOD
+Komandinis projektas "S.W.O.D.".
