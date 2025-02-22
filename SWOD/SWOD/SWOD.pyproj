@@ -43,6 +43,15 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="templates\login.html" />
+    <Content Include="templates\meniu.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="templates\profile.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="templates\recent.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="templates\register.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
