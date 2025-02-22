@@ -36,6 +36,9 @@
     <Folder Include="templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="database.db">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="templates\home.html">
       <SubType>Code</SubType>
     </Content>
