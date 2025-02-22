@@ -100,3 +100,6 @@ def recent():
 
 if(__name__) == '__main__':
     app.run('localhost', 4449, debug = True)
+    
+
+# bandom be klaidu
