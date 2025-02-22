@@ -36,5 +36,9 @@ def register():
 def menu():
     return render_template('meniu.html')
 
+@app.route('/recent')
+def recent():
+    return render_template('recent.html')
+
 if(__name__) == '__main__':
     app.run('localhost', 4449, debug = True)
