@@ -103,3 +103,4 @@ if(__name__) == '__main__':
     
 
 # bandom be klaidu
+# dar karta bandom
