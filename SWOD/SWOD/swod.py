@@ -13,7 +13,7 @@ app = Flask(__name__)
 @app.route('/hello')
 def hello():
    # Render the page
-   return "Pakeista"
+   return "Pakeista labas"
 
 if __name__ == '__main__':
    # Run the app server on localhost:4449
