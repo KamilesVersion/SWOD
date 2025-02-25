@@ -107,7 +107,7 @@ def register():
 
         # Log the user in after registration
         login_user(new_user)
-        return redirect(url_for('menu'))
+        return redirect(url_for('/menu'))
 
     return render_template('register.html', form=form)
 
@@ -115,9 +115,9 @@ def register():
 def menu():
     return render_template('meniu.html')
 
-@app.route('/menuPage')
-def menuPage():
-    return render_template('menuPage.html')
+# @app.route('/menuPage')
+# def menuPage():
+#     return render_template('menuPage.html')
 
 @app.route('/connect_spotify')
 def connect_spotify():
