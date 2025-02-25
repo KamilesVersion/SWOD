@@ -133,6 +133,10 @@ def connect_spotify():
 def recent():
     return render_template('recent.html')
 
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
 def create_spotify_oauth():
     return SpotifyOAuth(
         client_id=os.getenv("SPOTIFY_CLIENT_ID"),
