@@ -400,4 +400,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 # My database file
-database.db
+SWOD/SWOD/instance/database.db
