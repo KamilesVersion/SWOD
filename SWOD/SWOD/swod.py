@@ -7,8 +7,12 @@ from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
 import re
 from wtforms import ValidationError
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+import os
+from dotenv import load_dotenv
 
-
+load_dotenv() # Load environment variables from .env file
 
 app = Flask(__name__)
 
@@ -121,11 +125,20 @@ def menu():
 
 @app.route('/connect_spotify')
 def connect_spotify():
-    return render_template('connect_spotify.html')
+    sp_oauth = create_spotify_oauth()
+    auth_url = sp_oauth.get_authorize_url()
+    return redirect(auth_url)
 
 @app.route('/recent')
 def recent():
     return render_template('recent.html')
+
+def create_spotify_oauth():
+    return SpotifyOAuth(
+        client_id=os.getenv("SPOTIFY_CLIENT_ID"),
+        client_secret=os.getenv("SPOTIFY_CLIENT_SECRET"),
+        redirect_uri=url_for("menu", _external=True),
+        scope="user-top-read user-read-recently-played")
 
 # # EDIT PROFILE FEATURE START
 
