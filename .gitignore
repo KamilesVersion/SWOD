@@ -401,3 +401,6 @@ FodyWeavers.xsd
 
 # My database file
 /SWOD/SWOD/instance/database.db
+
+# Environment (secret) files
+.env
