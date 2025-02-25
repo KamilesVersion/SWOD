@@ -89,13 +89,17 @@ def register():
 
         # Log the user in after registration
         login_user(new_user)
-        return redirect(url_for('menu'))
+        return redirect(url_for('connect_spotify'))
 
     return render_template('register.html', form=form)
 
 @app.route('/menu')
 def menu():
     return render_template('meniu.html')
+
+@app.route('/connect_spotify')
+def connect_spotify():
+    return render_template('connect_spotify.html')
 
 @app.route('/recent')
 def recent():
