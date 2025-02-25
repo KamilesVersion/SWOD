@@ -77,16 +77,19 @@ def login():
                 return redirect(url_for('menu'))
     return render_template('login.html', form=form)
 
-@ app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
 
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         new_user = User(username=form.username.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for('login'))
+
+        # Log the user in after registration
+        login_user(new_user)
+        return redirect(url_for('menu'))
 
     return render_template('register.html', form=form)
 
@@ -100,7 +103,3 @@ def recent():
 
 if(__name__) == '__main__':
     app.run('localhost', 4449, debug = True)
-    
-
-# bandom be klaidu
-# dar karta bandom
