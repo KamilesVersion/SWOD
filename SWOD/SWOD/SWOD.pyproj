@@ -43,6 +43,9 @@
     <Content Include="templates\meniu.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="templates\menuPage.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="templates\profile.html">
       <SubType>Code</SubType>
     </Content>

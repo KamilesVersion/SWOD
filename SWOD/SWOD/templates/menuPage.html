@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Page</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(201, 219, 186);
+        }
+
+        /* Top header styles */
+        .header-container {
+            background-color: rgb(153, 193, 185);
+            padding: 10px 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .profile-link {
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+        }
+
+            .profile-link:hover {
+                color: lightgray;
+            }
+
+        .line {
+            width: 100%;
+            background-color: rgb(153, 193, 185);
+        }
+
+        /* Sidebar-style button container */
+        .menu-container {
+            position: absolute;
+            left: 20px;
+            top: 150px; /* Adjusted spacing so it doesn’t overlap */
+            width: 300px;
+        }
+
+        /* Button styling - always aligned to the left */
+        .menu-button-large {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: left;
+            background-color: rgb(153, 193, 185);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s ease-in-out;
+            margin-bottom: 15px;
+        }
+
+            .menu-button-large:hover {
+                background-color: rgb(133, 173, 165);
+            }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            text-decoration: none;
+        }
+
+            .back-button:hover {
+                text-decoration: underline;
+            }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top section (keeps Profile in the top-right) -->
+    <div class="header-container">
+        <div class="header">
+            <h1 style="color: white;">S.W.O.D.</h1>
+
+            <div>
+                <a href="profile.html" class="profile-link">Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="line">
+        <svg height="10" width="100%">
+            <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2" />
+        </svg>
+    </div>
+
+    <!-- Sidebar-like menu container -->
+    <div class="menu-container">
+        <!-- Recent Tracks Button (always pinned to the left and now properly spaced) -->
+        <a href="recent-tracks.html" class="menu-button-large">Recent Tracks</a>
+
+        <!-- Back Button -->
+        <a href="menu.html" class="back-button">← Back to Home</a>
+    </div>
+
+</body>
+
+</html>
+
