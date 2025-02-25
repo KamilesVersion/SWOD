@@ -113,11 +113,11 @@ def register():
 
 @app.route('/menu')
 def menu():
-    return render_template('meniu.html')
-
-@app.route('/menu-page')
-def menuPage():
     return render_template('menuPage.html')
+
+# @app.route('/menu-page')
+# def menuPage():
+#     return render_template('menuPage.html')
 
 @app.route('/connect_spotify')
 def connect_spotify():
