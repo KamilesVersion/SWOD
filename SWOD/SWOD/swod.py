@@ -116,7 +116,7 @@ def menu():
     return render_template('meniu.html')
 
 @app.route('/menuPage')
-def menu():
+def menuPage():
     return render_template('menuPage.html')
 
 @app.route('/connect_spotify')
