@@ -86,7 +86,14 @@ def login():
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
                 return redirect(url_for('menu'))
+            else:
+                form.password.errors.append("Netinkamas slaptazodis.")
+        else:
+            form.username.errors.append("Tokios paskyros su vartotojo vardu nera.")
     return render_template('login.html', form=form)
+
+
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
