@@ -5,6 +5,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
+import re
+from wtforms import ValidationError
 
 
 
@@ -38,19 +40,28 @@ def load_user(user_id):
 
 class RegisterForm(FlaskForm):
     username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+        InputRequired(), Length(min=4, max=20)],
+        render_kw={"placeholder": "Username"})
 
     password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
+        InputRequired(), Length(min=8, max=20)],
+        render_kw={"placeholder": "Password"})
 
     submit = SubmitField('Register')
 
     def validate_username(self, username):
-        existing_user_username = User.query.filter_by(
-            username=username.data).first()
-        if existing_user_username:
+        existing_user = User.query.filter_by(username=username.data).first()
+        if existing_user:
+            raise ValidationError('That username already exists. Please choose a different one.')
+
+    def validate_password(self, password):
+        pwd = password.data
+        if (len(pwd) < 8 or 
+            not re.search(r'[A-Z]', pwd) or 
+            not re.search(r'[!@#$%^&*(),.?":{}|<>]', pwd) or 
+            not re.search(r'\d', pwd)):
             raise ValidationError(
-                'That username already exists. Please choose a different one.')
+                'Password must be at least 8 characters long, contain at least one uppercase letter, one special symbol, and one number.')
 
 class LoginForm(FlaskForm):
     username = StringField(validators=[
