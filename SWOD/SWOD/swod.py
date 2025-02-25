@@ -127,5 +127,38 @@ def connect_spotify():
 def recent():
     return render_template('recent.html')
 
+# # EDIT PROFILE FEATURE START
+
+# # Edit Profile Form
+# class EditProfileForm(FlaskForm):
+#     username = StringField(validators=[Length(min=4, max=20)], render_kw={"placeholder": "New Username"})
+#     password = PasswordField(validators=[Length(min=8, max=20)], render_kw={"placeholder": "New Password"})
+#     submit = SubmitField('Update Profile')
+
+# @app.route('/edit-profile', methods=['GET', 'POST'])
+# @login_required
+# def edit_profile():
+#     form = EditProfileForm()
+
+#     if request.method == 'POST' and form.validate_on_submit():
+#         if form.username.data:
+#             existing_user = User.query.filter_by(username=form.username.data).first()
+#             if existing_user and existing_user.id != current_user.id:
+#                 flash('Username already taken. Choose another one.', 'danger')
+#             else:
+#                 current_user.username = form.username.data
+
+#         if form.password.data:
+#             hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+#             current_user.password = hashed_password
+
+#         db.session.commit()
+#         flash('Profile updated successfully!', 'success')
+#         return redirect(url_for('edit_profile'))
+
+#     return render_template('edit_profile.html', form=form)
+
+# # EDIT PROFILE FEATURE END
+
 if(__name__) == '__main__':
     app.run('localhost', 4449, debug = True)
