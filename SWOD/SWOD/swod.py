@@ -107,7 +107,7 @@ def register():
 
         # Log the user in after registration
         login_user(new_user)
-        return redirect(url_for('connect_spotify'))
+        return redirect(url_for('menu'))
 
     return render_template('register.html', form=form)
 
