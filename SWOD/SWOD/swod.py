@@ -142,7 +142,8 @@ def create_spotify_oauth():
         client_id=os.getenv("SPOTIFY_CLIENT_ID"),
         client_secret=os.getenv("SPOTIFY_CLIENT_SECRET"),
         redirect_uri=url_for("menu", _external=True),
-        scope="user-top-read user-read-recently-played")
+        scope="user-top-read user-read-recently-played",
+        show_dialog=True)
 
 # # EDIT PROFILE FEATURE START
 
