@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, session, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -126,8 +126,29 @@ def menu():
 @app.route('/connect_spotify')
 def connect_spotify():
     sp_oauth = create_spotify_oauth()
+    # session.clear()
+    # code = request.args.get("code")
+    # token_info = sp_oauth.get_access_token(code) # Exchange code for access token
+    # session["token_info"] = token_info  # Store token in session
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
+
+@app.route('/spotify_callback')
+def spotify_callback():
+    sp_oauth = create_spotify_oauth()
+    session.clear()
+    code = request.args.get("code")
+    
+    if not code:
+        return "Error: No code received from Spotify.", 400
+
+    token_info = sp_oauth.get_access_token(code)
+    
+    if not token_info:
+        return "Error: Could not get access token form Spotify.", 500
+    
+    session["token_info"] = token_info
+    return redirect(url_for("menu"))
 
 @app.route('/recent')
 def recent():
@@ -135,13 +156,25 @@ def recent():
 
 @app.route('/profile')
 def profile():
-    return render_template('profile.html')
+    token_info = session.get("token_info", None)
+    if not token_info:
+        return redirect(url_for("connect_spotify"))
+    # Refresh token if expired
+    sp_oauth = create_spotify_oauth()
+    if sp_oauth.is_token_expired(token_info):
+        token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
+        session["token_info"] = token_info # Save the new token
+
+    # Use the access token to fetch user details
+    sp = spotipy.Spotify(auth=token_info["access_token"])
+    user_info = sp.current_user()
+    return render_template('profile.html', user=user_info["display_name"])
 
 def create_spotify_oauth():
     return SpotifyOAuth(
         client_id=os.getenv("SPOTIFY_CLIENT_ID"),
         client_secret=os.getenv("SPOTIFY_CLIENT_SECRET"),
-        redirect_uri=url_for("menu", _external=True),
+        redirect_uri=url_for("spotify_callback", _external=True),
         scope="user-top-read user-read-recently-played",
         show_dialog=True)
 
