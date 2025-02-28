@@ -155,8 +155,11 @@ def recent():
     return render_template('recent.html')
 
 @app.route('/profile')
+@login_required
 def profile():
-    
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+     
     token_info = session.get("token_info", None)
     if not token_info:
         return redirect(url_for("connect_spotify"))
