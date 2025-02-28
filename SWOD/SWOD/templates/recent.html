@@ -1,190 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recent Tracks</title>
     <style>
-        /* Reset margin and padding */
         body {
-            margin: 0;
             font-family: Arial, sans-serif;
+            text-align: center;
         }
 
-        /* Top section with the first color */
-        .header-container {
-            background-color: rgb(250, 163, 129);
-            padding: 10px 20px;
-        }
-
-        /* Header with flex layout */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* Right-side container for Menu & Profile */
-        .right-container {
+        .track {
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+            margin-bottom: 10px;
         }
 
-        /* Dropdown styling */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-            .dropdown button {
-                background: none;
-                border: none;
-                font-size: 18px;
-                color: white;
-                font-weight: bold;
-                cursor: pointer;
+            .track img {
+                width: 50px;
+                height: 50px;
+                margin-right: 10px;
+                border-radius: 5px;
             }
 
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: white;
-            min-width: 150px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            z-index: 1;
-            border-radius: 5px;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        .dropdown-content a {
-            display: block;
-            text-decoration: none;
-            color: black;
-            padding: 5px;
-        }
-
-            .dropdown-content a:hover {
-                background-color: #f0f0f0;
-            }
-
-        /* Profile link */
-        .profile-link {
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            font-weight: bold;
-        }
-
-            .profile-link:hover {
-                color: lightgray;
-            }
-
-        /* SVG Divider Line */
-        .line {
-            width: 100%;
-            background-color: rgb(250, 163, 129);
-        }
-
-        /* Bottom content section */
-        .content {
-            background-color: rgb(245, 205, 167);
-            min-height: 100vh; /* Ensures content section fills the page */
-            padding: 20px;
-        }
-
-        /* Table styling */
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .button-container {
             margin-top: 20px;
-            background-color: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        th {
-            background-color: rgb(250, 163, 129);
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
             color: white;
+            background-color: #1DB954;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
         }
 
-        img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
+            .btn:hover {
+                background-color: #169c45;
+            }
     </style>
 </head>
-
 <body>
-    <!-- Top navigation bar -->
-    <div class="header-container">
-        <div class="header">
-            <h1 style="color: white;">S.W.O.D.</h1>
+    <h1>Recently Played Tracks</h1>
 
-            <div class="right-container">
-
-                <!-- Profile Link -->
-                <a href="profile" class="profile-link">Profile</a>
+    {% if tracks %}
+    <ul style="list-style-type: none; padding: 0;">
+        {% for track in tracks %}
+        <li class="track">
+            {% if track.album_cover %}
+            <img src="{{ track.album_cover }}" alt="Album Cover">
+            {% endif %}
+            <div>
+                <strong>{{ track.name }}</strong> by {{ track.artist }} <br>
+                <small>Album: {{ track.album }} | Played at: {{ track.played_at }}</small>
             </div>
-        </div>
-    </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No recently played tracks found.</p>
+    {% endif %}
 
-    <!-- Divider Line -->
-    <div class="line">
-        <svg height="10" width="100%">
-            <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2" />
-        </svg>
-    </div>
-
-    <!-- Recent Tracks content -->
-    <div class="content">
-        <h2>Your Recent Tracks</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date Listened</th>
-                    <th>Track Name</th>
-                    <th>Artist</th>
-                    <th>Cover</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>2025-02-21 14:30</td>
-                    <td>Shape of You</td>
-                    <td>Ed Sheeran</td>
-                    <td><img src="https://placehold.co/50x50" alt="Cover Image"></td>
-                </tr>
-                <tr>
-                    <td>2025-02-21 15:00</td>
-                    <td>Blinding Lights</td>
-                    <td>The Weeknd</td>
-                    <td><img src="https://placehold.co/50x50" alt="Cover Image"></td>
-                </tr>
-                <tr>
-                    <td>2025-02-21 16:15</td>
-                    <td>Levitating</td>
-                    <td>Dua Lipa</td>
-                    <td><img src="https://placehold.co/50x50" alt="Cover Image"></td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="button-container">
+        <a href="{{ url_for('menu') }}" class="btn">Back to Menu</a>
     </div>
 </body>
-
 </html>

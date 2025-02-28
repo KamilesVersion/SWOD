@@ -151,8 +151,36 @@ def spotify_callback():
     return redirect(url_for("menu"))
 
 @app.route('/recent')
+@login_required
 def recent():
-    return render_template('recent.html')
+    token_info = session.get("token_info", None)
+    if not token_info:
+        return redirect(url_for("connect_spotify"))
+
+    # Refresh token if expired
+    sp_oauth = create_spotify_oauth()
+    if sp_oauth.is_token_expired(token_info):
+        token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
+        session["token_info"] = token_info  # Save the new token
+
+    # Fetch last 20 played tracks
+    sp = spotipy.Spotify(auth=token_info["access_token"])
+    recent_tracks = sp.current_user_recently_played(limit=20)
+
+    # Extract necessary track details
+    tracks = []
+    for item in recent_tracks['items']:
+        track = item['track']
+        tracks.append({
+            'name': track['name'],
+            'artist': ", ".join(artist['name'] for artist in track['artists']),
+            'album': track['album']['name'],
+            'album_cover': track['album']['images'][0]['url'] if track['album']['images'] else None,
+            'played_at': item['played_at']
+        })
+
+    return render_template('recent.html', tracks=tracks)
+
 
 @app.route('/profile')
 @login_required
