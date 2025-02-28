@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import InputRequired, Length, ValidationError
+from wtforms.validators import InputRequired, Length, ValidationError, Optional
 from flask_bcrypt import Bcrypt
 import re
 from wtforms import ValidationError
@@ -214,52 +214,56 @@ def create_spotify_oauth():
         scope="user-top-read user-read-recently-played",
         show_dialog=True)
 
-# Profile editing
 class UpdateAccountForm(FlaskForm):
-    new_username = StringField(validators=[
-        InputRequired(), Length(min=4, max=20)],
-        render_kw={"placeholder": "New Username"})
-    
-    new_password = PasswordField(validators=[
-        InputRequired(), Length(min=8, max=20)],
-        render_kw={"placeholder": "New Password"})
-    
+    new_username = StringField(
+        validators=[Optional(), Length(min=4, max=20)],
+        render_kw={"placeholder": "New Username"}
+    )
+
+    new_password = PasswordField(
+        validators=[Optional(), Length(min=8, max=20)],
+        render_kw={"placeholder": "New Password"}
+    )
+
     submit = SubmitField('Update')
 
     def validate_new_username(self, new_username):
-        if new_username.data != current_user.username:
+        if new_username.data and new_username.data != current_user.username:
             existing_user = User.query.filter_by(username=new_username.data).first()
             if existing_user:
                 raise ValidationError('That username is already taken. Please choose another.')
 
     def validate_new_password(self, new_password):
-        pwd = new_password.data
-        if (len(pwd) < 8 or 
-            not re.search(r'[A-Z]', pwd) or 
-            not re.search(r'[!@#$%^&*(),.?":{}|<>]', pwd) or 
-            not re.search(r'\d', pwd)):
-            raise ValidationError(
-                'Password must be at least 8 characters long, contain at least one uppercase letter, one special symbol, and one number.')
-
+        if new_password.data:  # Only validate if a new password is entered
+            pwd = new_password.data
+            if (len(pwd) < 8 or 
+                not re.search(r'[A-Z]', pwd) or 
+                not re.search(r'[!@#$%^&*(),.?":{}|<>]', pwd) or 
+                not re.search(r'\d', pwd)):
+                raise ValidationError(
+                    'Password must be at least 8 characters long, contain at least one uppercase letter, one special symbol, and one number.')
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     form = UpdateAccountForm()
-    
+
     if form.validate_on_submit():
-        # Update username
-        current_user.username = form.new_username.data
-        
-        # Update password (hashed)
-        hashed_password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
-        current_user.password = hashed_password
+        # Update username only if it's provided
+        if form.new_username.data:
+            current_user.username = form.new_username.data
+
+        # Update password only if it's provided
+        if form.new_password.data:
+            hashed_password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+            current_user.password = hashed_password
 
         db.session.commit()
         flash('Your account has been updated!', 'success')
-        return redirect(url_for('login'))
+        return redirect(url_for('login'))  # Redirect after successful update
 
     return render_template('edit_profile.html', form=form)
+
 
 if(__name__) == '__main__':
     app.run('localhost', 4449, debug = True)
