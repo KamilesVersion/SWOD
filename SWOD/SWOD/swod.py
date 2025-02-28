@@ -62,7 +62,7 @@ class RegisterForm(FlaskForm):
         pwd = password.data
         if (len(pwd) < 8 or 
             not re.search(r'[A-Z]', pwd) or 
-            not re.search(r'[!@#$%^&*(),.?":{}|<>/\]', pwd) or 
+            not re.search(r'[!@#$%^&*(),.?":{}|<>]', pwd) or 
             not re.search(r'\d', pwd)):
             raise ValidationError(
                 'Password must be at least 8 characters long, contain at least one uppercase letter, one special symbol, and one number.')
@@ -136,7 +136,7 @@ def connect_spotify():
 @app.route('/spotify_callback')
 def spotify_callback():
     sp_oauth = create_spotify_oauth()
-    session.clear()
+    
     code = request.args.get("code")
     
     if not code:
