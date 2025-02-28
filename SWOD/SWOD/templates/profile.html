@@ -10,6 +10,17 @@
         img {
             border-radius: 50%;
         }
+        a:link, a:visited {
+            background-color: rgb(153, 193, 185);
+            color: white;
+            padding: 14px 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+        a:hover, a:active{
+            background-color: darkslategrey;
+        }
     </style>
 </head>
 
@@ -29,7 +40,9 @@
     {% else %}
         <p>You are not connected to Spotify.</p>
     {% endif %}
-
+    <br />
+    <br />
+    <a href="menu">Menu</a>
 
 </body>
 
