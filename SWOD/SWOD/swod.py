@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, session, request
+from flask import Flask, render_template, url_for, redirect, session, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -214,38 +214,52 @@ def create_spotify_oauth():
         scope="user-top-read user-read-recently-played",
         show_dialog=True)
 
-# # EDIT PROFILE FEATURE START
+# Profile editing
+class UpdateAccountForm(FlaskForm):
+    new_username = StringField(validators=[
+        InputRequired(), Length(min=4, max=20)],
+        render_kw={"placeholder": "New Username"})
+    
+    new_password = PasswordField(validators=[
+        InputRequired(), Length(min=8, max=20)],
+        render_kw={"placeholder": "New Password"})
+    
+    submit = SubmitField('Update')
 
-# # Edit Profile Form
-# class EditProfileForm(FlaskForm):
-#     username = StringField(validators=[Length(min=4, max=20)], render_kw={"placeholder": "New Username"})
-#     password = PasswordField(validators=[Length(min=8, max=20)], render_kw={"placeholder": "New Password"})
-#     submit = SubmitField('Update Profile')
+    def validate_new_username(self, new_username):
+        if new_username.data != current_user.username:
+            existing_user = User.query.filter_by(username=new_username.data).first()
+            if existing_user:
+                raise ValidationError('That username is already taken. Please choose another.')
 
-# @app.route('/edit-profile', methods=['GET', 'POST'])
-# @login_required
-# def edit_profile():
-#     form = EditProfileForm()
+    def validate_new_password(self, new_password):
+        pwd = new_password.data
+        if (len(pwd) < 8 or 
+            not re.search(r'[A-Z]', pwd) or 
+            not re.search(r'[!@#$%^&*(),.?":{}|<>]', pwd) or 
+            not re.search(r'\d', pwd)):
+            raise ValidationError(
+                'Password must be at least 8 characters long, contain at least one uppercase letter, one special symbol, and one number.')
 
-#     if request.method == 'POST' and form.validate_on_submit():
-#         if form.username.data:
-#             existing_user = User.query.filter_by(username=form.username.data).first()
-#             if existing_user and existing_user.id != current_user.id:
-#                 flash('Username already taken. Choose another one.', 'danger')
-#             else:
-#                 current_user.username = form.username.data
 
-#         if form.password.data:
-#             hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-#             current_user.password = hashed_password
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = UpdateAccountForm()
+    
+    if form.validate_on_submit():
+        # Update username
+        current_user.username = form.new_username.data
+        
+        # Update password (hashed)
+        hashed_password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+        current_user.password = hashed_password
 
-#         db.session.commit()
-#         flash('Profile updated successfully!', 'success')
-#         return redirect(url_for('edit_profile'))
+        db.session.commit()
+        flash('Your account has been updated!', 'success')
+        return redirect(url_for('login'))
 
-#     return render_template('edit_profile.html', form=form)
-
-# # EDIT PROFILE FEATURE END
+    return render_template('edit_profile.html', form=form)
 
 if(__name__) == '__main__':
     app.run('localhost', 4449, debug = True)
