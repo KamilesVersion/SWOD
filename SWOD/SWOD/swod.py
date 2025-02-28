@@ -156,6 +156,7 @@ def recent():
 
 @app.route('/profile')
 def profile():
+    
     token_info = session.get("token_info", None)
     if not token_info:
         return redirect(url_for("connect_spotify"))
@@ -168,7 +169,11 @@ def profile():
     # Use the access token to fetch user details
     sp = spotipy.Spotify(auth=token_info["access_token"])
     user_info = sp.current_user()
-    return render_template('profile.html', user=user_info["display_name"])
+    return render_template('profile.html', 
+                           user=user_info["display_name"], # spotify name
+                           profile_pic=user_info["images"][0]["url"] if user_info["images"] else None,
+                           username=current_user.username,
+                           spotify_logged_in=True) 
 
 def create_spotify_oauth():
     return SpotifyOAuth(

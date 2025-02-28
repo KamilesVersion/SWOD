@@ -10,8 +10,21 @@
 
 <body>
     <h1>Your Profile</h1>
-    <h3>Spotify username:</h3>
-    <h3>{{ user }}</h3>
+    <h3>Username: {{ username }}</h3>
+    <!-- Check if Spotify is logged in -->
+    {% if spotify_logged_in %}
+        <h3>Spotify username: {{ user }}</h3>
+        <!-- Display Spotify profile picture if available -->
+        {% if profile_pic %}
+            <img src="{{ profile_pic }}" alt="Spotify Profile Picture" width="150" />
+        {% else %}
+            <p>No profile picture available</p>
+        {% endif %}
+    {% else %}
+        <p>You are not connected to Spotify.</p>
+    {% endif %}
+
+
 </body>
 
 </html>
