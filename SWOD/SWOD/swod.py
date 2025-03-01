@@ -125,6 +125,7 @@ def menu():
 
 @app.route('/connect_spotify')
 def connect_spotify():
+    session["next_url"] = request.args.get("next", url_for("menu")) # Stores the target (where user wants to go) page URL
     sp_oauth = create_spotify_oauth()
    
     auth_url = sp_oauth.get_authorize_url()
@@ -145,14 +146,16 @@ def spotify_callback():
         return "Error: Could not get access token form Spotify.", 500
     
     session["token_info"] = token_info
-    return redirect(url_for("menu"))
+    # gets url where user wanted to go or chooses menu for fallback
+    next_url = session.pop("next_url", url_for("menu"))
+    return redirect(next_url)
 
 @app.route('/recent')
 @login_required
 def recent():
     token_info = session.get("token_info", None)
     if not token_info:
-        return redirect(url_for("connect_spotify"))
+        return redirect(url_for("connect_spotify", next=url_for("recent")))
 
     # Refresh token if expired
     sp_oauth = create_spotify_oauth()
@@ -187,7 +190,7 @@ def profile():
      
     token_info = session.get("token_info", None)
     if not token_info:
-        return redirect(url_for("connect_spotify"))
+        return redirect(url_for("connect_spotify", next=url_for("profile")))
     # Refresh token if expired
     sp_oauth = create_spotify_oauth()
     if sp_oauth.is_token_expired(token_info):
