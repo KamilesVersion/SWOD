@@ -126,10 +126,7 @@ def menu():
 @app.route('/connect_spotify')
 def connect_spotify():
     sp_oauth = create_spotify_oauth()
-    # session.clear()
-    # code = request.args.get("code")
-    # token_info = sp_oauth.get_access_token(code) # Exchange code for access token
-    # session["token_info"] = token_info  # Store token in session
+   
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
 
@@ -264,6 +261,11 @@ def edit_profile():
 
     return render_template('edit_profile.html', form=form)
 
+@app.route('/logout', methods=['GET', 'POST'])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
 
 if(__name__) == '__main__':
     app.run('localhost', 4449, debug = True)
