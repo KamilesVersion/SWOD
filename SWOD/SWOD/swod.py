@@ -267,5 +267,16 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+@app.route('/remove', methods=['GET', 'POST'])
+@login_required
+def remove():
+    #deleting from database
+    db.session.delete(current_user)
+    db.session.commit()
+    
+    logout_user()
+    session.clear() # Clear any remaining session data
+    return redirect(url_for('home'))
+
 if(__name__) == '__main__':
     app.run('localhost', 4449, debug = True)
