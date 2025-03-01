@@ -91,9 +91,9 @@ def login():
                 login_user(user)
                 return redirect(url_for('menu'))
             else:
-                form.password.errors.append("Netinkamas slaptazodis.")
+                form.password.errors.append("Invalid password.")
         else:
-            form.username.errors.append("Tokios paskyros su vartotojo vardu nera.")
+            form.username.errors.append("No account exists with this username.")
     return render_template('login.html', form=form)
 
 
