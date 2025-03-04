@@ -11,6 +11,8 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import os
 from dotenv import load_dotenv
+import pytz
+from datetime import datetime
 
 load_dotenv() # Load environment variables from .env file
 
@@ -150,6 +152,7 @@ def spotify_callback():
     next_url = session.pop("next_url", url_for("menu"))
     return redirect(next_url)
 
+
 @app.route('/recent')
 @login_required
 def recent():
@@ -167,19 +170,29 @@ def recent():
     sp = spotipy.Spotify(auth=token_info["access_token"])
     recent_tracks = sp.current_user_recently_played(limit=20)
 
+    # Define Lithuanian time zone
+    lithuania_tz = pytz.timezone('Europe/Vilnius')
+
     # Extract necessary track details
     tracks = []
     for item in recent_tracks['items']:
         track = item['track']
+        
+        # Convert played_at to Lithuanian time zone
+        played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
+        played_at_utc = played_at_utc.replace(tzinfo=pytz.utc)
+        played_at_lt = played_at_utc.astimezone(lithuania_tz)
+
         tracks.append({
             'name': track['name'],
             'artist': ", ".join(artist['name'] for artist in track['artists']),
             'album': track['album']['name'],
             'album_cover': track['album']['images'][0]['url'] if track['album']['images'] else None,
-            'played_at': item['played_at']
+            'played_at': played_at_lt.strftime("%Y-%m-%d %H:%M:%S")  # Format as Lithuanian time
         })
 
     return render_template('recent.html', tracks=tracks)
+
 
 
 @app.route('/profile')
