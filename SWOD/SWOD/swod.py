@@ -294,5 +294,10 @@ def remove():
     session.clear() # Clear any remaining session data
     return redirect(url_for('home'))
 
+@app.route('/recap')
+@login_required
+def recap():
+    return render_template('recap_page.html')
+
 if(__name__) == '__main__':
     app.run('localhost', 4449, debug = True)

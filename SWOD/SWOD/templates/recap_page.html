@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recap</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .header-container {
+            background-color: rgb(153, 193, 185);
+            padding: 10px 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .right-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-link, .menu-link {
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+        }
+
+            .profile-link:hover, .menu-link:hover {
+                color: lightgray;
+            }
+
+        .line {
+            width: 100%;
+            background-color: rgb(153, 193, 185);
+        }
+
+        .content {
+            background-color: rgb(201, 219, 186);
+            height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .button-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .recap-button {
+            background-color: rgb(153, 193, 185);
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+            .recap-button:hover {
+                background-color: rgb(129, 163, 157);
+            }
+    </style>
+</head>
+
+<body>
+
+    <div class="header-container">
+        <div class="header">
+            <h1 style="color: white;">S.W.O.D.</h1>
+            <div class="right-container">
+                <a href="menu" class="menu-link">Menu</a>
+                <a href="profile" class="profile-link">Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="line">
+        <svg height="10" width="100%">
+            <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2" />
+        </svg>
+    </div>
+
+    <div class="content">
+        <h2>Your Recaps</h2>
+        <div class="button-container">
+            <a href="yesterday-recap" class="recap-button">Yesterday's Recap</a>
+            <a href="last-week-recap" class="recap-button">Last Week's Recap</a>
+        </div>
+    </div>
+
+</body>
+
+</html>
