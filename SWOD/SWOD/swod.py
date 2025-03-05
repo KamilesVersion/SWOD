@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, session, request, flash
+from flask import Flask, render_template, url_for, redirect, session, request, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -298,6 +298,47 @@ def remove():
 @login_required
 def recap():
     return render_template('recap_page.html')
+
+#LABIAUSIAI KLAUSOMIAUSIA DAINA--------------------------------------------------
+
+@app.route("/most_listened_song")
+def most_listened_song():
+    token_info = session.get("token_info", None)
+
+    if not token_info:
+        return redirect(url_for("login"))
+
+    sp = spotipy.Spotify(auth=token_info["access_token"])
+    
+    # Fetch user's top tracks (long-term, i.e., most listened songs)
+    top_tracks = sp.current_user_top_tracks(limit=1, time_range="long_term")
+
+    if top_tracks["items"]:
+        song = top_tracks["items"][0]
+        song_name = song["name"]
+        artist_name = song["artists"][0]["name"]
+        return f"Your most listened song is: {song_name} by {artist_name}"
+    
+    return "No listening data found!"
+
+@app.route("/most_listened_song_json")
+def most_listened_song_json():
+    token_info = session.get("token_info", None)
+
+    if not token_info:
+        return {"error": "User not authenticated"}, 401
+
+    sp = spotipy.Spotify(auth=token_info["access_token"])
+    
+    top_tracks = sp.current_user_top_tracks(limit=1, time_range="long_term")
+
+    if top_tracks["items"]:
+        song = top_tracks["items"][0]
+        return {"song": song["name"], "artist": song["artists"][0]["name"]}
+    
+    return {"song": None, "artist": None}
+
+#-------------------------------------------------------------------------------
 
 if(__name__) == '__main__':
     app.run('localhost', 4449, debug = True)
