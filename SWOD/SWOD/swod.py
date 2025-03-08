@@ -416,22 +416,53 @@ def most_listened_song():
         return redirect(url_for("connect_spotify"))  # Jei nëra galiojanèio tokeno
 
 
+
+# @app.route("/most_listened_song_json")
+# def most_listened_song_json():
+#     # Pirmiausia bandome gauti Spotify klientà
+#     sp = get_spotify_client()  
+
+#     if not sp:
+#         return {"error": "User not authenticated"}, 401  # Jei nëra galiojanèio tokeno
+
+#     # Gauti top dainas (ilgalaikës)
+#     top_tracks = sp.current_user_top_tracks(limit=1, time_range="long_term")
+
+#     if top_tracks["items"]:
+#         song = top_tracks["items"][0]
+#         return {"song": song["name"], "artist": song["artists"][0]["name"]}
+
+#     return {"song": None, "artist": None}
+
 @app.route("/most_listened_song_json")
 def most_listened_song_json():
-    # Pirmiausia bandome gauti Spotify klientà
+    # Try to get the Spotify client
     sp = get_spotify_client()  
 
     if not sp:
-        return {"error": "User not authenticated"}, 401  # Jei nëra galiojanèio tokeno
+        return {"error": "User not authenticated"}, 401  # If no valid token exists
 
-    # Gauti top dainas (ilgalaikës)
+    # Fetch top tracks (long-term)
     top_tracks = sp.current_user_top_tracks(limit=1, time_range="long_term")
 
     if top_tracks["items"]:
         song = top_tracks["items"][0]
-        return {"song": song["name"], "artist": song["artists"][0]["name"]}
+        song_name = song["name"]
+        artist_name = song["artists"][0]["name"]
 
-    return {"song": None, "artist": None}
+        # Get album cover URL (assuming the first album in the list)
+        album_cover_url = song["album"]["images"][0]["url"] if song["album"]["images"] else None
+
+        # Return song details along with the album cover URL
+        return {
+            "song": song_name,
+            "artist": artist_name,
+            "album_cover": album_cover_url
+        }
+
+    # Return a default response if no data is found
+    return {"song": None, "artist": None, "album_cover": None}
+
 
 
 #-------------------------------------------------------------------------------
