@@ -406,4 +406,4 @@ FodyWeavers.xsd
 .env
 
 # Migration files
-SWOD/SWOD/migrations
+SWOD/SWOD/migrations/
