@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from flask import Flask, render_template, url_for, redirect, session, request, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
@@ -13,6 +16,7 @@ import os
 from dotenv import load_dotenv
 import pytz
 from datetime import datetime
+from flask_migrate import Migrate
 
 load_dotenv() # Load environment variables from .env file
 
@@ -29,10 +33,20 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
+    
+    # Spotify tokens
+    spotify_access_token = db.Column(db.String(255), nullable=True)
+    spotify_refresh_token = db.Column(db.String(255), nullable=True)
+    spotif_token_expiry = db.Column(db.DateTime, nullable=True)
 
 
-with app.app_context():
-    db.create_all()
+migrate = Migrate(app, db)
+
+# with app.app_context():
+#     db.create_all()
+
+
+
 
 
 login_manager = LoginManager()
@@ -77,6 +91,24 @@ class LoginForm(FlaskForm):
                              InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
 
     submit = SubmitField('Login')
+
+
+
+
+def get_spotify_client():
+    if current_user.is_authenticated and current_user.spotify_access_token:
+        sp_oauth = create_spotify_oauth()
+        
+        # Tikrina, ar pasibaigë prieigos þetono galiojimo laikas
+        if datetime.utcnow() > current_user.spotif_token_expiry:
+            new_token_info = sp_oauth.refresh_access_token(current_user.spotify_refresh_token)
+            current_user.spotify_access_token = new_token_info["access_token"]
+            current_user.spotif_token_expiry = datetime.utcfromtimestamp(new_token_info["expires_at"])
+            db.session.commit()  # Áraðome atnaujintus duomenis á duomenø bazæ
+        
+        return spotipy.Spotify(auth=current_user.spotify_access_token)
+    return None
+
 
 @app.route('/')
 def home():
@@ -133,6 +165,31 @@ def connect_spotify():
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
 
+# @app.route('/spotify_callback')
+# def spotify_callback():
+#     sp_oauth = create_spotify_oauth()
+    
+#     code = request.args.get("code")
+    
+#     if not code:
+#         return "Error: No code received from Spotify.", 400
+
+#     token_info = sp_oauth.get_access_token(code)
+    
+#     if not token_info:
+#         return "Error: Could not get access token form Spotify.", 500
+    
+#     if current_user.is_authenticated:
+#             current_user.spotify_access_token = token_info["access_token"]
+#             current_user.spotify_refresh_token = token_info["refresh_token"]
+#             current_user.spotif_token_expiry = datetime.utcfromtimestamp(token_info["expires_at"])
+            
+    
+#     session["token_info"] = token_info
+#     # gets url where user wanted to go or chooses menu for fallback
+#     next_url = session.pop("next_url", url_for("menu"))
+#     return redirect(next_url)
+
 @app.route('/spotify_callback')
 def spotify_callback():
     sp_oauth = create_spotify_oauth()
@@ -142,15 +199,25 @@ def spotify_callback():
     if not code:
         return "Error: No code received from Spotify.", 400
 
-    token_info = sp_oauth.get_access_token(code)
-    
+    try:
+        token_info = sp_oauth.get_access_token(code)
+    except Exception as e:
+        return f"Error: {str(e)}", 500
+
     if not token_info:
-        return "Error: Could not get access token form Spotify.", 500
-    
+        return "Error: Could not get access token from Spotify.", 500
+
+    if current_user.is_authenticated:
+        current_user.spotify_access_token = token_info["access_token"]
+        current_user.spotify_refresh_token = token_info["refresh_token"]
+        current_user.spotif_token_expiry = datetime.utcfromtimestamp(token_info["expires_at"])
+        db.session.commit()
+
     session["token_info"] = token_info
-    # gets url where user wanted to go or chooses menu for fallback
+
     next_url = session.pop("next_url", url_for("menu"))
     return redirect(next_url)
+
 
 
 @app.route('/recent')
@@ -167,8 +234,14 @@ def recent():
         session["token_info"] = token_info  # Save the new token
 
     # Fetch last 20 played tracks
-    sp = spotipy.Spotify(auth=token_info["access_token"])
-    recent_tracks = sp.current_user_recently_played(limit=20)
+    #sp = spotipy.Spotify(auth=token_info["access_token"])
+    #recent_tracks = sp.current_user_recently_played(limit=20)
+
+    sp = get_spotify_client()  # Naudojame get_spotify_client funkcijà
+    if sp:
+        recent_tracks = sp.current_user_recently_played(limit=20)
+    else:
+        return redirect(url_for("connect_spotify", next=url_for("recent")))  # Jei nëra galiojanèio tokeno
 
     # Define Lithuanian time zone
     lithuania_tz = pytz.timezone('Europe/Vilnius')
@@ -211,8 +284,19 @@ def profile():
         session["token_info"] = token_info # Save the new token
 
     # Use the access token to fetch user details
-    sp = spotipy.Spotify(auth=token_info["access_token"])
-    user_info = sp.current_user()
+    # sp = spotipy.Spotify(auth=token_info["access_token"])
+    # user_info = sp.current_user()
+
+    sp = get_spotify_client()  # Naudojame get_spotify_client funkcijà
+    if sp:
+        user_info = sp.current_user()
+    else:
+        return redirect(url_for("connect_spotify", next=url_for("profile")))  # Jei nëra galiojanèio tokeno
+
+    
+
+
+
     return render_template('profile.html', 
                            user=user_info["display_name"], # spotify name
                            profile_pic=user_info["images"][0]["url"] if user_info["images"] else None,
@@ -308,35 +392,47 @@ def most_listened_song():
     if not token_info:
         return redirect(url_for("login"))
 
-    sp = spotipy.Spotify(auth=token_info["access_token"])
+    # sp = spotipy.Spotify(auth=token_info["access_token"])
     
-    # Fetch user's top tracks (long-term, i.e., most listened songs)
-    top_tracks = sp.current_user_top_tracks(limit=1, time_range="long_term")
+    # # Fetch user's top tracks (long-term, i.e., most listened songs)
+    # top_tracks = sp.current_user_top_tracks(limit=1, time_range="long_term")
 
-    if top_tracks["items"]:
-        song = top_tracks["items"][0]
-        song_name = song["name"]
-        artist_name = song["artists"][0]["name"]
-        return f"Your most listened song is: {song_name} by {artist_name}"
+    # if top_tracks["items"]:
+    #     song = top_tracks["items"][0]
+    #     song_name = song["name"]
+    #     artist_name = song["artists"][0]["name"]
+    #     return f"Your most listened song is: {song_name} by {artist_name}"
     
-    return "No listening data found!"
+    # return "No listening data found!"
+
+    sp = get_spotify_client()  # Naudojame get_spotify_client funkcijà
+    if sp:
+        top_tracks = sp.current_user_top_tracks(limit=1, time_range="long_term")
+        if top_tracks["items"]:
+            song = top_tracks["items"][0]
+            return f"Your most listened song is: {song['name']} by {song['artists'][0]['name']}"
+        return "No listening data found!"
+    else:
+        return redirect(url_for("connect_spotify"))  # Jei nëra galiojanèio tokeno
+
 
 @app.route("/most_listened_song_json")
 def most_listened_song_json():
-    token_info = session.get("token_info", None)
+    # Pirmiausia bandome gauti Spotify klientà
+    sp = get_spotify_client()  
 
-    if not token_info:
-        return {"error": "User not authenticated"}, 401
+    if not sp:
+        return {"error": "User not authenticated"}, 401  # Jei nëra galiojanèio tokeno
 
-    sp = spotipy.Spotify(auth=token_info["access_token"])
-    
+    # Gauti top dainas (ilgalaikës)
     top_tracks = sp.current_user_top_tracks(limit=1, time_range="long_term")
 
     if top_tracks["items"]:
         song = top_tracks["items"][0]
         return {"song": song["name"], "artist": song["artists"][0]["name"]}
-    
+
     return {"song": None, "artist": None}
+
 
 #-------------------------------------------------------------------------------
 
