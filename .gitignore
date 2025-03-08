@@ -404,3 +404,6 @@ FodyWeavers.xsd
 
 # Environment (secret) files
 .env
+
+# Migration files
+/SWOD/SWOD/migrations
