@@ -466,6 +466,55 @@ def most_listened_song_json():
 
 
 #-------------------------------------------------------------------------------
+#FAVE AUTLIKEJAS
+
+@app.route("/most_listened_artist")
+def most_listened_artist():
+    token_info = session.get("token_info", None)
+
+    if not token_info:
+        return redirect(url_for("login"))
+
+    sp = get_spotify_client()  # Use the get_spotify_client function
+    if sp:
+        top_artists = sp.current_user_top_artists(limit=1, time_range="long_term")
+        if top_artists["items"]:
+            artist = top_artists["items"][0]
+            artist_name = artist["name"]
+            return f"Your most listened artist is: {artist_name}"
+        return "No listening data found!"
+    else:
+        return redirect(url_for("connect_spotify"))  # Redirect to the connect page if the user is not authenticated
+
+@app.route("/most_listened_artist_json")
+def most_listened_artist_json():
+    # Try to get the Spotify client
+    sp = get_spotify_client()
+
+    if not sp:
+        return jsonify({"error": "User not authenticated"}), 401  # If no valid token exists
+
+    # Fetch top artists (long-term)
+    top_artists = sp.current_user_top_artists(limit=1, time_range="long_term")
+
+    if top_artists["items"]:
+        artist = top_artists["items"][0]
+        artist_name = artist["name"]
+
+        # Get artist image URL (assuming the first image in the list)
+        artist_image_url = artist["images"][0]["url"] if artist["images"] else None
+
+        # Return artist details along with the image URL
+        return jsonify({
+            "artist": artist_name,
+            "artist_image": artist_image_url
+        })
+
+    # Return a default response if no data is found
+    return jsonify({"artist": None, "artist_image": None})
+
+
+#-------------------------------------------------------------------------------
 
 if(__name__) == '__main__':
     app.run('localhost', 4449, debug = True)
