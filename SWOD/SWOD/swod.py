@@ -383,6 +383,12 @@ def remove():
 def recap():
     return render_template('recap_page.html')
 
+# PRAEJUSIOS SAVAITES RECAP------------------------------------------------------
+@app.route('/last-week-recap')
+@login_required
+def last_week_recap():
+    return render_template('last_week.html');
+
 #LABIAUSIAI KLAUSOMIAUSIA DAINA--------------------------------------------------
 
 @app.route("/most_listened_song")
