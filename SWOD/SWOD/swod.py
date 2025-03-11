@@ -252,9 +252,18 @@ def recent():
         track = item['track']
         
         # Convert played_at to Lithuanian time zone
-        played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
+        # played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
+        # played_at_utc = played_at_utc.replace(tzinfo=pytz.utc)
+        # played_at_lt = played_at_utc.astimezone(lithuania_tz)
+
+# Convert played_at to Lithuanian time zone
+        try:
+            played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%SZ")
         played_at_utc = played_at_utc.replace(tzinfo=pytz.utc)
         played_at_lt = played_at_utc.astimezone(lithuania_tz)
+
 
         tracks.append({
             'name': track['name'],
