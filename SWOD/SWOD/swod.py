@@ -78,7 +78,7 @@ class RegisterForm(FlaskForm):
         pwd = password.data
         if (len(pwd) < 8 or 
             not re.search(r'[A-Z]', pwd) or 
-            not re.search(r'[!@#$%^&*(),.?":{}|<>]', pwd) or 
+            not re.search(r'[!@#$%^&*(),. ":{}|<>]', pwd) or 
             not re.search(r'\d', pwd)):
             raise ValidationError(
                 'Password must be at least 8 characters long, contain at least one uppercase letter, one special symbol, and one number.')
@@ -99,12 +99,12 @@ def get_spotify_client():
     if current_user.is_authenticated and current_user.spotify_access_token:
         sp_oauth = create_spotify_oauth()
         
-        # Tikrina, ar pasibaig? prieigos ?etono galiojimo laikas
+        # Tikrina, ar pasibaig  prieigos  etono galiojimo laikas
         if datetime.utcnow() > current_user.spotif_token_expiry:
             new_token_info = sp_oauth.refresh_access_token(current_user.spotify_refresh_token)
             current_user.spotify_access_token = new_token_info["access_token"]
             current_user.spotif_token_expiry = datetime.utcfromtimestamp(new_token_info["expires_at"])
-            db.session.commit()  # ?ra?ome atnaujintus duomenis ? duomen? baz?
+            db.session.commit()  #  ra ome atnaujintus duomenis   duomen  baz 
         
         return spotipy.Spotify(auth=current_user.spotify_access_token)
     return None
@@ -237,11 +237,11 @@ def recent():
     #sp = spotipy.Spotify(auth=token_info["access_token"])
     #recent_tracks = sp.current_user_recently_played(limit=20)
 
-    sp = get_spotify_client()  # Naudojame get_spotify_client funkcij?
+    sp = get_spotify_client()  # Naudojame get_spotify_client funkcij 
     if sp:
         recent_tracks = sp.current_user_recently_played(limit=20)
     else:
-        return redirect(url_for("connect_spotify", next=url_for("recent")))  # Jei n?ra galiojan?io tokeno
+        return redirect(url_for("connect_spotify", next=url_for("recent")))  # Jei n ra galiojan io tokeno
 
     # Define Lithuanian time zone
     lithuania_tz = pytz.timezone('Europe/Vilnius')
@@ -296,11 +296,11 @@ def profile():
     # sp = spotipy.Spotify(auth=token_info["access_token"])
     # user_info = sp.current_user()
 
-    sp = get_spotify_client()  # Naudojame get_spotify_client funkcij?
+    sp = get_spotify_client()  # Naudojame get_spotify_client funkcij 
     if sp:
         user_info = sp.current_user()
     else:
-        return redirect(url_for("connect_spotify", next=url_for("profile")))  # Jei n?ra galiojan?io tokeno
+        return redirect(url_for("connect_spotify", next=url_for("profile")))  # Jei n ra galiojan io tokeno
 
     
 
@@ -344,7 +344,7 @@ class UpdateAccountForm(FlaskForm):
             pwd = new_password.data
             if (len(pwd) < 8 or 
                 not re.search(r'[A-Z]', pwd) or 
-                not re.search(r'[!@#$%^&*(),.?":{}|<>]', pwd) or 
+                not re.search(r'[!@#$%^&*(),. ":{}|<>]', pwd) or 
                 not re.search(r'\d', pwd)):
                 raise ValidationError(
                     'Password must be at least 8 characters long, contain at least one uppercase letter, one special symbol, and one number.')
@@ -426,7 +426,7 @@ def most_listened_song():
     
     # return "No listening data found!"
 
-    sp = get_spotify_client()  # Naudojame get_spotify_client funkcij?
+    sp = get_spotify_client()  # Naudojame get_spotify_client funkcij 
     if sp:
         top_tracks = sp.current_user_top_tracks(limit=1, time_range="long_term")
         if top_tracks["items"]:
@@ -434,19 +434,19 @@ def most_listened_song():
             return f"Your most listened song is: {song['name']} by {song['artists'][0]['name']}"
         return "No listening data found!"
     else:
-        return redirect(url_for("connect_spotify"))  # Jei n?ra galiojan?io tokeno
+        return redirect(url_for("connect_spotify"))  # Jei n ra galiojan io tokeno
 
 
 
 # @app.route("/most_listened_song_json")
 # def most_listened_song_json():
-#     # Pirmiausia bandome gauti Spotify klient?
+#     # Pirmiausia bandome gauti Spotify klient 
 #     sp = get_spotify_client()  
 
 #     if not sp:
-#         return {"error": "User not authenticated"}, 401  # Jei n?ra galiojan?io tokeno
+#         return {"error": "User not authenticated"}, 401  # Jei n ra galiojan io tokeno
 
-#     # Gauti top dainas (ilgalaik?s)
+#     # Gauti top dainas (ilgalaik s)
 #     top_tracks = sp.current_user_top_tracks(limit=1, time_range="long_term")
 
 #     if top_tracks["items"]:
