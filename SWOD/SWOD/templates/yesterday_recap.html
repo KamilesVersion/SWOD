@@ -4,11 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recap</title>
+    <title>Yesterday's Recap</title>
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
+            background-color: rgb(201, 219, 186);
         }
 
         .header-container {
@@ -28,14 +29,17 @@
             gap: 15px;
         }
 
-        .profile-link, .menu-link {
+        .nav-button {
             text-decoration: none;
             font-size: 18px;
             color: white;
             font-weight: bold;
+            background: none;
+            border: none;
+            cursor: pointer;
         }
 
-            .profile-link:hover, .menu-link:hover {
+            .nav-button:hover {
                 color: lightgray;
             }
 
@@ -45,34 +49,38 @@
         }
 
         .content {
-            background-color: rgb(201, 219, 186);
-            height: 100vh;
-            padding: 20px;
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
             text-align: center;
         }
 
-        .button-container {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
+        .recap-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: rgb(173, 199, 170);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
-        .recap-button {
-            background-color: rgb(153, 193, 185);
-            border: none;
-            padding: 10px 20px;
-            font-size: 18px;
-            color: white;
+        .recap-item {
+            margin: 15px 0;
+            font-size: 20px;
+        }
+
+        .highlight {
             font-weight: bold;
-            cursor: pointer;
-            border-radius: 5px;
-            text-decoration: none;
+            color: rgb(60, 80, 60);
         }
-
-            .recap-button:hover {
-                background-color: rgb(129, 163, 157);
-            }
     </style>
 </head>
 
@@ -81,9 +89,10 @@
     <div class="header-container">
         <div class="header">
             <h1 style="color: white;">S.W.O.D.</h1>
+
             <div class="right-container">
-                <a href="menu" class="menu-link">Menu</a>
-                <a href="profile" class="profile-link">Profile</a>
+                <a href="{{ url_for('menu') }}" class="nav-button">Menu</a>
+                <a href="{{ url_for('profile') }}" class="nav-button">Profile</a>
             </div>
         </div>
     </div>
@@ -95,10 +104,18 @@
     </div>
 
     <div class="content">
-        <h2>Your Recaps</h2>
-        <div class="button-container">
-            <a href="{{ url_for('yesterday_recap') }}" class="recap-button">Yesterday's Recap</a>
-            <a href="last-week-recap" class="recap-button">Last Week's Recap</a>
+        <h2>Yesterday's Recap</h2>
+
+        <div class="recap-container">
+            <div class="recap-item">
+                <span class="highlight">Top Artist:</span> {{ top_artist }}
+            </div>
+            <div class="recap-item">
+                <span class="highlight">Top Song:</span> {{ top_song }}
+            </div>
+            <div class="recap-item">
+                <span class="highlight">Minutes Listened:</span> {{ minutes_listened }} minutes
+            </div>
         </div>
     </div>
 

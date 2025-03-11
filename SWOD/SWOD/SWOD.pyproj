@@ -59,6 +59,7 @@
     </Content>
     <Content Include="templates\recap_page.html" />
     <Content Include="templates\register.html" />
+    <Content Include="templates\yesterday_recap.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

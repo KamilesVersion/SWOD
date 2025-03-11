@@ -389,6 +389,12 @@ def recap():
 def last_week_recap():
     return render_template('last_week.html');
 
+# PRAEJUSIOS DIENOS RECAP------------------------------------------------------
+@app.route('/yesterday_recap')
+@login_required
+def yesterday_recap():
+    return render_template('yesterday_recap.html');
+
 #LABIAUSIAI KLAUSOMIAUSIA DAINA--------------------------------------------------
 
 @app.route("/most_listened_song")
