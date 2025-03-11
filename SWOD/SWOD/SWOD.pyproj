@@ -36,9 +36,7 @@
     <Folder Include="templates\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include=".env">
-      <SubType>Code</SubType>
-    </Content>
+    <Content Include=".env" />
     <Content Include="templates\edit_profile.html">
       <SubType>Code</SubType>
     </Content>
