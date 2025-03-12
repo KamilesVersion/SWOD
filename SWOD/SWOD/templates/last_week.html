@@ -92,8 +92,8 @@
         <div class="section">
             <h3>Top 5 Artists</h3>
             <ul class="list">
-                {% for song in top_songs %}
-                <li>{{song[0]}} - {{song[1]}} plays</li>
+                {% for artist in top_artists %}
+                <li>{{artist[0]}} - {{artist[1]}} plays</li>
                 {% endfor %}
             </ul>
         </div>
@@ -110,12 +110,12 @@
 
         <div class="section">
             <h3>Most Played Album</h3>
-            <!-- <p><strong></strong> -  plays</p> -->
+            <p><strong>{{ most_played_album[0] }}</strong> - {{most_played_album[1] }}  plays</p>
         </div>
 
         <div class="section">
             <h3>Total Listening Time</h3>
-            <!-- <p class="minutes">{{ total_minutes }} minutes</p> -->
+            <p class="minutes">{{ total_minutes }} minutes</p> 
         </div>
         </div>
     </body>
