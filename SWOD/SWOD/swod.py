@@ -627,23 +627,51 @@ def most_listened_artist_json():
     return jsonify({"artist": None, "artist_image": None})
 
 
+# @app.route('/most_listened_genre_json')
+# @login_required
+# def most_listened_genre_json():
+#     # Suraskime klausomiausi
+#     user_id = current_user.id
+#     genre_count = db.session.query(ListeningHistory.genre, db.func.count().label('count')) \
+#         .filter_by(user_id=user_id) \
+#         .group_by(ListeningHistory.genre) \
+#         .order_by(db.func.count().desc()) \
+#         .first()
+
+#     # Jeigu n ra  anr , gr  iname "No data"
+#     if genre_count:
+#         genre = genre_count[0]
+#         return jsonify({'genre': genre})
+#     else:
+#         return jsonify({'genre': 'No data available'})
+
 @app.route('/most_listened_genre_json')
 @login_required
 def most_listened_genre_json():
-    # Suraskime klausomiausi
     user_id = current_user.id
-    genre_count = db.session.query(ListeningHistory.genre, db.func.count().label('count')) \
-        .filter_by(user_id=user_id) \
-        .group_by(ListeningHistory.genre) \
-        .order_by(db.func.count().desc()) \
-        .first()
 
-    # Jeigu n ra  anr , gr  iname "No data"
-    if genre_count:
-        genre = genre_count[0]
+    # Query the most frequently listened genres, ignoring NULL values
+    genre_counts = (
+        db.session.query(ListeningHistory.genre, db.func.count().label('count'))
+        .filter(ListeningHistory.user_id == user_id, ListeningHistory.genre.isnot(None))  # Ignore NULL genres
+        .group_by(ListeningHistory.genre)
+        .order_by(db.func.count().desc())
+        .limit(2)  # Get top two genres
+        .all()
+    )
+
+    # Check if there are results
+    if genre_counts:
+        # If the first genre is somehow NULL, take the second one if available
+        if genre_counts[0][0] is None and len(genre_counts) > 1:
+            genre = genre_counts[1][0]  # Use second most listened genre
+        else:
+            genre = genre_counts[0][0]  # Use the most listened genre
+
         return jsonify({'genre': genre})
-    else:
-        return jsonify({'genre': 'No data available'})
+
+    return jsonify({'genre': 'No data available'})
+
 
 
 #-------------------------------------------------------------------------------
