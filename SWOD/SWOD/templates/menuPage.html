@@ -109,6 +109,22 @@
             margin-bottom: 15px;
         }
 
+        .most-genre-container {
+            position: absolute;
+            top: 510px; /* Position at the bottom */
+            right: 20px; /* Align to the right */
+            background-color: rgb(153, 193, 185);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
             /* Styling for song and artist info */
             .most-listened-container p,
             .most-artist-container p {
@@ -194,6 +210,36 @@
         </div>
     </div>
 
+    <!-- Most listened genre (Right side box) -->
+    <div class="most-genre-container" id="most-genre">
+        <p>Most Listened Spotify Genre:</p>
+        <p id="genre-info">Loading...</p>
+    </div>
+
+    <script>
+        // Fetch most listened genre from Flask API
+        function fetchMostListenedGenre() {
+            fetch("/most_listened_genre_json")
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.genre) {
+                        document.getElementById("genre-info").innerText = data.genre;
+                    } else {
+                        document.getElementById("genre-info").innerText = "No genre data available!";
+                    }
+                })
+                .catch(function (error) {
+                    document.getElementById("genre-info").innerText = "Error fetching data.";
+                });
+        }
+
+        // Call the function to fetch and display genre data
+
+    </script>
+
+
     <script>
         // Fetch most listened song from Flask API
         function fetchMostListenedSong() {
@@ -250,6 +296,7 @@
         // Call both functions to fetch and display data
         fetchMostListenedSong();
         fetchMostListenedArtist();
+        fetchMostListenedGenre();
     </script>
 
 </body>

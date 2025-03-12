@@ -254,7 +254,7 @@ def recent():
         return redirect(url_for("connect_spotify", next=url_for("recent")))
 
     # Fetch last 20 played tracks
-    recent_tracks = sp.current_user_recently_played(limit=20)
+    recent_tracks = sp.current_user_recently_played(limit=50)
 
     lithuania_tz = pytz.timezone('Europe/Vilnius')
     tracks = []
@@ -271,6 +271,12 @@ def recent():
         played_at_utc = played_at_utc.replace(tzinfo=pytz.utc)
         played_at_lt = played_at_utc.astimezone(lithuania_tz)
 
+        # Get artist's genre
+        artist_id = track['artists'][0]['id']  # Taking the first artist's ID
+        artist_info = sp.artist(artist_id)  # Get artist info
+        artist_genres = artist_info.get('genres', [])
+        genre = artist_genres[0] if artist_genres else None  # Take the first genre if exists
+
         # Check for duplicates (by played_at and user_id)
         existing_track = ListeningHistory.query.filter_by(
             played_at=played_at_utc,
@@ -285,8 +291,8 @@ def recent():
                 track_name=track['name'],
                 album_name=track['album']['name'],
                 duration_ms=track['duration_ms'],
-                played_at=played_at_utc,  # saugom UTC formatu
-                genre=None  # Galima papildyti vëliau, jei norësi
+                played_at=played_at_utc,  # Save in UTC format
+                genre=genre  # Add genre
             )
             db.session.add(new_history)
             db.session.commit()
@@ -297,10 +303,12 @@ def recent():
             'artist': ", ".join(artist['name'] for artist in track['artists']),
             'album': track['album']['name'],
             'album_cover': track['album']['images'][0]['url'] if track['album']['images'] else None,
-            'played_at': played_at_lt.strftime("%Y-%m-%d %H:%M:%S")  # Format as Lithuanian time
+            'played_at': played_at_lt.strftime("%Y-%m-%d %H:%M:%S"),  # Format as Lithuanian time
+            'genre': genre  # Include genre in display data
         })
 
     return render_template('recent.html', tracks=tracks)
+
 
 
 # -------------------------------------------------------------- SENA
@@ -617,6 +625,25 @@ def most_listened_artist_json():
 
     # Return a default response if no data is found
     return jsonify({"artist": None, "artist_image": None})
+
+
+@app.route('/most_listened_genre_json')
+@login_required
+def most_listened_genre_json():
+    # Suraskime klausomiausià þanrà
+    user_id = current_user.id
+    genre_count = db.session.query(ListeningHistory.genre, db.func.count().label('count')) \
+        .filter_by(user_id=user_id) \
+        .group_by(ListeningHistory.genre) \
+        .order_by(db.func.count().desc()) \
+        .first()
+
+    # Jeigu nëra þanrø, gràþiname "No data"
+    if genre_count:
+        genre = genre_count[0]
+        return jsonify({'genre': genre})
+    else:
+        return jsonify({'genre': 'No data available'})
 
 
 #-------------------------------------------------------------------------------
