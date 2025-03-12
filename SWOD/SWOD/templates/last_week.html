@@ -83,7 +83,7 @@
 
     <div class="line">
         <svg height="10" width="100%">
-            <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2"/>
+            <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2" />
         </svg>
     </div>
 
@@ -93,7 +93,10 @@
             <h3>Top 5 Artists</h3>
             <ul class="list">
                 {% for artist in top_artists %}
-                <li>{{artist[0]}} - {{artist[1]}} plays</li>
+                <li>
+                    
+                    {{artist[0]}} - {{artist[1]}} plays
+                </li>
                 {% endfor %}
             </ul>
         </div>
@@ -103,7 +106,10 @@
             <h3>Top 10 Songs</h3>
             <ul class="list">
                 {% for song in top_songs %}
-                <li>{{ song[0] }} - {{ song[1] }} plays</li>
+                <li>
+                    
+                    {{ song[0] }} - {{ song[1] }} plays
+                </li>
                 {% endfor %}
             </ul>
         </div>
@@ -115,8 +121,10 @@
 
         <div class="section">
             <h3>Total Listening Time</h3>
-            <p class="minutes">{{ total_minutes }} minutes</p> 
+            <p class="minutes">{{ total_minutes }} minutes</p>
         </div>
-        </div>
-    </body>
+    </div>
+
+
+</body>
     </html>

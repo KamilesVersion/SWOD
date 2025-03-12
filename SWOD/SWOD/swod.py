@@ -490,10 +490,9 @@ def recap():
 @app.route('/last-week-recap')
 @login_required
 def last_week_recap():
-    lithuania_tz = pytz.timezone('Europe/Vilnius')
     #get current time in UTC and calculate last 7 days
-    now_utc = datetime.utcnow()
-    seven_days_ago_utc = now_utc - timedelta(days=7)
+    
+    seven_days_ago_utc = datetime.utcnow() - timedelta(days=7)
     
     #take tracks from database in the last 7 days
     last_week_tracks = ListeningHistory.query.filter(
@@ -501,11 +500,18 @@ def last_week_recap():
         ListeningHistory.played_at >= seven_days_ago_utc
     ).all()
     
+    if not last_week_tracks:
+        return render_template('last_week.html', message="No listening data found for the last week")
+    
     # data structures to store counts
     song_counter = Counter()
     artist_counter = Counter()
     album_counter = Counter()
     total_minutes = 0
+    
+    sp = get_spotify_client()
+    if not sp:
+        return redirect(url_for("connect_spotify", next=url_for("last_week_recap")))
     
     for track in last_week_tracks:
         song_counter[track.track_name] += 1
@@ -515,9 +521,10 @@ def last_week_recap():
     
     total_minutes = round(total_minutes / (1000 * 60))
     
-    top_artists = artist_counter.most_common(5) # top 5
+    top_artists =  artist_counter.most_common(5) # top 5
     top_songs = song_counter.most_common(10) # top 10
     most_played_album = album_counter.most_common(1)[0] if album_counter else ("No data", 0)
+    
     
     return render_template('last_week.html',
                            top_artists=top_artists,
