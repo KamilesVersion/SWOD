@@ -436,7 +436,7 @@ class UpdateAccountForm(FlaskForm):
             pwd = new_password.data
             if (len(pwd) < 8 or 
                 not re.search(r'[A-Z]', pwd) or 
-                not re.search(r'[!@#$%^&*(),. ":{}|<>]', pwd) or 
+                not re.search(r'[!@#$%^&*(),.?":{}|<>]', pwd) or 
                 not re.search(r'\d', pwd)):
                 raise ValidationError(
                     'Password must be at least 8 characters long, contain at least one uppercase letter, one special symbol, and one number.')
