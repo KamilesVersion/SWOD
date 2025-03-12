@@ -249,7 +249,7 @@ def recent():
         token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
         session["token_info"] = token_info  # Save the new token
 
-    sp = get_spotify_client()  # Naudojame get_spotify_client funkcijà
+    sp = get_spotify_client()  # Naudojame get_spotify_client funkcij
     if not sp:
         return redirect(url_for("connect_spotify", next=url_for("recent")))
 
@@ -630,7 +630,7 @@ def most_listened_artist_json():
 @app.route('/most_listened_genre_json')
 @login_required
 def most_listened_genre_json():
-    # Suraskime klausomiausià þanrà
+    # Suraskime klausomiausi
     user_id = current_user.id
     genre_count = db.session.query(ListeningHistory.genre, db.func.count().label('count')) \
         .filter_by(user_id=user_id) \
@@ -638,7 +638,7 @@ def most_listened_genre_json():
         .order_by(db.func.count().desc()) \
         .first()
 
-    # Jeigu nëra þanrø, gràþiname "No data"
+    # Jeigu n ra  anr , gr  iname "No data"
     if genre_count:
         genre = genre_count[0]
         return jsonify({'genre': genre})
