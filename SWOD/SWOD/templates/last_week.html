@@ -92,10 +92,12 @@
         <div class="section">
             <h3>Top 5 Artists</h3>
             <ul class="list">
-                {% for artist in top_artists %}
+                {% for artist, plays, image in top_artists %}
                 <li>
-                    
-                    {{artist[0]}} - {{artist[1]}} plays
+                    {% if image %}
+                        <img src="{{ image }} " alt="{{ artist }}" width="50" height="50" style="border-radius:50%;" />
+                    {% endif %}
+                    {{artist}} - {{plays}} plays
                 </li>
                 {% endfor %}
             </ul>
