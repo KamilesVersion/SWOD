@@ -523,7 +523,8 @@ def last_week_recap():
     # fetching album data
     if track.album_name not in album_details:
         try:
-            album_search = sp.search(q=track.album_name, type="album", limit=1)['albums']['items']
+            query = f"album:{track.album_name} artist:{track.artist_name}"
+            album_search = sp.search(q=query, type="album", limit=1)['albums']['items']
             if album_search:
                 album_info = album_search[0]
                 album_details[track.album_name] = {
