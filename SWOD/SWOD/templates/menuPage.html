@@ -72,6 +72,259 @@
             }
 
         /* Right side boxes */
+        .most-artist-container, .most-listened-container, .most-album-container, .most-genre-container {
+            position: absolute;
+            right: 20px;
+            width: 470px;
+            background-color: rgb(153, 193, 185);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .most-listened-container {
+            top: 150px;
+        }
+
+        .most-artist-container {
+            top: 330px;
+        }
+
+        .most-album-container {
+            top: 510px;
+        }
+
+        .most-genre-container {
+            top: 690px;
+        }
+
+            .most-listened-container p, .most-artist-container p, .most-album-container p, .most-genre-container p {
+                margin: 8px 0;
+                line-height: 1.5;
+            }
+
+        .song-album-container, .album-container, .artist-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .album-cover, .artist-image {
+            width: 90px;
+            height: 90px;
+            border-radius: 8px;
+            margin-right: 15px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top section -->
+    <div class="header-container">
+        <div class="header">
+            <h1 style="color: white;">S.W.O.D.</h1>
+            <div>
+                <a href="profile" class="profile-link">Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="line">
+        <svg height="10" width="100%">
+            <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2" />
+        </svg>
+    </div>
+
+    <!-- Sidebar menu -->
+    <div class="menu-container">
+        <a href="recent" class="menu-button-large">Recent Tracks</a>
+        <a href="recap" class="menu-button-large">Your Recaps</a>
+    </div>
+
+    <!-- Most listened song -->
+    <div class="most-listened-container" id="most-listened">
+        <p>Most Listened Spotify Song:</p>
+        <div class="song-album-container">
+            <img id="song-album-cover" class="album-cover" src="" alt="Album Cover" style="display: none;">
+            <p id="song-info">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Most listened artist -->
+    <div class="most-artist-container" id="most-artist">
+        <p>Most Listened Spotify Artist:</p>
+        <div class="artist-container">
+            <img id="artist-image" class="artist-image" src="" alt="Artist Image" style="display: none;">
+            <p id="artist-info">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Most listened album -->
+    <div class="most-album-container" id="most-album">
+        <p>Most Listened Spotify Album:</p>
+        <div class="album-container">
+            <img id="album-cover-album" class="album-cover" src="" alt="Album Cover" style="display: none;">
+            <p id="album-info">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Most listened genre -->
+    <div class="most-genre-container" id="most-genre">
+        <p>Most Listened Spotify Genre:</p>
+        <p id="genre-info">Loading...</p>
+    </div>
+
+    <script>
+        function fetchMostListenedSong() {
+            fetch("/most_listened_song_json")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.song && data.artist) {
+                        document.getElementById("song-info").innerText = `${data.song} by ${data.artist}`;
+                        if (data.album_cover) {
+                            const albumCover = document.getElementById("song-album-cover");
+                            albumCover.src = data.album_cover;
+                            albumCover.style.display = "block";
+                        }
+                    }
+                })
+                .catch(() => document.getElementById("song-info").innerText = "Error fetching data.");
+        }
+
+        function fetchMostListenedArtist() {
+            fetch("/most_listened_artist_json")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.artist) {
+                        document.getElementById("artist-info").innerText = data.artist;
+                        if (data.artist_image) {
+                            const artistImage = document.getElementById("artist-image");
+                            artistImage.src = data.artist_image;
+                            artistImage.style.display = "block";
+                        }
+                    }
+                })
+                .catch(() => document.getElementById("artist-info").innerText = "Error fetching data.");
+        }
+
+        function fetchMostListenedAlbum() {
+            fetch("/most_listened_album_json")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.album && data.artist) {
+                        document.getElementById("album-info").innerText = `"${data.album}" by ${data.artist}`;
+                        if (data.album_cover) {
+                            const albumCover = document.getElementById("album-cover-album");
+                            albumCover.src = data.album_cover;
+                            albumCover.style.display = "block";
+                        }
+                    }
+                })
+                .catch(() => document.getElementById("album-info").innerText = "Error fetching data.");
+        }
+
+        function fetchMostListenedGenre() {
+            fetch("/most_listened_genre_json")
+                .then(response => response.json())
+                .then(data => document.getElementById("genre-info").innerText = data.genre || "No genre data available!")
+                .catch(() => document.getElementById("genre-info").innerText = "Error fetching data.");
+        }
+
+        fetchMostListenedSong();
+        fetchMostListenedArtist();
+        fetchMostListenedAlbum();
+        fetchMostListenedGenre();
+    </script>
+
+</body>
+</html>
+
+
+<!--<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Page</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(201, 219, 186);
+        }
+
+        /* Top header styles */
+        .header-container {
+            background-color: rgb(153, 193, 185);
+            padding: 10px 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .profile-link {
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+            padding: 5px;
+        }
+
+            .profile-link:hover {
+                color: lightgray;
+            }
+
+        .line {
+            width: 100%;
+            background-color: rgb(153, 193, 185);
+            margin: 0;
+        }
+
+        /* Sidebar menu */
+        .menu-container {
+            position: absolute;
+            left: 20px;
+            top: 150px;
+            width: 300px;
+        }
+
+        .menu-button-large {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: left;
+            background-color: rgb(153, 193, 185);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s ease-in-out;
+            margin-bottom: 15px;
+        }
+
+            .menu-button-large:hover {
+                background-color: rgb(133, 173, 165);
+            }
+
+        /* Right side boxes */
         .most-artist-container {
             position: absolute;
             top: 150px;
@@ -108,10 +361,27 @@
             align-items: flex-start;
             margin-bottom: 15px;
         }
+        .most-album-container {
+            position: absolute;
+            right: 20px;
+            top: 510px;
+            width: 470px;
+            background-color: rgb(153, 193, 185);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
 
         .most-genre-container {
             position: absolute;
-            top: 510px; /* Position at the bottom */
+            top: 680px; /* Position at the bottom */
             right: 20px; /* Align to the right */
             width: 470px;
             background-color: rgb(153, 193, 185);
@@ -128,7 +398,8 @@
 
             /* Styling for song and artist info */
             .most-listened-container p,
-            .most-artist-container p {
+            .most-artist-container p,
+            .most-album-container p{
                 margin: 8px 0;
                 line-height: 1.5;
             }
@@ -159,6 +430,14 @@
             margin-top: 10px;
         }
 
+        .album-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            margin-top: 10px;
+        }
+
         .artist-image {
             width: 90px;
             height: 90px;
@@ -169,50 +448,53 @@
     </style>
 </head>
 
-<body>
-
-    <!-- Top section -->
-    <div class="header-container">
-        <div class="header">
-            <h1 style="color: white;">S.W.O.D.</h1>
-            <div>
-                <a href="profile" class="profile-link">Profile</a>
-            </div>
+<body>-->
+<!-- Top section -->
+<!--<div class="header-container">
+    <div class="header">
+        <h1 style="color: white;">S.W.O.D.</h1>
+        <div>
+            <a href="profile" class="profile-link">Profile</a>
         </div>
     </div>
+</div>
 
-    <div class="line">
-        <svg height="10" width="100%">
-            <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2" />
-        </svg>
+<div class="line">
+    <svg height="10" width="100%">
+        <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2" />
+    </svg>
+</div>-->
+<!-- Sidebar menu -->
+<!--<div class="menu-container">
+    <a href="recent" class="menu-button-large">Recent Tracks</a>
+    <a href="recap" class="menu-button-large">Your Recaps</a>
+</div>-->
+<!-- Most listened song (Right side box) -->
+<!--<div class="most-listened-container" id="most-listened">
+    <p>Most Listened Spotify Song:</p>
+    <div class="song-album-container">
+        <img id="album-cover" class="album-cover" src="" alt="Album Cover" style="display: none;">
+        <p id="song-info">Loading...</p>
     </div>
-
-    <!-- Sidebar menu -->
-    <div class="menu-container">
-        <a href="recent" class="menu-button-large">Recent Tracks</a>
-        <a href="recap" class="menu-button-large">Your Recaps</a>
+</div>-->
+<!-- Most listened artist (Right side box) -->
+<!--<div class="most-artist-container" id="most-artist">
+    <p>Most Listened Spotify Artist:</p>
+    <div class="artist-container">
+        <img id="artist-image" class="artist-image" src="" alt="Artist Image" style="display: none;">
+        <p id="artist-info">Loading...</p>
     </div>
-
-    <!-- Most listened song (Right side box) -->
-    <div class="most-listened-container" id="most-listened">
-        <p>Most Listened Spotify Song:</p>
-        <div class="song-album-container">
-            <img id="album-cover" class="album-cover" src="" alt="Album Cover" style="display: none;">
-            <p id="song-info">Loading...</p>
-        </div>
+</div>-->
+<!-- Most listened album (Right side box) -->
+<!--<div class="most-album-container" id="most-album">
+    <p>Most Listened Spotify Album:</p>
+    <div class="album-container">
+        <img id="album-cover" class="album-cover" src="" alt="Album Cover" style="display: none;">
+        <p id="album-info">Loading...</p>
     </div>
-
-    <!-- Most listened artist (Right side box) -->
-    <div class="most-artist-container" id="most-artist">
-        <p>Most Listened Spotify Artist:</p>
-        <div class="artist-container">
-            <img id="artist-image" class="artist-image" src="" alt="Artist Image" style="display: none;">
-            <p id="artist-info">Loading...</p>
-        </div>
-    </div>
-
-    <!-- Most listened genre (Right side box) -->
-    <div class="most-genre-container" id="most-genre">
+</div>-->
+<!-- Most listened genre (Right side box) -->
+<!--<div class="most-genre-container" id="most-genre">
         <p>Most Listened Spotify Genre:</p>
         <p id="genre-info">Loading...</p>
     </div>
@@ -344,14 +626,41 @@
                 });
         }
 
+        function fetchMostListenedAlbum() {
+            fetch("/most_listened_album_json")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.album && data.artist) {
+                        document.getElementById("album-info").innerText =
+                            `"${data.album}" by ${data.artist}`;
+
+                        // Show album cover if available
+                        if (data.album_cover) {
+                            const albumCover = document.getElementById("album-cover");
+                            albumCover.src = data.album_cover;
+                            albumCover.style.display = "block";
+                        } else {
+                            console.log("No album cover available for", data.album);
+                        }
+                    } else {
+                        document.getElementById("album-info").innerText = "No album data available!";
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("album-info").innerText = "Error fetching data.";
+                    console.error("Error fetching album data:", error);
+                });
+        }
+
 
 
         // Call both functions to fetch and display data
         fetchMostListenedSong();
         fetchMostListenedArtist();
+        fetchMostListenedAlbum();
         fetchMostListenedGenre();
+
     </script>
 
 </body>
-</html>
-
+</html>-->
