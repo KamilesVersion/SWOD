@@ -168,8 +168,25 @@ def register():
     return render_template('register.html', form=form)
 
 @app.route('/menu')
+@login_required
 def menu():
+    token_info = session.get("token_info", None)
+    if not token_info:
+        return redirect(url_for("connect_spotify", next=url_for("menu")))
+
+    sp_oauth = create_spotify_oauth()
+    if sp_oauth.is_token_expired(token_info):
+        token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
+        session["token_info"] = token_info
+
+    sp = get_spotify_client()
+    if not sp:
+        return redirect(url_for("connect_spotify", next=url_for("menu")))
+
+    update_listening_history(sp, current_user.id)  # Call common function
+
     return render_template('menuPage.html')
+
 
 # @app.route('/menu-page')
 # def menuPage():
@@ -238,28 +255,83 @@ def spotify_callback():
 
 
 
-@app.route('/recent')
-@login_required
-def recent():
-    token_info = session.get("token_info", None)
-    if not token_info:
-        return redirect(url_for("connect_spotify", next=url_for("recent")))
+# @app.route('/recent')
+# @login_required
+# def recent():
+#     token_info = session.get("token_info", None)
+#     if not token_info:
+#         return redirect(url_for("connect_spotify", next=url_for("recent")))
 
-    # Refresh token if expired
-    sp_oauth = create_spotify_oauth()
-    if sp_oauth.is_token_expired(token_info):
-        token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
-        session["token_info"] = token_info  # Save the new token
+#     # Refresh token if expired
+#     sp_oauth = create_spotify_oauth()
+#     if sp_oauth.is_token_expired(token_info):
+#         token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
+#         session["token_info"] = token_info  # Save the new token
 
-    sp = get_spotify_client()  # Naudojame get_spotify_client funkcij
-    if not sp:
-        return redirect(url_for("connect_spotify", next=url_for("recent")))
+#     sp = get_spotify_client()  # Naudojame get_spotify_client funkcij
+#     if not sp:
+#         return redirect(url_for("connect_spotify", next=url_for("recent")))
 
-    # Fetch last 20 played tracks
+#     # Fetch last 20 played tracks
+#     recent_tracks = sp.current_user_recently_played(limit=50)
+
+#     lithuania_tz = pytz.timezone('Europe/Vilnius')
+#     tracks = []
+
+#     for item in recent_tracks['items']:
+#         track = item['track']
+
+#         # Convert played_at to datetime (timezone aware)
+#         try:
+#             played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
+#         except ValueError:
+#             played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%SZ")
+
+#         played_at_utc = played_at_utc.replace(tzinfo=pytz.utc)
+#         played_at_lt = played_at_utc.astimezone(lithuania_tz)
+
+#         # Get artist's genre
+#         artist_id = track['artists'][0]['id']  # Taking the first artist's ID
+#         artist_info = sp.artist(artist_id)  # Get artist info
+#         artist_genres = artist_info.get('genres', [])
+#         genre = artist_genres[0] if artist_genres else None  # Take the first genre if exists
+
+#         # Check for duplicates (by played_at and user_id)
+#         existing_track = ListeningHistory.query.filter_by(
+#             played_at=played_at_utc,
+#             user_id=current_user.id
+#         ).first()
+
+#         # If track does not exist, insert it into database
+#         if not existing_track:
+#             new_history = ListeningHistory(
+#                 user_id=current_user.id,
+#                 artist_name=", ".join(artist['name'] for artist in track['artists']),
+#                 track_name=track['name'],
+#                 album_name=track['album']['name'],
+#                 duration_ms=track['duration_ms'],
+#                 played_at=played_at_utc,  # Save in UTC format
+#                 genre=genre  # Add genre
+#             )
+#             db.session.add(new_history)
+#             db.session.commit()
+
+#         # For display purposes
+#         tracks.append({
+#             'name': track['name'],
+#             'artist': ", ".join(artist['name'] for artist in track['artists']),
+#             'album': track['album']['name'],
+#             'album_cover': track['album']['images'][0]['url'] if track['album']['images'] else None,
+#             'played_at': played_at_lt.strftime("%Y-%m-%d %H:%M:%S"),  # Format as Lithuanian time
+#             'genre': genre  # Include genre in display data
+#         })
+
+#     return render_template('recent.html', tracks=tracks)
+
+
+def update_listening_history(sp, user_id):
     recent_tracks = sp.current_user_recently_played(limit=50)
-
     lithuania_tz = pytz.timezone('Europe/Vilnius')
-    tracks = []
 
     for item in recent_tracks['items']:
         track = item['track']
@@ -274,100 +346,87 @@ def recent():
         played_at_lt = played_at_utc.astimezone(lithuania_tz)
 
         # Get artist's genre
-        artist_id = track['artists'][0]['id']  # Taking the first artist's ID
-        artist_info = sp.artist(artist_id)  # Get artist info
+        artist_id = track['artists'][0]['id']
+        artist_info = sp.artist(artist_id)
         artist_genres = artist_info.get('genres', [])
-        genre = artist_genres[0] if artist_genres else None  # Take the first genre if exists
+        genre = artist_genres[0] if artist_genres else None
 
-        # Check for duplicates (by played_at and user_id)
+        # Check for duplicates
         existing_track = ListeningHistory.query.filter_by(
             played_at=played_at_utc,
-            user_id=current_user.id
+            user_id=user_id
         ).first()
 
-        # If track does not exist, insert it into database
         if not existing_track:
             new_history = ListeningHistory(
-                user_id=current_user.id,
+                user_id=user_id,
                 artist_name=", ".join(artist['name'] for artist in track['artists']),
                 track_name=track['name'],
                 album_name=track['album']['name'],
                 duration_ms=track['duration_ms'],
-                played_at=played_at_utc,  # Save in UTC format
-                genre=genre  # Add genre
+                played_at=played_at_utc,
+                genre=genre
             )
             db.session.add(new_history)
             db.session.commit()
 
-        # For display purposes
+
+
+# -------------------------------------------------------------- SENA
+@app.route('/recent')
+@login_required
+def recent():
+    token_info = session.get("token_info", None)
+    if not token_info:
+        return redirect(url_for("connect_spotify", next=url_for("recent")))
+
+    # Refresh token if expired
+    sp_oauth = create_spotify_oauth()
+    if sp_oauth.is_token_expired(token_info):
+        token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
+        session["token_info"] = token_info  # Save the new token
+
+    # Fetch last 20 played tracks
+    #sp = spotipy.Spotify(auth=token_info["access_token"])
+    #recent_tracks = sp.current_user_recently_played(limit=20)
+
+    sp = get_spotify_client()  # Naudojame get_spotify_client funkcij 
+    if sp:
+        recent_tracks = sp.current_user_recently_played(limit=20)
+    else:
+        return redirect(url_for("connect_spotify", next=url_for("recent")))  # Jei n ra galiojan io tokeno
+
+    # Define Lithuanian time zone
+    lithuania_tz = pytz.timezone('Europe/Vilnius')
+
+    # Extract necessary track details
+    tracks = []
+    for item in recent_tracks['items']:
+        track = item['track']
+        
+        # Convert played_at to Lithuanian time zone
+        # played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
+        # played_at_utc = played_at_utc.replace(tzinfo=pytz.utc)
+        # played_at_lt = played_at_utc.astimezone(lithuania_tz)
+
+# Convert played_at to Lithuanian time zone
+        try:
+            played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%SZ")
+        played_at_utc = played_at_utc.replace(tzinfo=pytz.utc)
+        played_at_lt = played_at_utc.astimezone(lithuania_tz)
+
+
         tracks.append({
             'name': track['name'],
             'artist': ", ".join(artist['name'] for artist in track['artists']),
             'album': track['album']['name'],
             'album_cover': track['album']['images'][0]['url'] if track['album']['images'] else None,
-            'played_at': played_at_lt.strftime("%Y-%m-%d %H:%M:%S"),  # Format as Lithuanian time
-            'genre': genre  # Include genre in display data
+            'played_at': played_at_lt.strftime("%Y-%m-%d %H:%M:%S")  # Format as Lithuanian time
         })
 
     return render_template('recent.html', tracks=tracks)
-
-
-
-# -------------------------------------------------------------- SENA
-# @app.route('/recent')
-# @login_required
-# def recent():
-#     token_info = session.get("token_info", None)
-#     if not token_info:
-#         return redirect(url_for("connect_spotify", next=url_for("recent")))
-
-#     # Refresh token if expired
-#     sp_oauth = create_spotify_oauth()
-#     if sp_oauth.is_token_expired(token_info):
-#         token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
-#         session["token_info"] = token_info  # Save the new token
-
-#     # Fetch last 20 played tracks
-#     #sp = spotipy.Spotify(auth=token_info["access_token"])
-#     #recent_tracks = sp.current_user_recently_played(limit=20)
-
-#     sp = get_spotify_client()  # Naudojame get_spotify_client funkcij 
-#     if sp:
-#         recent_tracks = sp.current_user_recently_played(limit=20)
-#     else:
-#         return redirect(url_for("connect_spotify", next=url_for("recent")))  # Jei n ra galiojan io tokeno
-
-#     # Define Lithuanian time zone
-#     lithuania_tz = pytz.timezone('Europe/Vilnius')
-
-#     # Extract necessary track details
-#     tracks = []
-#     for item in recent_tracks['items']:
-#         track = item['track']
-        
-#         # Convert played_at to Lithuanian time zone
-#         # played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
-#         # played_at_utc = played_at_utc.replace(tzinfo=pytz.utc)
-#         # played_at_lt = played_at_utc.astimezone(lithuania_tz)
-
-# # Convert played_at to Lithuanian time zone
-#         try:
-#             played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
-#         except ValueError:
-#             played_at_utc = datetime.strptime(item['played_at'], "%Y-%m-%dT%H:%M:%SZ")
-#         played_at_utc = played_at_utc.replace(tzinfo=pytz.utc)
-#         played_at_lt = played_at_utc.astimezone(lithuania_tz)
-
-
-#         tracks.append({
-#             'name': track['name'],
-#             'artist': ", ".join(artist['name'] for artist in track['artists']),
-#             'album': track['album']['name'],
-#             'album_cover': track['album']['images'][0]['url'] if track['album']['images'] else None,
-#             'played_at': played_at_lt.strftime("%Y-%m-%d %H:%M:%S")  # Format as Lithuanian time
-#         })
-
-#     return render_template('recent.html', tracks=tracks)
 
 
 
@@ -724,24 +783,25 @@ def most_listened_genre_json():
     # Query the most frequently listened genres, ignoring NULL values
     genre_counts = (
         db.session.query(ListeningHistory.genre, db.func.count().label('count'))
-        .filter(ListeningHistory.user_id == user_id, ListeningHistory.genre.isnot(None))  # Ignore NULL genres
+        .filter(
+            ListeningHistory.user_id == user_id,
+            ListeningHistory.genre.isnot(None),  # Ignore NULL genres
+            ListeningHistory.genre != ''         # Ignore empty string genres
+        )
         .group_by(ListeningHistory.genre)
         .order_by(db.func.count().desc())
-        .limit(2)  # Get top two genres
+        .limit(1)  # Get top one genre
         .all()
     )
 
-    # Check if there are results
+    # Check if there is at least one genre
     if genre_counts:
-        # If the first genre is somehow NULL, take the second one if available
-        if genre_counts[0][0] is None and len(genre_counts) > 1:
-            genre = genre_counts[1][0]  # Use second most listened genre
-        else:
-            genre = genre_counts[0][0]  # Use the most listened genre
-
+        genre = genre_counts[0][0]  # Take the top genre
         return jsonify({'genre': genre})
 
-    return jsonify({'genre': 'No data available'})
+    # If no genres found
+    return jsonify({'genre': 'No data available, listen to more music!'})
+
 
 
 
