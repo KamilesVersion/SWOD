@@ -510,6 +510,7 @@ def last_week_recap():
     album_details = {} # artist and cover
     total_minutes = 0
     artist_images = {}
+    song_details = {} # cover and artist name
     
     sp = get_spotify_client()
     if not sp:
@@ -521,39 +522,56 @@ def last_week_recap():
         album_counter[track.album_name] += 1
         total_minutes += track.duration_ms
         
-        # fetching album data
-        if track.album_name not in album_details:
-            try:
-                query = f"album:{track.album_name} artist:{track.artist_name}"
-                album_search = sp.search(q=query, type="album", limit=1)['albums']['items']
-                if album_search:
-                    album_info = album_search[0]
-                    album_details[track.album_name] = {
-                            "artist": album_info["artists"][0]["name"],
-                            "cover": album_info["images"][0]["url"] if album_info["images"] else None
-                        }
-                else:
-                    album_details[track.album_name] = {"artist": "Unknown", "cover": None}
-            except:
-                album_details[track.album_name] = {"artist": "Unknown", "cover": None}
-            
-        # fetch artist image
-        if track.artist_name not in artist_images:
-            try:
-                artist_search = sp.search(q=f"artist:{track.artist_name}", type="artist", limit=1)['artists']['items']
-                if artist_search:
-                    artist_images[track.artist_name] = artist_search[0]['images'][0]['url'] if artist_search[0]['images'] else None
-                else: 
-                    artist_images[track.artist_name] = None
-            except:
-                artist_images[track.artist_name] = None
-            
+    # get top items
+    top_artists = artist_counter.most_common(5)
+    top_songs = song_counter.most_common(10)
+    most_played_album_name, most_played_album_count = album_counter.most_common(1)[0] if album_counter else ("No data", 0)
+        
+    # fetch artist image
+    for artist, _ in top_artists:
+        try:
+            artist_search = sp.search(q=f"artist:{artist}", type="artist", limit=1)['artists']['items']
+            artist_images[artist] = artist_search[0]['images'][0]['url'] if artist_search[0]['images'] else None
+        except:
+            artist_images[artist] = None
+
+    # fetch song details
+    for (song, artist), _ in top_songs:
+        try: 
+            song_search = sp.search(q=f"track:{song} artist:{artist}", type="track", limit=1)['tracks']['items']
+            if song_search:
+                song_details[(song, artist)] = {
+                    "cover": song_search[0]["album"]["images"][0]["url"] if song_search[0]["album"]["images"] else None
+                    }
+            else:
+                song_details[(song, artist)] = {"cover": None}
+        except:
+            song_details[(song, artist)] = {"cover": None}
+
+    # fetch album data
+    if most_played_album_name != "No data":
+        try:
+            album_search = sp.search(q=f"album:{most_played_album_name}", type="album", limit=1)['albums']['items']
+            if album_search:
+                album_info = album_search[0]
+                album_details = {
+                    "artist": album_info["artists"][0]["name"],
+                    "cover": album_info["images"][0]["url"] if album_info["images"] else None
+                    }
+            else:
+                album_details = {"artist": "Unknown", "cover": None}
+        except:
+            album_details = {"artist": "Unknown", "cover": None}
+
     
     
     total_minutes = round(total_minutes / (1000 * 60))
     
-    top_artists =  [(artist, count, artist_images.get(artist)) for artist, count in artist_counter.most_common(5)] # top 5
-    top_songs = song_counter.most_common(10) # top 10
+    top_artists =  [(artist, count, artist_images.get(artist)) for artist, count in top_artists] # top 5
+    top_songs = [
+        (song, artist, count, song_details.get((song, artist), {}).get("cover"))
+        for (song, artist), count in top_songs
+    ]# top 10
     most_played_album_name, most_played_album_count = album_counter.most_common(1)[0] if album_counter else ("No data", 0)
     
     # fetch album details

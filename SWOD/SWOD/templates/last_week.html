@@ -107,10 +107,12 @@
         <div class="section">
             <h3>Top 10 Songs</h3>
             <ul class="list">
-                {% for song in top_songs %}
+                {% for song, artist, plays, cover in top_songs %}
                 <li>
-                    
-                    {{ song[0] }} - {{ song[1] }} plays
+                    {% if cover %}
+                        <img src="{{cover }}" alt="{{ song }}" width="50" height="50" style="border-radius:5px;" />
+                    {% endif %}
+                    <strong>{{ song }}</strong> by {{ artist}} - {{ plays }} plays
                 </li>
                 {% endfor %}
             </ul>
