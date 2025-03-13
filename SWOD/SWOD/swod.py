@@ -578,8 +578,8 @@ def last_week_recap():
     most_played_album = {
         "name": most_played_album_name,
         "plays": most_played_album_count,
-        "artist": album_details.get(most_played_album_name, {}).get("artist", "Unknown"),
-        "cover": album_details.get(most_played_album_name, {}).get("cover", None),
+        "artist": album_details.get("artist", "Unknown"),
+        "cover": album_details.get("cover", None),
         }
     
     
