@@ -116,7 +116,11 @@
 
         <div class="section">
             <h3>Most Played Album</h3>
-            <p><strong>{{ most_played_album[0] }}</strong> - {{most_played_album[1] }}  plays</p>
+            {% if most_played_album["cover"] %}
+                <img src="{{ most_played_album['cover'] }}" alt="Album cover" width="150" height="150" />
+            {% endif %}
+            <p><strong>{{ most_played_album["name"] }}</strong> - {{most_played_album["plays"] }}  plays</p>
+            <p>By: <strong>{{most_played_album["artist"] }}</strong></p>
         </div>
 
         <div class="section">

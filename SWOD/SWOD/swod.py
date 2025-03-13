@@ -507,6 +507,7 @@ def last_week_recap():
     song_counter = Counter()
     artist_counter = Counter()
     album_counter = Counter()
+    album_details = {} # artist and cover
     total_minutes = 0
     
     sp = get_spotify_client()
@@ -518,12 +519,35 @@ def last_week_recap():
         artist_counter[track.artist_name] += 1
         album_counter[track.album_name] += 1
         total_minutes += track.duration_ms
+        
+    # fetching album data
+    if track.album_name not in album_details:
+        try:
+            album_search = sp.search(q=track.album_name, type="album", limit=1)['albums']['items']
+            if album_search:
+                album_info = album_search[0]
+                album_details[track.album_name] = {
+                        "artist": album_info["artists"][0]["name"],
+                        "cover": album_info["images"][0]["url"] if album_info["images"] else None
+                    }
+            else:
+                album_details[track.album_name] = {"artist": "Unknown", "cover": None}
+        except:
+            album_details[track.album_name] = {"artist": "Unknown", "cover": None}
     
     total_minutes = round(total_minutes / (1000 * 60))
     
     top_artists =  artist_counter.most_common(5) # top 5
     top_songs = song_counter.most_common(10) # top 10
-    most_played_album = album_counter.most_common(1)[0] if album_counter else ("No data", 0)
+    most_played_album_name, most_played_album_count = album_counter.most_common(1)[0] if album_counter else ("No data", 0)
+    
+    # fetch album details
+    most_played_album = {
+        "name": most_played_album_name,
+        "plays": most_played_album_count,
+        "artist": album_details.get(most_played_album_name, {}).get("artist", "Unknown"),
+        "cover": album_details.get(most_played_album_name, {}).get("cover", None),
+        }
     
     
     return render_template('last_week.html',
