@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,9 +33,6 @@
             font-size: 18px;
             color: white;
             font-weight: bold;
-            background: none;
-            border: none;
-            cursor: pointer;
         }
 
             .nav-button:hover {
@@ -50,46 +46,74 @@
 
         .content {
             min-height: 100vh;
-            padding: 40px 20px;
+            padding: 20px;
+            text-align: center; /* Centers "Yesterday's Recap" */
+        }
+
+        .section {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: start; /* Aligns content to the left */
+            gap: 10px;
+            margin: 20px auto;
+            padding: 15px;
+            max-width: 800px;
+            background-color: rgb(173, 199, 170);
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         h2 {
             font-size: 28px;
-            margin-bottom: 20px;
-            text-align: center;
+            text-align: center; /* Centers "Yesterday's Recap" */
         }
 
-        .recap-container {
-            width: 90%;
-            max-width: 800px;
-            background-color: rgb(173, 199, 170);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .recap-item {
-            margin: 15px 0;
-            font-size: 20px;
+        h3 {
+            margin: 0; /* Removes default margin */
+            font-size: 22px;
+            text-align: left; /* Makes box titles left-aligned */
         }
 
         .highlight {
             font-weight: bold;
             color: rgb(60, 80, 60);
         }
+
+        .song-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 2px; /* Square cover */
+            object-fit: cover;
+            margin-top: 10px;
+        }
+
+        .artist-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%; /* Makes it round */
+            object-fit: cover;
+            margin-top: 10px;
+        }
+
+        .time-count {
+            font-size: 22px; /* Same size as song titles */
+        }
+
+        .left-align {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+            .left-align div {
+                text-align: left;
+            }
     </style>
 </head>
-
 <body>
-
     <div class="header-container">
         <div class="header">
             <h1 style="color: white;">S.W.O.D.</h1>
-
             <div class="right-container">
                 <a href="{{ url_for('menu') }}" class="nav-button">Menu</a>
                 <a href="{{ url_for('profile') }}" class="nav-button">Profile</a>
@@ -106,19 +130,37 @@
     <div class="content">
         <h2>Yesterday's Recap</h2>
 
-        <div class="recap-container">
-            <div class="recap-item">
-                <span class="highlight">Top Artist:</span> {{ top_artist }}
-            </div>
-            <div class="recap-item">
-                <span class="highlight">Top Song:</span> {{ top_song }}
-            </div>
-            <div class="recap-item">
-                <span class="highlight">Minutes Listened:</span> {{ minutes_listened }} minutes
+        <div class="section">
+            <h3>Top Artist</h3>
+            <div class="left-align">
+                {% if top_artist.image %}
+                <img src="{{ top_artist.image }}" alt="Artist Image" class="artist-img">
+                {% endif %}
+                <div>
+                    <p class="highlight">{{ top_artist.name }}</p>
+                    <p>Times played: {{ top_artist.plays }}</p>
+                </div>
             </div>
         </div>
+
+        <div class="section">
+            <h3>Top Song</h3>
+            <div class="left-align">
+                {% if top_song.cover %}
+                <img src="{{ top_song.cover }}" alt="Song Cover" class="song-img">
+                {% endif %}
+                <div>
+                    <p class="highlight">{{ top_song.name }}</p>
+                    <p>by {{ top_song.artist }} | Times played: {{ top_song.plays }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Total Listening Time</h3>
+            <p class="highlight">{{ total_minutes }} minutes</p>
+        </div>
     </div>
-
 </body>
-
 </html>
+
