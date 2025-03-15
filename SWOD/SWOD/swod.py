@@ -844,6 +844,41 @@ def most_listened_genre_json():
 
 
 
+@app.route("/top_10_listened_artists")
+def top_10_listened_artists():
+    try:
+        sp = get_spotify_client()
+
+        top_artists = db.session.query(
+            ListeningHistory.artist_name,
+            db.func.count().label('play_count')
+        ).group_by(ListeningHistory.artist_name)\
+         .order_by(db.func.count().desc())\
+         .limit(10).all()
+
+        artist_data = []
+        
+        for artist_name, play_count in top_artists:
+            search_results = sp.search(q=f"artist:{artist_name}", type="artist", limit=1)
+            if search_results['artists']['items']:
+                artist_info = search_results['artists']['items'][0]
+                artist_image = artist_info['images'][0]['url'] if artist_info.get('images') else None
+            else:
+                artist_image = None
+
+            artist_data.append({
+                "artist": artist_name,
+                "play_count": play_count,
+                "artist_image": artist_image
+            })
+
+        return render_template('top_artists.html', artists=artist_data)
+
+    except Exception as e:
+        return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
+
+
+
 #-------------------------------------------------------------------------------
 
 if(__name__) == '__main__':
