@@ -524,6 +524,7 @@ def edit_profile():
 @login_required
 def logout():
     logout_user()
+    session.clear()
     return redirect(url_for('home'))
 
 @app.route('/remove', methods=['GET', 'POST'])
@@ -772,8 +773,12 @@ def most_listened_song_json():
 def most_listened_artist_json():
     try:
         sp = get_spotify_client()
+        
+        # Query most listened artist for the logged-in user
         artist_name = db.session.query(
             ListeningHistory.artist_name
+        ).filter_by(
+            user_id=current_user.id
         ).group_by(
             ListeningHistory.artist_name
         ).order_by(
@@ -796,14 +801,17 @@ def most_listened_artist_json():
     except Exception as e:
         return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
 
+
 @app.route("/most_listened_album_json")
 def most_listened_album_json():
     try:
         sp = get_spotify_client()
 
-        # Query the most listened album
+        # Query the most listened album for the logged-in user
         most_listened_album = db.session.query(
             ListeningHistory.artist_name, ListeningHistory.album_name
+        ).filter_by(
+            user_id=current_user.id
         ).group_by(
             ListeningHistory.artist_name, ListeningHistory.album_name
         ).order_by(db.func.count().desc()).limit(1).first()
@@ -830,6 +838,70 @@ def most_listened_album_json():
 
     except Exception as e:
         return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
+
+
+# @app.route("/most_listened_artist_json")
+# def most_listened_artist_json():
+#     try:
+#         sp = get_spotify_client()
+#         artist_name = db.session.query(
+#             ListeningHistory.artist_name
+#         ).group_by(
+#             ListeningHistory.artist_name
+#         ).order_by(
+#             db.func.count().desc()
+#         ).limit(1).scalar()
+
+#         if not artist_name:
+#             return jsonify({"artist": None, "artist_image": None})
+
+#         # Search for artist on Spotify
+#         search_results = sp.search(q=f"artist:{artist_name}", type="artist", limit=1)
+#         if search_results['artists']['items']:
+#             artist_info = search_results['artists']['items'][0]
+#             artist_image = artist_info['images'][0]['url'] if artist_info['images'] else None
+#         else:
+#             artist_image = None
+
+#         return jsonify({"artist": artist_name, "artist_image": artist_image})
+
+#     except Exception as e:
+#         return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
+
+# @app.route("/most_listened_album_json")
+# def most_listened_album_json():
+#     try:
+#         sp = get_spotify_client()
+
+#         # Query the most listened album
+#         most_listened_album = db.session.query(
+#             ListeningHistory.artist_name, ListeningHistory.album_name
+#         ).group_by(
+#             ListeningHistory.artist_name, ListeningHistory.album_name
+#         ).order_by(db.func.count().desc()).limit(1).first()
+
+#         if not most_listened_album:
+#             return jsonify({"album": None, "artist": None, "album_cover": None})
+
+#         artist_name, album_name = most_listened_album
+
+#         # Search for the album on Spotify
+#         search_results = sp.search(q=f"{album_name} {artist_name}", type="album", limit=1)
+
+#         if search_results['albums']['items']:
+#             album_info = search_results['albums']['items'][0]
+#             album_cover = album_info['images'][0]['url'] if album_info.get('images') else None
+#         else:
+#             album_cover = None
+
+#         return jsonify({
+#             "album": album_name,
+#             "artist": artist_name,
+#             "album_cover": album_cover
+#         })
+
+#     except Exception as e:
+#         return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
 
 
 #==========================================================
