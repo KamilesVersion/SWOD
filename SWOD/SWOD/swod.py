@@ -974,16 +974,22 @@ def most_listened_genre_json():
 
 
 @app.route("/top_10_listened_artists")
+@login_required  # <-- kad prie ğito kelio galëtø eiti tik prisijungæ vartotojai
 def top_10_listened_artists():
     try:
         sp = get_spotify_client()
 
+        # Imame tik dabartinio vartotojo klausymosi istorijà
         top_artists = db.session.query(
             ListeningHistory.artist_name,
             db.func.count().label('play_count')
-        ).group_by(ListeningHistory.artist_name)\
-         .order_by(db.func.count().desc())\
-         .limit(10).all()
+        ).filter(
+            ListeningHistory.user_id == current_user.id
+        ).group_by(
+            ListeningHistory.artist_name
+        ).order_by(
+            db.func.count().desc()
+        ).limit(10).all()
 
         artist_data = []
         
@@ -1005,6 +1011,7 @@ def top_10_listened_artists():
 
     except Exception as e:
         return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
+
 
 
 
