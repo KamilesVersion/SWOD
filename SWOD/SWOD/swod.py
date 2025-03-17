@@ -189,12 +189,25 @@ def menu():
 # def menuPage():
 #     return render_template('menuPage.html')
 
+# @app.route('/connect_spotify')
+# def connect_spotify():
+#     session["next_url"] = request.args.get("next", url_for("menu")) # Stores the target (where user wants to go) page URL
+#     sp_oauth = create_spotify_oauth()
+   
+#     auth_url = sp_oauth.get_authorize_url()
+#     return redirect(auth_url)
+
 @app.route('/connect_spotify')
 def connect_spotify():
-    session["next_url"] = request.args.get("next", url_for("menu")) # Stores the target (where user wants to go) page URL
+    session["next_url"] = request.args.get("next", url_for("menu"))
     sp_oauth = create_spotify_oauth()
-   
     auth_url = sp_oauth.get_authorize_url()
+    
+    # Store the time when the user connected Spotify
+    if current_user.is_authenticated:
+        current_user.spotify_connected_at = datetime.utcnow().replace(tzinfo=pytz.utc)
+        db.session.commit()
+    
     return redirect(auth_url)
 
 # @app.route('/spotify_callback')
@@ -366,7 +379,6 @@ def update_listening_history(sp, user_id):
             )
             db.session.add(new_history)
             db.session.commit()
-
 
 
 # -------------------------------------------------------------- SENA
