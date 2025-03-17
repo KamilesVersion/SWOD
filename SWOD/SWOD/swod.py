@@ -745,12 +745,47 @@ def yesterday_recap():
     
 #     return jsonify(response)
 
+# @app.route("/most_listened_song_json")
+# def most_listened_song_json():
+#     try:
+#         sp = get_spotify_client()
+#         most_listened_song = db.session.query(
+#             ListeningHistory.artist_name, ListeningHistory.track_name
+#         ).group_by(
+#             ListeningHistory.artist_name, ListeningHistory.track_name
+#         ).order_by(db.func.count().desc()).limit(1).first()
+
+#         if not most_listened_song:
+#             return jsonify({"song": None, "artist": None, "album_cover": None})
+
+#         artist_name, track_name = most_listened_song
+
+#         # Search for the track on Spotify
+#         search_results = sp.search(q=f"track:{track_name} artist:{artist_name}", type="track", limit=1)
+#         if search_results['tracks']['items']:
+#             track_info = search_results['tracks']['items'][0]
+#             album_cover = track_info['album']['images'][0]['url'] if track_info['album']['images'] else None
+#         else:
+#             album_cover = None
+
+#         return jsonify({
+#             "song": track_name,
+#             "artist": artist_name,
+#             "album_cover": album_cover
+#         })
+
+#     except Exception as e:
+#         return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
 @app.route("/most_listened_song_json")
 def most_listened_song_json():
     try:
         sp = get_spotify_client()
+
+        # Query the most listened song for the logged-in user
         most_listened_song = db.session.query(
             ListeningHistory.artist_name, ListeningHistory.track_name
+        ).filter_by(
+            user_id=current_user.id  # Get the current logged-in user's ID
         ).group_by(
             ListeningHistory.artist_name, ListeningHistory.track_name
         ).order_by(db.func.count().desc()).limit(1).first()
@@ -762,9 +797,10 @@ def most_listened_song_json():
 
         # Search for the track on Spotify
         search_results = sp.search(q=f"track:{track_name} artist:{artist_name}", type="track", limit=1)
+
         if search_results['tracks']['items']:
             track_info = search_results['tracks']['items'][0]
-            album_cover = track_info['album']['images'][0]['url'] if track_info['album']['images'] else None
+            album_cover = track_info['album']['images'][0]['url'] if track_info.get('album', {}).get('images') else None
         else:
             album_cover = None
 
@@ -986,12 +1022,12 @@ def most_listened_genre_json():
 
 
 @app.route("/top_10_listened_artists")
-@login_required  
+@login_required  # <-- kad prie ?ito kelio gal?t? eiti tik prisijung? vartotojai
 def top_10_listened_artists():
     try:
         sp = get_spotify_client()
 
-
+        # Imame tik dabartinio vartotojo klausymosi istorij?
         top_artists = db.session.query(
             ListeningHistory.artist_name,
             db.func.count().label('play_count')
