@@ -189,12 +189,25 @@ def menu():
 # def menuPage():
 #     return render_template('menuPage.html')
 
+# @app.route('/connect_spotify')
+# def connect_spotify():
+#     session["next_url"] = request.args.get("next", url_for("menu")) # Stores the target (where user wants to go) page URL
+#     sp_oauth = create_spotify_oauth()
+   
+#     auth_url = sp_oauth.get_authorize_url()
+#     return redirect(auth_url)
+
 @app.route('/connect_spotify')
 def connect_spotify():
-    session["next_url"] = request.args.get("next", url_for("menu")) # Stores the target (where user wants to go) page URL
+    session["next_url"] = request.args.get("next", url_for("menu"))
     sp_oauth = create_spotify_oauth()
-   
     auth_url = sp_oauth.get_authorize_url()
+    
+    # Store the time when the user connected Spotify
+    if current_user.is_authenticated:
+        current_user.spotify_connected_at = datetime.utcnow().replace(tzinfo=pytz.utc)
+        db.session.commit()
+    
     return redirect(auth_url)
 
 # @app.route('/spotify_callback')
@@ -366,7 +379,6 @@ def update_listening_history(sp, user_id):
             )
             db.session.add(new_history)
             db.session.commit()
-
 
 
 # -------------------------------------------------------------- SENA
@@ -547,11 +559,8 @@ def recap():
 @app.route('/last-week-recap')
 @login_required
 def last_week_recap():
-    #get current time in UTC and calculate last 7 days
-    
     seven_days_ago_utc = datetime.utcnow() - timedelta(days=7)
     
-    #take tracks from database in the last 7 days
     last_week_tracks = ListeningHistory.query.filter(
         ListeningHistory.user_id == current_user.id,
         ListeningHistory.played_at >= seven_days_ago_utc
@@ -560,14 +569,14 @@ def last_week_recap():
     if not last_week_tracks:
         return render_template('last_week.html', message="No listening data found for the last week")
     
-    # data structures to store counts
     song_counter = Counter()
     artist_counter = Counter()
     album_counter = Counter()
-    album_details = {} # artist and cover
+    song_durations = {} 
+    album_durations = {}  
     total_minutes = 0
     artist_images = {}
-    song_details = {} # cover and artist name
+    song_details = {}
     
     sp = get_spotify_client()
     if not sp:
@@ -578,34 +587,44 @@ def last_week_recap():
         artist_counter[track.artist_name] += 1
         album_counter[track.album_name] += 1
         total_minutes += track.duration_ms
-        
-    # get top items
+
+
+        key = (track.track_name, track.artist_name)
+        song_durations[key] = song_durations.get(key, 0) + track.duration_ms
+        album_durations[track.album_name] = album_durations.get(track.album_name, 0) + track.duration_ms
+    
+
+    song_durations = {key: round(value / (1000 * 60)) for key, value in song_durations.items()}
+    album_durations = {key: round(value / (1000 * 60)) for key, value in album_durations.items()}
+    total_minutes = round(total_minutes / (1000 * 60))
+    
+
     top_artists = artist_counter.most_common(5)
     top_songs = song_counter.most_common(10)
     most_played_album_name, most_played_album_count = album_counter.most_common(1)[0] if album_counter else ("No data", 0)
-        
-    # fetch artist image
+    
+
     for artist, _ in top_artists:
         try:
             artist_search = sp.search(q=f"artist:{artist}", type="artist", limit=1)['artists']['items']
             artist_images[artist] = artist_search[0]['images'][0]['url'] if artist_search[0]['images'] else None
         except:
             artist_images[artist] = None
-
-    # fetch song details
+    
     for (song, artist), _ in top_songs:
         try: 
             song_search = sp.search(q=f"track:{song} artist:{artist}", type="track", limit=1)['tracks']['items']
             if song_search:
                 song_details[(song, artist)] = {
                     "cover": song_search[0]["album"]["images"][0]["url"] if song_search[0]["album"]["images"] else None
-                    }
+                }
             else:
                 song_details[(song, artist)] = {"cover": None}
         except:
             song_details[(song, artist)] = {"cover": None}
+    
 
-    # fetch album data
+    album_details = {"artist": "Unknown", "cover": None}
     if most_played_album_name != "No data":
         try:
             album_search = sp.search(q=f"album:{most_played_album_name}", type="album", limit=1)['albums']['items']
@@ -614,37 +633,32 @@ def last_week_recap():
                 album_details = {
                     "artist": album_info["artists"][0]["name"],
                     "cover": album_info["images"][0]["url"] if album_info["images"] else None
-                    }
-            else:
-                album_details = {"artist": "Unknown", "cover": None}
+                }
         except:
             album_details = {"artist": "Unknown", "cover": None}
+    
 
-    
-    
-    total_minutes = round(total_minutes / (1000 * 60))
-    
-    top_artists =  [(artist, count, artist_images.get(artist)) for artist, count in top_artists] # top 5
+    top_artists = [(artist, count, artist_images.get(artist)) for artist, count in top_artists]
     top_songs = [
-        (song, artist, count, song_details.get((song, artist), {}).get("cover"))
+        (song, artist, count, song_details.get((song, artist), {}).get("cover"), song_durations.get((song, artist), 0))
         for (song, artist), count in top_songs
-    ]# top 10
-    most_played_album_name, most_played_album_count = album_counter.most_common(1)[0] if album_counter else ("No data", 0)
+    ]
     
-    # fetch album details
     most_played_album = {
         "name": most_played_album_name,
         "plays": most_played_album_count,
         "artist": album_details.get("artist", "Unknown"),
         "cover": album_details.get("cover", None),
-        }
+        "total_minutes": album_durations.get(most_played_album_name, 0),
+    }
     
-    
-    return render_template('last_week.html',
-                           top_artists=top_artists,
-                           top_songs=top_songs,
-                           most_played_album=most_played_album,
-                           total_minutes=total_minutes)
+    return render_template(
+        'last_week.html',
+        top_artists=top_artists,
+        top_songs=top_songs,
+        most_played_album=most_played_album,
+        total_minutes=total_minutes
+    )
 
 # PRAEJUSIOS DIENOS RECAP------------------------------------------------------
 # @app.route('/yesterday_recap')
@@ -673,11 +687,20 @@ def yesterday_recap():
     # Count occurrences of songs and artists
     song_counter = Counter()
     artist_counter = Counter()
+    song_durations = {}  # Store accumulated time per song
     total_minutes = 0
 
     for track in yesterday_tracks:
-        song_counter[track.track_name, track.artist_name] += 1
+        key = (track.track_name, track.artist_name)
+        song_counter[key] += 1
         artist_counter[track.artist_name] += 1
+
+        # Calculate total time for each song
+        if key in song_durations:
+            song_durations[key] += track.duration_ms
+        else:
+            song_durations[key] = track.duration_ms
+
         total_minutes += track.duration_ms
 
     # Get top artist and top song
@@ -686,6 +709,9 @@ def yesterday_recap():
 
     # Convert total milliseconds to minutes
     total_minutes = round(total_minutes / (1000 * 60))
+
+    # Convert song durations to minutes
+    song_durations = {k: round(v / (1000 * 60)) for k, v in song_durations.items()}
 
     # Use stored Spotify credentials
     sp = spotipy.Spotify(auth=current_user.spotify_access_token)
@@ -707,7 +733,9 @@ def yesterday_recap():
     return render_template('yesterday_recap.html',
                            top_artist={"name": top_artist, "plays": top_artist_count, "image": artist_image},
                            top_song={"name": top_song, "artist": top_song_artist, "plays": top_song_count, "cover": song_cover},
-                           total_minutes=total_minutes)
+                           total_minutes=total_minutes,
+                           song_durations=song_durations)
+
 
 #LABIAUSIAI KLAUSOMIAUSIA DAINA--------------------------------------------------
 
@@ -733,12 +761,47 @@ def yesterday_recap():
     
 #     return jsonify(response)
 
+# @app.route("/most_listened_song_json")
+# def most_listened_song_json():
+#     try:
+#         sp = get_spotify_client()
+#         most_listened_song = db.session.query(
+#             ListeningHistory.artist_name, ListeningHistory.track_name
+#         ).group_by(
+#             ListeningHistory.artist_name, ListeningHistory.track_name
+#         ).order_by(db.func.count().desc()).limit(1).first()
+
+#         if not most_listened_song:
+#             return jsonify({"song": None, "artist": None, "album_cover": None})
+
+#         artist_name, track_name = most_listened_song
+
+#         # Search for the track on Spotify
+#         search_results = sp.search(q=f"track:{track_name} artist:{artist_name}", type="track", limit=1)
+#         if search_results['tracks']['items']:
+#             track_info = search_results['tracks']['items'][0]
+#             album_cover = track_info['album']['images'][0]['url'] if track_info['album']['images'] else None
+#         else:
+#             album_cover = None
+
+#         return jsonify({
+#             "song": track_name,
+#             "artist": artist_name,
+#             "album_cover": album_cover
+#         })
+
+#     except Exception as e:
+#         return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
 @app.route("/most_listened_song_json")
 def most_listened_song_json():
     try:
         sp = get_spotify_client()
+
+        # Query the most listened song for the logged-in user
         most_listened_song = db.session.query(
             ListeningHistory.artist_name, ListeningHistory.track_name
+        ).filter_by(
+            user_id=current_user.id  # Get the current logged-in user's ID
         ).group_by(
             ListeningHistory.artist_name, ListeningHistory.track_name
         ).order_by(db.func.count().desc()).limit(1).first()
@@ -750,9 +813,10 @@ def most_listened_song_json():
 
         # Search for the track on Spotify
         search_results = sp.search(q=f"track:{track_name} artist:{artist_name}", type="track", limit=1)
+
         if search_results['tracks']['items']:
             track_info = search_results['tracks']['items'][0]
-            album_cover = track_info['album']['images'][0]['url'] if track_info['album']['images'] else None
+            album_cover = track_info['album']['images'][0]['url'] if track_info.get('album', {}).get('images') else None
         else:
             album_cover = None
 
