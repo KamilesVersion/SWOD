@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Today's Recap</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(201, 219, 186);
+        }
+
+        .header-container {
+            background-color: rgb(153, 193, 185);
+            padding: 10px 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .right-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-button {
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+        }
+
+            .nav-button:hover {
+                color: lightgray;
+            }
+
+        .line {
+            width: 100%;
+            background-color: rgb(153, 193, 185);
+        }
+
+        .content {
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .section {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            gap: 10px;
+            margin: 20px auto;
+            padding: 15px;
+            max-width: 800px;
+            background-color: rgb(173, 199, 170);
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 28px;
+            text-align: center;
+        }
+
+        h3 {
+            margin: 0;
+            font-size: 22px;
+            text-align: left;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: rgb(60, 80, 60);
+        }
+
+        .song-img, .artist-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-top: 10px;
+        }
+
+        .time-count {
+            font-size: 22px;
+        }
+
+        .left-align {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+            .left-align div {
+                text-align: left;
+            }
+
+        .recap-button {
+            background-color: rgb(153, 193, 185);
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-bottom: 60px;
+            margin-top: 60px;
+        }
+
+            .recap-button:hover {
+                background-color: rgb(129, 163, 157);
+            }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="header">
+            <h1 style="color: white;">S.W.O.D.</h1>
+            <div class="right-container">
+                <a href="{{ url_for('menu') }}" class="nav-button">Menu</a>
+                <a href="{{ url_for('profile') }}" class="nav-button">Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="line">
+        <svg height="10" width="100%">
+            <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2" />
+        </svg>
+    </div>
+
+    <div class="content">
+        <h2>Today's Recap</h2>
+
+        <div class="section">
+            <h3>Top Artist</h3>
+            <div class="left-align">
+                {% if top_artist.image %}
+                <img src="{{ top_artist.image }}" alt="Artist Image" class="artist-img">
+                {% endif %}
+                <div>
+                    <p class="highlight">{{ top_artist.name }}</p>
+                    <p>Times played: {{ top_artist.plays }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Top Song</h3>
+            <div class="left-align">
+                {% if top_song.cover %}
+                <img src="{{ top_song.cover }}" alt="Song Cover" class="song-img">
+                {% endif %}
+                <div>
+                    <p class="highlight">{{ top_song.name }}</p>
+                    <p>by {{ top_song.artist }} | Times played: {{ top_song.plays }} | Total time: {{ song_durations[(top_song.name, top_song.artist)] }} min</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Total Listening Time</h3>
+            <p class="highlight">{{ total_minutes }} minutes</p>
+        </div>
+
+        <!--<a href="/recap" class="recap-button">Back to Recaps</a>-->
+    </div>
+</body>
+</html>
