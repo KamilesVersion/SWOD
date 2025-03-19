@@ -108,6 +108,25 @@
             .left-align div {
                 text-align: left;
             }
+
+        /* Style for the "Go Back to Recap Tracks" button */
+        .recap-button {
+            background-color: rgb(153, 193, 185);
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-bottom: 60px; /* Adds space below the button */
+            margin-top: 60px;
+        }
+
+            .recap-button:hover {
+                background-color: rgb(129, 163, 157);
+            }
     </style>
 </head>
 <body>
@@ -156,12 +175,13 @@
             </div>
         </div>
 
-
         <div class="section">
             <h3>Total Listening Time</h3>
             <p class="highlight">{{ total_minutes }} minutes</p>
         </div>
+
+        <a href="/recap" class="recap-button">Back to Recaps</a>
+
     </div>
 </body>
 </html>
-
