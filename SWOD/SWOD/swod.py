@@ -665,10 +665,13 @@ def last_week_recap():
 @app.route('/yesterday_recap')
 @login_required
 def yesterday_recap():
-    # Get the current time in UTC and calculate yesterday's date range
-    today_utc = datetime.utcnow().date()
-    yesterday_start = datetime.combine(today_utc - timedelta(days=1), datetime.min.time())  # 00:00 UTC
-    yesterday_end = datetime.combine(today_utc - timedelta(days=1), datetime.max.time())  # 23:59:59 UTC
+    # Get the current time in UTC and convert it to Lithuanian time
+    lithuanian_tz = pytz.timezone('Europe/Vilnius')
+    today_utc = datetime.utcnow().replace(tzinfo=pytz.utc)  # Current time in UTC
+    today_lithuanian = today_utc.astimezone(lithuanian_tz).date()  # Convert to Lithuanian time zone
+
+    yesterday_start = datetime.combine(today_lithuanian - timedelta(days=1), datetime.min.time())  # 00:00 LT
+    yesterday_end = datetime.combine(today_lithuanian - timedelta(days=1), datetime.max.time())  # 23:59:59 LT
 
     # Query tracks played yesterday
     yesterday_tracks = ListeningHistory.query.filter(
@@ -731,6 +734,77 @@ def yesterday_recap():
                            top_song={"name": top_song, "artist": top_song_artist, "plays": top_song_count, "cover": song_cover},
                            total_minutes=total_minutes,
                            song_durations=song_durations)
+
+
+# @app.route('/yesterday_recap')
+# @login_required
+# def yesterday_recap():
+#     # Get the current time in UTC and calculate yesterday's date range
+#     today_utc = datetime.utcnow().date()
+#     yesterday_start = datetime.combine(today_utc - timedelta(days=1), datetime.min.time())  # 00:00 UTC
+#     yesterday_end = datetime.combine(today_utc - timedelta(days=1), datetime.max.time())  # 23:59:59 UTC
+
+#     # Query tracks played yesterday
+#     yesterday_tracks = ListeningHistory.query.filter(
+#         ListeningHistory.user_id == current_user.id,
+#         ListeningHistory.played_at >= yesterday_start,
+#         ListeningHistory.played_at <= yesterday_end
+#     ).all()
+
+#     if not yesterday_tracks:
+#         return render_template('yesterday_recap.html', message="No listening data found for yesterday")
+
+#     # Count occurrences of songs and artists
+#     song_counter = Counter()
+#     artist_counter = Counter()
+#     song_durations = {}  # Store accumulated time per song
+#     total_minutes = 0
+
+#     for track in yesterday_tracks:
+#         key = (track.track_name, track.artist_name)
+#         song_counter[key] += 1
+#         artist_counter[track.artist_name] += 1
+
+#         # Calculate total time for each song
+#         if key in song_durations:
+#             song_durations[key] += track.duration_ms
+#         else:
+#             song_durations[key] = track.duration_ms
+
+#         total_minutes += track.duration_ms
+
+#     # Get top artist and top song
+#     top_artist, top_artist_count = artist_counter.most_common(1)[0] if artist_counter else ("No data", 0)
+#     (top_song, top_song_artist), top_song_count = song_counter.most_common(1)[0] if song_counter else (("No data", "Unknown"), 0)
+
+#     # Convert total milliseconds to minutes
+#     total_minutes = round(total_minutes / (1000 * 60))
+
+#     # Convert song durations to minutes
+#     song_durations = {k: round(v / (1000 * 60)) for k, v in song_durations.items()}
+
+#     # Use stored Spotify credentials
+#     sp = spotipy.Spotify(auth=current_user.spotify_access_token)
+
+#     # Fetch artist image
+#     try:
+#         artist_search = sp.search(q=f"artist:{top_artist}", type="artist", limit=1)['artists']['items']
+#         artist_image = artist_search[0]['images'][0]['url'] if artist_search and artist_search[0]['images'] else None
+#     except:
+#         artist_image = None
+
+#     # Fetch song cover image
+#     try:
+#         song_search = sp.search(q=f"track:{top_song} artist:{top_song_artist}", type="track", limit=1)['tracks']['items']
+#         song_cover = song_search[0]["album"]["images"][0]["url"] if song_search and song_search[0]["album"]["images"] else None
+#     except:
+#         song_cover = None
+
+#     return render_template('yesterday_recap.html',
+#                            top_artist={"name": top_artist, "plays": top_artist_count, "image": artist_image},
+#                            top_song={"name": top_song, "artist": top_song_artist, "plays": top_song_count, "cover": song_cover},
+#                            total_minutes=total_minutes,
+#                            song_durations=song_durations)
 
 # TODAY'S RECAP ------------------------------------------------------
 
