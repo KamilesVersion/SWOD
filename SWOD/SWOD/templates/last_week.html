@@ -112,15 +112,16 @@
         <div class="section">
             <h3>Top 10 Songs</h3>
             <ul class="list">
-                {% for song, artist, plays, cover in top_songs %}
+                {% for song, artist, plays, cover, total_minutes in top_songs %}
                 <li>
                     {% if cover %}
-                        <img src="{{cover }}" alt="{{ song }}" width="50" height="50" style="border-radius:5px;" />
+                    <img src="{{cover }}" alt="{{ song }}" width="50" height="50" style="border-radius:5px;" />
                     {% endif %}
-                    <strong>{{ song }}</strong> by {{ artist}} - {{ plays }} plays
+                    <strong>{{ song }}</strong> by {{ artist}} - {{ plays }} plays | {{ total_minutes }} min
                 </li>
                 {% endfor %}
             </ul>
+
         </div>
 
         <div class="section">
@@ -128,7 +129,7 @@
             {% if most_played_album["cover"] %}
                 <img src="{{ most_played_album['cover'] }}" alt="Album cover" width="150" height="150" />
             {% endif %}
-            <p><strong>{{ most_played_album["name"] }}</strong> - {{most_played_album["plays"] }}  plays</p>
+            <p><strong>{{ most_played_album["name"] }}</strong> - {{ most_played_album["plays"] }} plays | {{ most_played_album["total_minutes"] }} min</p>
             <p>By: <strong>{{most_played_album["artist"] }}</strong></p>
         </div>
 

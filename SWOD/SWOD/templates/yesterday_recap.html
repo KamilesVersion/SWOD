@@ -151,10 +151,11 @@
                 {% endif %}
                 <div>
                     <p class="highlight">{{ top_song.name }}</p>
-                    <p>by {{ top_song.artist }} | Times played: {{ top_song.plays }}</p>
+                    <p>by {{ top_song.artist }} | Times played: {{ top_song.plays }} | Total time: {{ song_durations[(top_song.name, top_song.artist)] }} min</p>
                 </div>
             </div>
         </div>
+
 
         <div class="section">
             <h3>Total Listening Time</h3>
