@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from tkinter import N
 from flask import Flask, render_template, url_for, redirect, session, request, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -902,6 +899,51 @@ def most_listened_album_json():
 
     except Exception as e:
         return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
+
+@app.route("/top_10_listened_albums")
+def top_10_most_listened_albums_json():
+    try:
+        sp = get_spotify_client()
+
+        # Query the top 10 most listened albums for the logged-in user
+        top_10_albums = db.session.query(
+            ListeningHistory.artist_name,
+            ListeningHistory.album_name,
+            db.func.count().label('play_count')  # Counting the number of times the album was played
+        ).filter_by(
+            user_id=current_user.id
+        ).group_by(
+            ListeningHistory.artist_name,
+            ListeningHistory.album_name
+        ).order_by(db.func.count().desc()).limit(10).all()
+
+        if not top_10_albums:
+            return jsonify({"albums": []})
+
+        albums_data = []
+
+        # For each album, search for it on Spotify and get the album cover
+        for artist_name, album_name, play_count in top_10_albums:
+            search_results = sp.search(q=f"{album_name} {artist_name}", type="album", limit=1)
+
+            if search_results['albums']['items']:
+                album_info = search_results['albums']['items'][0]
+                album_cover = album_info['images'][0]['url'] if album_info.get('images') else None
+            else:
+                album_cover = None
+
+            albums_data.append({
+                "album": album_name,
+                "artist": artist_name,
+                "album_cover": album_cover,
+                "play_count": play_count  # Adding the play count to the response
+            })
+
+        return render_template("top_albums.html", albums=albums_data)
+
+    except Exception as e:
+        return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
+
 
 
 # @app.route("/most_listened_artist_json")

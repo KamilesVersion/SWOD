@@ -61,6 +61,9 @@
     </Content>
     <Content Include="templates\recap_page.html" />
     <Content Include="templates\register.html" />
+    <Content Include="templates\top_albums.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="templates\top_artists.html" />
     <Content Include="templates\yesterday_recap.html" />
   </ItemGroup>
