@@ -16,6 +16,8 @@ import pytz
 from datetime import datetime, timedelta
 from flask_migrate import Migrate
 from collections import Counter
+from models import db, User, ListeningHistory
+
 
 load_dotenv() # Load environment variables from .env file
 
@@ -25,37 +27,38 @@ bcrypt = Bcrypt(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'thisisasecretkey'
 
-db = SQLAlchemy(app)
+# db = SQLAlchemy(app)
 
 
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), nullable=False, unique=True)
-    password = db.Column(db.String(80), nullable=False)
+# class User(db.Model, UserMixin):
+#     id = db.Column(db.Integer, primary_key=True)
+#     username = db.Column(db.String(20), nullable=False, unique=True)
+#     password = db.Column(db.String(80), nullable=False)
     
-    # Spotify tokens
-    spotify_access_token = db.Column(db.String(255), nullable=True)
-    spotify_refresh_token = db.Column(db.String(255), nullable=True)
-    spotif_token_expiry = db.Column(db.DateTime, nullable=True)
+#     # Spotify tokens
+#     spotify_access_token = db.Column(db.String(255), nullable=True)
+#     spotify_refresh_token = db.Column(db.String(255), nullable=True)
+#     spotif_token_expiry = db.Column(db.DateTime, nullable=True)
     
 
-# -------------------------------------------------------------- klausymo baze
+# # -------------------------------------------------------------- klausymo baze
     
-class ListeningHistory(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) 
-    artist_name = db.Column(db.String(255), nullable=False)
-    track_name = db.Column(db.String(255), nullable=False)
-    album_name = db.Column(db.String(255), nullable=False)
-    duration_ms = db.Column(db.Integer, nullable=False)
-    played_at = db.Column(db.DateTime, nullable=False)
-    genre = db.Column(db.String(255), nullable=True)
+# class ListeningHistory(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) 
+#     artist_name = db.Column(db.String(255), nullable=False)
+#     track_name = db.Column(db.String(255), nullable=False)
+#     album_name = db.Column(db.String(255), nullable=False)
+#     duration_ms = db.Column(db.Integer, nullable=False)
+#     played_at = db.Column(db.DateTime, nullable=False)
+#     genre = db.Column(db.String(255), nullable=True)
 
-    user = db.relationship('User', backref=db.backref('listening_history', lazy=True))
+#     user = db.relationship('User', backref=db.backref('listening_history', lazy=True))
+
+db.init_app(app)
 
 
-
-migrate = Migrate(app, db)
+# migrate = Migrate(app, db)
 
 with app.app_context():
     db.create_all()
