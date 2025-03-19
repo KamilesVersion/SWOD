@@ -737,17 +737,35 @@ def yesterday_recap():
 @app.route('/todays_recap')
 @login_required
 def today_recap():
-    # Get the current date and time in UTC
-    now_utc = datetime.utcnow()
-    today_start = datetime.combine(now_utc.date(), datetime.min.time())  # 00:00 UTC
-    today_end = now_utc  # Current time UTC
+    # Define Lithuanian timezone
+    lt_timezone = pytz.timezone('Europe/Vilnius')
 
-    # Query tracks played today
+    # Get current time in Lithuania
+    now_lt = datetime.now(lt_timezone)
+    today_start_lt = datetime.combine(now_lt.date(), datetime.min.time())  # 00:00 Lithuanian time
+    today_start_utc = today_start_lt.astimezone(pytz.utc)  # Convert to UTC
+
+    # Query tracks played today in Lithuanian time
     today_tracks = ListeningHistory.query.filter(
         ListeningHistory.user_id == current_user.id,
-        ListeningHistory.played_at >= today_start,
-        ListeningHistory.played_at <= today_end
+        ListeningHistory.played_at >= today_start_utc,
+        ListeningHistory.played_at <= now_lt.astimezone(pytz.utc)  # Convert now_lt to UTC
     ).all()
+
+# @app.route('/todays_recap')
+# @login_required
+# def today_recap():
+#     # Get the current date and time in UTC
+#     now_utc = datetime.utcnow()
+#     today_start = datetime.combine(now_utc.date(), datetime.min.time())  # 00:00 UTC
+#     today_end = now_utc  # Current time UTC
+
+#     # Query tracks played today
+#     today_tracks = ListeningHistory.query.filter(
+#         ListeningHistory.user_id == current_user.id,
+#         ListeningHistory.played_at >= today_start,
+#         ListeningHistory.played_at <= today_end
+#     ).all()
 
     if not today_tracks:
         return render_template('todays_recap.html', message="No listening data found for today")
