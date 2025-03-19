@@ -974,12 +974,12 @@ def most_listened_genre_json():
 
 
 @app.route("/top_10_listened_artists")
-@login_required  # <-- kad prie ğito kelio galëtø eiti tik prisijungæ vartotojai
+@login_required  # <-- kad prie sito kelio galetu eiti tik prisijunge vartotojai
 def top_10_listened_artists():
     try:
         sp = get_spotify_client()
 
-        # Imame tik dabartinio vartotojo klausymosi istorijà
+        # Imame tik dabartinio vartotojo klausymosi istorija
         top_artists = db.session.query(
             ListeningHistory.artist_name,
             db.func.count().label('play_count')
