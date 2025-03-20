@@ -73,6 +73,24 @@
             font-weight: bold;
             color: rgb(80, 100, 90);
         }
+        
+        .recap-button {
+            background-color: rgb(153, 193, 185);
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-bottom: 60px; 
+            margin-top: 60px;
+        }
+
+        .recap-button:hover {
+            background-color: rgb(129, 163, 157);
+        }
     </style>
 </head>
 <body>
@@ -100,7 +118,7 @@
                 {% for artist, plays, image in top_artists %}
                 <li>
                     {% if image %}
-                        <img src="{{ image }} " alt="{{ artist }}" width="50" height="50" style="border-radius:50%;" />
+                    <img src="{{ image }} " alt="{{ artist }}" width="50" height="50" style="border-radius:50%;" />
                     {% endif %}
                     {{artist}} - {{plays}} plays
                 </li>
@@ -127,7 +145,7 @@
         <div class="section">
             <h3>Most Played Album</h3>
             {% if most_played_album["cover"] %}
-                <img src="{{ most_played_album['cover'] }}" alt="Album cover" width="150" height="150" />
+            <img src="{{ most_played_album['cover'] }}" alt="Album cover" width="150" height="150" />
             {% endif %}
             <p><strong>{{ most_played_album["name"] }}</strong> - {{ most_played_album["plays"] }} plays | {{ most_played_album["total_minutes"] }} min</p>
             <p>By: <strong>{{most_played_album["artist"] }}</strong></p>
@@ -137,6 +155,7 @@
             <h3>Total Listening Time</h3>
             <p class="minutes">{{ total_minutes }} minutes</p>
         </div>
+        <a href="/recap" class="recap-button">Back To Recaps</a>
     </div>
 
 
