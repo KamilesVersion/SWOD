@@ -1,3 +1,4 @@
+from forms import RegisterForm, LoginForm, UpdateAccountForm
 from tkinter import N
 from flask import Flask, render_template, url_for, redirect, session, request, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -17,6 +18,7 @@ from datetime import datetime, timedelta
 from flask_migrate import Migrate
 from collections import Counter
 from models import db, User, ListeningHistory
+
 
 
 load_dotenv() # Load environment variables from .env file
@@ -73,39 +75,39 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-class RegisterForm(FlaskForm):
-    username = StringField(validators=[
-        InputRequired(), Length(min=4, max=20)],
-        render_kw={"placeholder": "Username"})
+# class RegisterForm(FlaskForm):
+#     username = StringField(validators=[
+#         InputRequired(), Length(min=4, max=20)],
+#         render_kw={"placeholder": "Username"})
 
-    password = PasswordField(validators=[
-        InputRequired(), Length(min=8, max=20)],
-        render_kw={"placeholder": "Password"})
+#     password = PasswordField(validators=[
+#         InputRequired(), Length(min=8, max=20)],
+#         render_kw={"placeholder": "Password"})
 
-    submit = SubmitField('Register')
+#     submit = SubmitField('Register')
 
-    def validate_username(self, username):
-        existing_user = User.query.filter_by(username=username.data).first()
-        if existing_user:
-            raise ValidationError('That username already exists. Please choose a different one.')
+#     def validate_username(self, username):
+#         existing_user = User.query.filter_by(username=username.data).first()
+#         if existing_user:
+#             raise ValidationError('That username already exists. Please choose a different one.')
 
-    def validate_password(self, password):
-        pwd = password.data
-        if (len(pwd) < 8 or 
-            not re.search(r'[A-Z]', pwd) or 
-            not re.search(r'[!@#$%^&*(),. ":{}|<>]', pwd) or 
-            not re.search(r'\d', pwd)):
-            raise ValidationError(
-                'Password must be at least 8 characters long, contain at least one uppercase letter, one special symbol, and one number.')
+#     def validate_password(self, password):
+#         pwd = password.data
+#         if (len(pwd) < 8 or 
+#             not re.search(r'[A-Z]', pwd) or 
+#             not re.search(r'[!@#$%^&*(),. ":{}|<>]', pwd) or 
+#             not re.search(r'\d', pwd)):
+#             raise ValidationError(
+#                 'Password must be at least 8 characters long, contain at least one uppercase letter, one special symbol, and one number.')
 
-class LoginForm(FlaskForm):
-    username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+# class LoginForm(FlaskForm):
+#     username = StringField(validators=[
+#                            InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
 
-    password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
+#     password = PasswordField(validators=[
+#                              InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
 
-    submit = SubmitField('Login')
+#     submit = SubmitField('Login')
 
 
 
@@ -482,34 +484,34 @@ def create_spotify_oauth():
         scope="user-top-read user-read-recently-played",
         show_dialog=True)
 
-class UpdateAccountForm(FlaskForm):
-    new_username = StringField(
-        validators=[Optional(), Length(min=4, max=20)],
-        render_kw={"placeholder": "New Username"}
-    )
+# class UpdateAccountForm(FlaskForm):
+#     new_username = StringField(
+#         validators=[Optional(), Length(min=4, max=20)],
+#         render_kw={"placeholder": "New Username"}
+#     )
 
-    new_password = PasswordField(
-        validators=[Optional(), Length(min=8, max=20)],
-        render_kw={"placeholder": "New Password"}
-    )
+#     new_password = PasswordField(
+#         validators=[Optional(), Length(min=8, max=20)],
+#         render_kw={"placeholder": "New Password"}
+#     )
 
-    submit = SubmitField('Update')
+#     submit = SubmitField('Update')
 
-    def validate_new_username(self, new_username):
-        if new_username.data and new_username.data != current_user.username:
-            existing_user = User.query.filter_by(username=new_username.data).first()
-            if existing_user:
-                raise ValidationError('That username is already taken. Please choose another.')
+#     def validate_new_username(self, new_username):
+#         if new_username.data and new_username.data != current_user.username:
+#             existing_user = User.query.filter_by(username=new_username.data).first()
+#             if existing_user:
+#                 raise ValidationError('That username is already taken. Please choose another.')
 
-    def validate_new_password(self, new_password):
-        if new_password.data:  # Only validate if a new password is entered
-            pwd = new_password.data
-            if (len(pwd) < 8 or 
-                not re.search(r'[A-Z]', pwd) or 
-                not re.search(r'[!@#$%^&*(),.?":{}|<>]', pwd) or 
-                not re.search(r'\d', pwd)):
-                raise ValidationError(
-                    'Password must be at least 8 characters long, contain at least one uppercase letter, one special symbol, and one number.')
+#     def validate_new_password(self, new_password):
+#         if new_password.data:  # Only validate if a new password is entered
+#             pwd = new_password.data
+#             if (len(pwd) < 8 or 
+#                 not re.search(r'[A-Z]', pwd) or 
+#                 not re.search(r'[!@#$%^&*(),.?":{}|<>]', pwd) or 
+#                 not re.search(r'\d', pwd)):
+#                 raise ValidationError(
+#                     'Password must be at least 8 characters long, contain at least one uppercase letter, one special symbol, and one number.')
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
