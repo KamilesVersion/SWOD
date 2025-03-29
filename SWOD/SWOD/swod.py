@@ -1308,7 +1308,7 @@ def top_50_songs():
         )
             
         album_covers = {}
-        
+
         sp=get_spotify_client()
         if sp:
             unique_albums = {(song.album_name, song.artist_name) for song in top_songs}
