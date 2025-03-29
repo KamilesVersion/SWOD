@@ -1290,18 +1290,30 @@ def top_10_listened_artists():
 @login_required
 def top_50_songs():
     try:
-        sp=get_spotify_client()
-        if not sp:
-            return redirect(url_for("connect_spotify", next=url_for("top_50_songs")))
-        
         song_counter = Counter()
+        album_covers = {}
         # current user
         user_tracks = ListeningHistory.query.filter_by(user_id=current_user.id).all()
         
         for track in user_tracks:
             song_counter[(track.track_name, track.artist_name, track.album_name)] += 1
+            if track.album_name not in album_covers:
+                album_covers[track.album_name] = None # placeholder for cover
         
         top_songs = song_counter.most_common(50)
+        
+        sp=get_spotify_client()
+        if sp:
+            for album_name in album_covers.keys():
+                try:
+                    search_results = sp.search(q=f"album:{album_name}", type="album", limit=1)
+                    if search_results['albums']['items']:
+                        album_covers[album_name] = search_results['albums']['items'][0]['images'][0]['url']
+                except:
+                    album_covers[album_name] = None
+            
+                #return redirect(url_for("connect_spotify", next=url_for("top_50_songs")))
+        
         
         formatted_songs = []
         for(track_name, artist_name, album_name), play_count in top_songs:
