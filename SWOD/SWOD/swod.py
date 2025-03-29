@@ -1,3 +1,4 @@
+from turtle import listen
 from forms import RegisterForm, LoginForm, UpdateAccountForm
 from tkinter import N
 from flask import Flask, render_template, url_for, redirect, session, request, flash, jsonify
@@ -1284,7 +1285,38 @@ def top_10_listened_artists():
         return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
 
 
-
+# MOST LISTENED SONGS -----------------------------------------------------------
+@app.route("/top_50_songs")
+@login_required
+def top_50_songs():
+    try:
+        sp=get_spotify_client()
+        if not sp:
+            return redirect(url_for("connect_spotify", next=url_for("top_50_songs")))
+        
+        song_counter = Counter()
+        # current user
+        user_tracks = ListeningHistory.query.filter_by(user_id=current_user.id).all()
+        
+        for track in user_tracks:
+            song_counter[(track.track_name, track.artist_name, track.album_name)] += 1
+        
+        top_songs = song_counter.most_common(50)
+        
+        formatted_songs = []
+        for(track_name, artist_name, album_name), play_count in top_songs:
+            formatted_songs.append({
+                "song": track_name,
+                "artist": artist_name,
+                "album": album_name,
+                "plays": play_count
+            })
+            
+        return render_template("top_50_songs.html", top_songs=formatted_songs)
+    except Exception as e:
+        return render_template("top_50_songs.html", error=f"Error fetching top songs: {str(e)}")
+        
+        
 
 #-------------------------------------------------------------------------------
 

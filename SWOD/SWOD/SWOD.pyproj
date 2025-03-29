@@ -68,6 +68,7 @@
     <Content Include="templates\recap_page.html" />
     <Content Include="templates\register.html" />
     <Content Include="templates\todays_recap.html" />
+    <Content Include="templates\top_50_songs.html" />
     <Content Include="templates\top_albums.html">
       <SubType>Code</SubType>
     </Content>

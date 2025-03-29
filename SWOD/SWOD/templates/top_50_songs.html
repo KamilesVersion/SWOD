@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Top 50 songs</title>
+    <style>
+        .list {list-style:none; padding: 0; }
+        .list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+        }
+        .list .song-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .list .plays { font-weight: bold; color: #555; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(201, 219, 186);
+        }
+
+        .header-container {
+            background-color: rgb(153, 193, 185);
+            padding: 10px 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .right-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-button {
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+            .nav-button:hover {
+                color: lightgray;
+            }
+
+        .line {
+            width: 100%;
+            background-color: rgb(153, 193, 185);
+        }
+
+        .content {
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .album-list {
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .album {
+            display: flex;
+            align-items: center;
+            background-color: rgb(173, 199, 170);
+            padding: 15px;
+            border-radius: 10px;
+            color: black;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+            .album img {
+                width: 70px;
+                height: 70px;
+                margin-right: 15px;
+                object-fit: cover;
+            }
+
+        .album-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .album-info strong {
+                font-size: 20px;
+            }
+
+            .album-info small {
+                font-size: 14px;
+                color: rgb(60, 80, 60);
+            }
+
+        .album-number {
+            font-weight: bold;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Your Top 50 Songs</h2>
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% else %}
+        <ul class="list">
+            {% for song in top_songs %}
+            <li>
+                <div class="song-info">
+                    <strong>{{ song.song }}</strong> by {{ song.artist }} <br />
+                    <small>Album: {{ song.album }} </small>
+                </div>
+                <span class="plays">{{ song.plays }} plays</span>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
