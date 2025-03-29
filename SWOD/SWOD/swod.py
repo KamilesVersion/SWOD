@@ -1,3 +1,4 @@
+from ast import List
 from turtle import listen
 from forms import RegisterForm, LoginForm, UpdateAccountForm
 from tkinter import N
@@ -19,6 +20,7 @@ from datetime import datetime, timedelta
 from flask_migrate import Migrate
 from collections import Counter
 from models import db, User, ListeningHistory
+from sqlalchemy.sql import func
 
 
 
@@ -1290,39 +1292,54 @@ def top_10_listened_artists():
 @login_required
 def top_50_songs():
     try:
-        song_counter = Counter()
+        
+        top_songs = (
+            db.session.query(
+                ListeningHistory.track_name,
+                ListeningHistory.artist_name,
+                ListeningHistory.album_name,
+                func.count(ListeningHistory.track_name).label("play_count")
+            )
+            .filter_by(user_id=current_user.id)
+            .group_by(ListeningHistory.track_name, ListeningHistory.artist_name, ListeningHistory.album_name)
+            .order_by(func.count(ListeningHistory.track_name).desc())
+            .limit(50)
+            .all()
+        )
+            
         album_covers = {}
-        # current user
-        user_tracks = ListeningHistory.query.filter_by(user_id=current_user.id).all()
-        
-        for track in user_tracks:
-            song_counter[(track.track_name, track.artist_name, track.album_name)] += 1
-            if track.album_name not in album_covers:
-                album_covers[track.album_name] = None # placeholder for cover
-        
-        top_songs = song_counter.most_common(50)
         
         sp=get_spotify_client()
         if sp:
-            for album_name in album_covers.keys():
+            unique_albums = {(song.album_name, song.artist_name) for song in top_songs}
+            for album_name, artist_name in unique_albums:
+                cover_url = None
                 try:
-                    search_results = sp.search(q=f"album:{album_name}", type="album", limit=1)
-                    if search_results['albums']['items']:
-                        album_covers[album_name] = search_results['albums']['items'][0]['images'][0]['url']
+                    album_search = sp.search(q=f"album:{album_name} artist:{artist_name}", type="album", limit=1)
+                    if album_search['albums']['items']:
+                        cover_url = album_search['albums']['items'][0]['images'][0]['url']
+                        
+                    if not cover_url:
+                        track_search = sp.search(q=f"track:{album_name} artist:{artist_name}", type="track", limit=1)
+                        if track_search['tracks']['items']:
+                            cover_url = track_search['tracks']['items'][0]['album']['images'][0]['url']
                 except:
-                    album_covers[album_name] = None
-            
-                #return redirect(url_for("connect_spotify", next=url_for("top_50_songs")))
+                    cover_url = None
+             
+                album_covers[(album_name, artist_name)] = cover_url
+                
         
-        
-        formatted_songs = []
-        for(track_name, artist_name, album_name), play_count in top_songs:
-            formatted_songs.append({
-                "song": track_name,
-                "artist": artist_name,
-                "album": album_name,
-                "plays": play_count
-            })
+        formatted_songs = [
+            {
+                "song": song.track_name,
+                "artist": song.artist_name,
+                "album": song.album_name,
+                "plays": song.play_count,
+                "cover": album_covers.get((song.album_name, song.artist_name))
+            }
+            for song in top_songs
+        ]        
+
             
         return render_template("top_50_songs.html", top_songs=formatted_songs)
     except Exception as e:

@@ -6,18 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Top 50 songs</title>
     <style>
-        .list {list-style:none; padding: 0; }
-        .list li {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px;
-            border-bottom: 1px solid #ccc;
-        }
-        .list .song-info {
-            display: flex;
-            flex-direction: column;
-        }
-        .list .plays { font-weight: bold; color: #555; }
+        
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -51,9 +40,9 @@
             cursor: pointer;
         }
 
-            .nav-button:hover {
-                color: lightgray;
-            }
+        .nav-button:hover {
+            color: lightgray;
+        }
 
         .line {
             width: 100%;
@@ -74,7 +63,7 @@
             text-align: center;
         }
 
-        .album-list {
+        .song-list {
             width: 90%;
             max-width: 800px;
             display: flex;
@@ -82,7 +71,7 @@
             gap: 15px;
         }
 
-        .album {
+        .song {
             display: flex;
             align-items: center;
             background-color: rgb(173, 199, 170);
@@ -92,28 +81,28 @@
             box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
         }
 
-            .album img {
-                width: 70px;
-                height: 70px;
-                margin-right: 15px;
-                object-fit: cover;
-            }
+        .song img {
+            width: 70px;
+            height: 70px;
+            margin-right: 15px;
+            object-fit: cover;
+        }
 
-        .album-info {
+        .song-info {
             display: flex;
             flex-direction: column;
         }
 
-            .album-info strong {
-                font-size: 20px;
-            }
+        .song-info strong {
+             font-size: 20px;
+        }
 
-            .album-info small {
-                font-size: 14px;
-                color: rgb(60, 80, 60);
-            }
+        .song-info small {
+             font-size: 14px;
+             color: rgb(60, 80, 60);
+        }
 
-        .album-number {
+        .song-number {
             font-weight: bold;
             font-size: 20px;
             margin-right: 15px;
@@ -121,21 +110,43 @@
     </style>
 </head>
 <body>
-    <h2>Your Top 50 Songs</h2>
-    {% if error %}
+
+    <div class="header-container">
+        <div class="header">
+            <h1 style="color: white;">S.W.O.D.</h1>
+            <div class="right-container">
+                <a href="{{ url_for('menu') }}" class="nav-button">Menu</a>
+                <a href="{{ url_for('profile') }}" class="nav-button">Profile</a>
+            </div>
+        </div>
+    </div>
+    <div class="line">
+        <svg height="10" width="100%">
+            <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2"/>
+        </svg>
+    </div>
+    <div class="content">
+        <h2>Your Top 50 Songs</h2>
+        {% if error %}
         <p style="color: red;">{{ error }}</p>
-    {% else %}
-        <ul class="list">
+        {% else %}
+        <div class="song-list">
             {% for song in top_songs %}
-            <li>
+            <div class="song">
+                <div class="song-number">{{ loop.index }}.</div>
+                {% if song.cover %}
+                <img src="{{ song.cover }}" alt="Album Cover" />
+                {% endif %}
                 <div class="song-info">
-                    <strong>{{ song.song }}</strong> by {{ song.artist }} <br />
-                    <small>Album: {{ song.album }} </small>
+                    <strong>{{song.song}}</strong><br />
+                    <small>by {{ song.artist }}</small> <br />
+                    <small>Album: {{ song.album }}</small><br />
+                    <small>Played {{ song.plays }} times</small>
                 </div>
-                <span class="plays">{{ song.plays }} plays</span>
-            </li>
+            </div>
             {% endfor %}
-        </ul>
-    {% endif %}
+        </div>
+        {% endif %}
+    </div>
 </body>
 </html>
