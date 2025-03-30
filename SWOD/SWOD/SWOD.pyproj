@@ -33,6 +33,9 @@
     <Compile Include="models.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="spotify.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="swod.py">
       <SubType>Code</SubType>
     </Compile>

@@ -12,8 +12,6 @@ from flask_bcrypt import Bcrypt
 import re
 from wtforms import ValidationError
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-import os
 from dotenv import load_dotenv
 import pytz
 from datetime import datetime, timedelta
@@ -21,6 +19,7 @@ from flask_migrate import Migrate
 from collections import Counter
 from models import db, User, ListeningHistory
 from sqlalchemy.sql import func
+from spotify import SpotifyService
 
 
 
@@ -32,6 +31,7 @@ bcrypt = Bcrypt(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'thisisasecretkey'
 
+spotify = SpotifyService();
 # db = SQLAlchemy(app)
 
 
@@ -114,22 +114,6 @@ def load_user(user_id):
 
 
 
-
-def get_spotify_client():
-    if current_user.is_authenticated and current_user.spotify_access_token:
-        sp_oauth = create_spotify_oauth()
-        
-        # Tikrina, ar pasibaig  prieigos  etono galiojimo laikas
-        if datetime.utcnow() > current_user.spotif_token_expiry:
-            new_token_info = sp_oauth.refresh_access_token(current_user.spotify_refresh_token)
-            current_user.spotify_access_token = new_token_info["access_token"]
-            current_user.spotif_token_expiry = datetime.utcfromtimestamp(new_token_info["expires_at"])
-            db.session.commit()  #  ra ome atnaujintus duomenis   duomen  baz 
-        
-        return spotipy.Spotify(auth=current_user.spotify_access_token)
-    return None
-
-
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -176,12 +160,12 @@ def menu():
     if not token_info:
         return redirect(url_for("connect_spotify", next=url_for("menu")))
 
-    sp_oauth = create_spotify_oauth()
+    sp_oauth = spotify.create_spotify_oauth()
     if sp_oauth.is_token_expired(token_info):
         token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
         session["token_info"] = token_info
 
-    sp = get_spotify_client()
+    sp = spotify.get_spotify_client()
     if not sp:
         return redirect(url_for("connect_spotify", next=url_for("menu")))
 
@@ -205,7 +189,7 @@ def menu():
 @app.route('/connect_spotify')
 def connect_spotify():
     session["next_url"] = request.args.get("next", url_for("menu"))
-    sp_oauth = create_spotify_oauth()
+    sp_oauth = spotify.create_spotify_oauth()
     auth_url = sp_oauth.get_authorize_url()
     
     # Store the time when the user connected Spotify
@@ -242,7 +226,7 @@ def connect_spotify():
 
 @app.route('/spotify_callback')
 def spotify_callback():
-    sp_oauth = create_spotify_oauth()
+    sp_oauth = spotify.create_spotify_oauth()
     
     code = request.args.get("code")
     
@@ -395,7 +379,7 @@ def recent():
         return redirect(url_for("connect_spotify", next=url_for("recent")))
 
     # Refresh token if expired
-    sp_oauth = create_spotify_oauth()
+    sp_oauth = spotify.create_spotify_oauth()
     if sp_oauth.is_token_expired(token_info):
         token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
         session["token_info"] = token_info  # Save the new token
@@ -404,7 +388,7 @@ def recent():
     #sp = spotipy.Spotify(auth=token_info["access_token"])
     #recent_tracks = sp.current_user_recently_played(limit=20)
 
-    sp = get_spotify_client()  # Naudojame get_spotify_client funkcij 
+    sp = spotify.get_spotify_client()  # Naudojame get_spotify_client funkcij 
     if sp:
         recent_tracks = sp.current_user_recently_played(limit=20)
     else:
@@ -454,7 +438,7 @@ def profile():
     if not token_info:
         return redirect(url_for("connect_spotify", next=url_for("profile")))
     # Refresh token if expired
-    sp_oauth = create_spotify_oauth()
+    sp_oauth = spotify.create_spotify_oauth()
     if sp_oauth.is_token_expired(token_info):
         token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
         session["token_info"] = token_info # Save the new token
@@ -463,7 +447,7 @@ def profile():
     # sp = spotipy.Spotify(auth=token_info["access_token"])
     # user_info = sp.current_user()
 
-    sp = get_spotify_client()  # Naudojame get_spotify_client funkcij 
+    sp = spotify.get_spotify_client()  # Naudojame get_spotify_client funkcij 
     if sp:
         user_info = sp.current_user()
     else:
@@ -479,13 +463,7 @@ def profile():
                            username=current_user.username,
                            spotify_logged_in=True) 
 
-def create_spotify_oauth():
-    return SpotifyOAuth(
-        client_id=os.getenv("SPOTIFY_CLIENT_ID"),
-        client_secret=os.getenv("SPOTIFY_CLIENT_SECRET"),
-        redirect_uri=url_for("spotify_callback", _external=True),
-        scope="user-top-read user-read-recently-played",
-        show_dialog=True)
+
 
 # class UpdateAccountForm(FlaskForm):
 #     new_username = StringField(
@@ -583,7 +561,7 @@ def last_week_recap():
     artist_images = {}
     song_details = {}
     
-    sp = get_spotify_client()
+    sp = spotify.get_spotify_client()
     if not sp:
         return redirect(url_for("connect_spotify", next=url_for("last_week_recap")))
     
@@ -961,7 +939,7 @@ def today_recap():
 @app.route("/most_listened_song_json")
 def most_listened_song_json():
     try:
-        sp = get_spotify_client()
+        sp = spotify.get_spotify_client()
 
         # Query the most listened song for the logged-in user
         most_listened_song = db.session.query(
@@ -1002,7 +980,7 @@ def most_listened_song_json():
 @app.route("/most_listened_artist_json")
 def most_listened_artist_json():
     try:
-        sp = get_spotify_client()
+        sp = spotify.get_spotify_client()
         
         # Query most listened artist for the logged-in user
         artist_name = db.session.query(
@@ -1035,7 +1013,7 @@ def most_listened_artist_json():
 @app.route("/most_listened_album_json")
 def most_listened_album_json():
     try:
-        sp = get_spotify_client()
+        sp = spotify.get_spotify_client()
 
         # Query the most listened album for the logged-in user
         most_listened_album = db.session.query(
@@ -1072,7 +1050,7 @@ def most_listened_album_json():
 @app.route("/top_10_listened_albums")
 def top_10_most_listened_albums_json():
     try:
-        sp = get_spotify_client()
+        sp = spotify.get_spotify_client()
 
         # Query the top 10 most listened albums for the logged-in user
         top_10_albums = db.session.query(
@@ -1252,7 +1230,7 @@ def most_listened_genre_json():
 @login_required  # <-- kad prie sito kelio galetu eiti tik prisijunge vartotojai
 def top_10_listened_artists():
     try:
-        sp = get_spotify_client()
+        sp = spotify.get_spotify_client()
 
         # Imame tik dabartinio vartotojo klausymosi istorija
         top_artists = db.session.query(
@@ -1310,7 +1288,7 @@ def top_50_songs():
             
         album_covers = {}
 
-        sp=get_spotify_client()
+        sp = spotify.get_spotify_client()
         if sp:
             unique_albums = {(song.album_name, song.artist_name) for song in top_songs}
             for album_name, artist_name in unique_albums:
