@@ -816,38 +816,26 @@ def yesterday_recap():
 @app.route('/todays_recap')
 @login_required
 def today_recap():
-    # Define Lithuanian timezone
     lt_timezone = pytz.timezone('Europe/Vilnius')
-
-    # Get current time in Lithuania
     now_lt = datetime.now(lt_timezone)
-    today_start_lt = datetime.combine(now_lt.date(), datetime.min.time())  # 00:00 Lithuanian time
-    today_start_utc = today_start_lt.astimezone(pytz.utc)  # Convert to UTC
+    today_start_lt = datetime.combine(now_lt.date(), datetime.min.time())
+    today_start_utc = today_start_lt.astimezone(pytz.utc)
 
-    # Query tracks played today in Lithuanian time
     today_tracks = ListeningHistory.query.filter(
         ListeningHistory.user_id == current_user.id,
         ListeningHistory.played_at >= today_start_utc,
-        ListeningHistory.played_at <= now_lt.astimezone(pytz.utc)  # Convert now_lt to UTC
+        ListeningHistory.played_at <= now_lt.astimezone(pytz.utc)
     ).all()
 
-# @app.route('/todays_recap')
-# @login_required
-# def today_recap():
-#     # Get the current date and time in UTC
-#     now_utc = datetime.utcnow()
-#     today_start = datetime.combine(now_utc.date(), datetime.min.time())  # 00:00 UTC
-#     today_end = now_utc  # Current time UTC
-
-#     # Query tracks played today
-#     today_tracks = ListeningHistory.query.filter(
-#         ListeningHistory.user_id == current_user.id,
-#         ListeningHistory.played_at >= today_start,
-#         ListeningHistory.played_at <= today_end
-#     ).all()
-
     if not today_tracks:
-        return render_template('todays_recap.html', message="No listening data found for today")
+        return render_template(
+            'todays_recap.html',
+            message="No listening data found for today",
+            top_artist={"name": "No data", "plays": 0, "image": None},
+            top_song={"name": "No data", "artist": "Unknown", "plays": 0, "cover": None},
+            total_minutes=0,
+            song_durations={}
+        )
 
     # Count occurrences of songs and artists
     song_counter = Counter()
@@ -868,9 +856,19 @@ def today_recap():
 
         total_minutes += track.duration_ms
 
-    # Get top artist and top song
-    top_artist, top_artist_count = artist_counter.most_common(1)[0] if artist_counter else ("No data", 0)
-    (top_song, top_song_artist), top_song_count = song_counter.most_common(1)[0] if song_counter else (("No data", "Unknown"), 0)
+    # Safely get the top artist
+    top_artist_data = artist_counter.most_common(1)
+    if top_artist_data:
+        top_artist, top_artist_count = top_artist_data[0]
+    else:
+        top_artist, top_artist_count = "No data", 0
+
+    # Safely get the top song
+    top_song_data = song_counter.most_common(1)
+    if top_song_data:
+        (top_song, top_song_artist), top_song_count = top_song_data[0]
+    else:
+        top_song, top_song_artist, top_song_count = "No data", "Unknown", 0
 
     # Convert total milliseconds to minutes
     total_minutes = round(total_minutes / (1000 * 60))
@@ -882,25 +880,28 @@ def today_recap():
     sp = spotipy.Spotify(auth=current_user.spotify_access_token)
 
     # Fetch artist image
-    try:
-        artist_search = sp.search(q=f"artist:{top_artist}", type="artist", limit=1)['artists']['items']
-        artist_image = artist_search[0]['images'][0]['url'] if artist_search and artist_search[0]['images'] else None
-    except:
-        artist_image = None
+    artist_image = None
+    if top_artist != "No data":
+        try:
+            artist_search = sp.search(q=f"artist:{top_artist}", type="artist", limit=1)['artists']['items']
+            artist_image = artist_search[0]['images'][0]['url'] if artist_search and artist_search[0]['images'] else None
+        except:
+            artist_image = None
 
     # Fetch song cover image
-    try:
-        song_search = sp.search(q=f"track:{top_song} artist:{top_song_artist}", type="track", limit=1)['tracks']['items']
-        song_cover = song_search[0]["album"]["images"][0]["url"] if song_search and song_search[0]["album"]["images"] else None
-    except:
-        song_cover = None
+    song_cover = None
+    if top_song != "No data":
+        try:
+            song_search = sp.search(q=f"track:{top_song} artist:{top_song_artist}", type="track", limit=1)['tracks']['items']
+            song_cover = song_search[0]["album"]["images"][0]["url"] if song_search and song_search[0]["album"]["images"] else None
+        except:
+            song_cover = None
 
     return render_template('todays_recap.html',
                            top_artist={"name": top_artist, "plays": top_artist_count, "image": artist_image},
                            top_song={"name": top_song, "artist": top_song_artist, "plays": top_song_count, "cover": song_cover},
                            total_minutes=total_minutes,
                            song_durations=song_durations)
-
 
 #LABIAUSIAI KLAUSOMIAUSIA DAINA--------------------------------------------------
 
