@@ -566,12 +566,8 @@ def last_week_recap():
         return redirect(url_for("connect_spotify", next=url_for("last_week_recap")))
     
     for track in last_week_tracks:
-        # get all artists
-        artists = track.artist_name.split(", ")
-        # artists separately
-        for artist in artists:
-            artist_counter[artist] += 1
         song_counter[track.track_name, track.artist_name] += 1
+        artist_counter[track.artist_name] += 1
         album_counter[track.album_name] += 1
         total_minutes += track.duration_ms
 
