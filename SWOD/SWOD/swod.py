@@ -1316,12 +1316,13 @@ def top_50_songs():
             for album_name, artist_name in unique_albums:
                 cover_url = None
                 try:
-                    album_search = sp.search(q=f"album:{album_name} artist:{artist_name}", type="album", limit=1)
+                    first_artist = artist_name.split(",")[0].strip()
+                    album_search = sp.search(q=f"album:{album_name} artist:{first_artist}", type="album", limit=1)
                     if album_search['albums']['items']:
                         cover_url = album_search['albums']['items'][0]['images'][0]['url']
                         
                     if not cover_url:
-                        track_search = sp.search(q=f"track:{album_name} artist:{artist_name}", type="track", limit=1)
+                        track_search = sp.search(q=f"track:{album_name} artist:{first_artist}", type="track", limit=1)
                         if track_search['tracks']['items']:
                             cover_url = track_search['tracks']['items'][0]['album']['images'][0]['url']
                 except:
