@@ -51,6 +51,7 @@
     <Content Include="templates\edit_profile.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="templates\genres.html" />
     <Content Include="templates\home.html">
       <SubType>Code</SubType>
     </Content>

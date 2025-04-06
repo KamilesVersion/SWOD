@@ -1325,6 +1325,30 @@ def top_50_songs():
     except Exception as e:
         return render_template("top_50_songs.html", error=f"Error fetching top songs: {str(e)}")
         
+
+# YOUR GENRES -----------------------------------------------------------
+@app.route('/genres')
+@login_required
+def genres():
+    user_id = current_user.id
+
+    # Query all genres the user has listened to, ordered by frequency
+    genre_counts = (
+        db.session.query(ListeningHistory.genre, db.func.count().label('count'))
+        .filter(
+            ListeningHistory.user_id == user_id,
+            ListeningHistory.genre.isnot(None),
+            ListeningHistory.genre != ''
+        )
+        .group_by(ListeningHistory.genre)
+        .order_by(db.func.count().desc())
+        .all()
+    )
+
+    # Create a list of dictionaries: [{'genre': 'Pop', 'count': 42}, ...]
+    genre_list = [{'genre': genre, 'count': count} for genre, count in genre_counts]
+
+    return render_template('genres.html', genre_list=genre_list)
         
 
 #-------------------------------------------------------------------------------
