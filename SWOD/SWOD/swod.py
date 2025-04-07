@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 from flask_migrate import Migrate
 from collections import Counter
 from models import db, User, ListeningHistory
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, desc
 from spotify import SpotifyService
 
 
@@ -942,6 +942,395 @@ def genre_artists(genre):
     artist_list = [artist[0] for artist in artists]
 
     return render_template('genre_artists.html', genre=genre, artists=artist_list)
+
+# ---------------------------------- CUSTOM DATE RANGE STATS ----------------------------------
+@app.route('/select_interval')
+@login_required
+def select_interval():
+    """Render the interval selection page with calendar widgets"""
+    return render_template('select_interval.html')
+
+@app.route("/review_statistics", methods=["POST"])
+@login_required
+def review_statistics():
+    try:
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        
+        # Validate dates were provided
+        if not start_date or not end_date:
+            flash('Please select both start and end dates', 'error')
+            return redirect(url_for('select_interval'))
+
+        start_date = datetime.strptime(request.form['start_date'], '%Y-%m-%d')
+        end_date = datetime.strptime(request.form['end_date'], '%Y-%m-%d') + timedelta(days=1)
+
+        
+        # Get top 5 songs
+        top_songs = (
+            db.session.query(
+                ListeningHistory.track_name,
+                ListeningHistory.artist_name,
+                ListeningHistory.album_name,
+                func.count(ListeningHistory.track_name).label("play_count")
+            )
+            .filter(
+                ListeningHistory.user_id == current_user.id,
+                ListeningHistory.played_at >= start_date,
+                ListeningHistory.played_at <= end_date
+            )
+            .group_by(ListeningHistory.track_name, ListeningHistory.artist_name, ListeningHistory.album_name)
+            .order_by(func.count(ListeningHistory.track_name).desc())
+            .limit(5)
+            .all()
+        )
+        
+        # Get top 3 artists
+        top_artists = (
+            db.session.query(
+                ListeningHistory.artist_name,
+                func.count(ListeningHistory.artist_name).label("play_count")
+            )
+            .filter(
+                ListeningHistory.user_id == current_user.id,
+                ListeningHistory.played_at >= start_date,
+                ListeningHistory.played_at <= end_date
+            )
+            .group_by(ListeningHistory.artist_name)
+            .order_by(func.count(ListeningHistory.artist_name).desc())
+            .limit(3)
+            .all()
+        )
+        
+        # Get top album
+        top_album = (
+            db.session.query(
+                ListeningHistory.album_name,
+                ListeningHistory.artist_name,
+                func.count(ListeningHistory.album_name).label("play_count")
+            )
+            .filter(
+                ListeningHistory.user_id == current_user.id,
+                ListeningHistory.played_at >= start_date,
+                ListeningHistory.played_at <= end_date
+            )
+            .group_by(ListeningHistory.album_name, ListeningHistory.artist_name)
+            .order_by(func.count(ListeningHistory.album_name).desc())
+            .first()
+        )
+        
+        # Get Spotify client
+        sp = spotify.get_spotify_client()
+        album_covers = {}
+        artist_images = {}
+        
+        if sp:
+            # Get album covers for songs and top album
+            unique_albums = {(song.album_name, song.artist_name) for song in top_songs}
+            if top_album:
+                unique_albums.add((top_album.album_name, top_album.artist_name))
+                
+            for album_name, artist_name in unique_albums:
+                try:
+                    first_artist = artist_name.split(",")[0].strip()
+                    album_search = sp.search(q=f"album:{album_name} artist:{first_artist}", type="album", limit=1)
+                    if album_search['albums']['items']:
+                        album_covers[(album_name, artist_name)] = album_search['albums']['items'][0]['images'][0]['url']
+                    else:
+                        track_search = sp.search(q=f"track:{album_name} artist:{first_artist}", type="track", limit=1)
+                        if track_search['tracks']['items']:
+                            album_covers[(album_name, artist_name)] = track_search['tracks']['items'][0]['album']['images'][0]['url']
+                except Exception as e:
+                    print(f"Error fetching album cover for {album_name}: {str(e)}")
+                    album_covers[(album_name, artist_name)] = None
+            
+            # Get artist images
+            unique_artists = {artist.artist_name for artist in top_artists}
+            for artist_name in unique_artists:
+                try:
+                    artist_search = sp.search(q=f"artist:{artist_name}", type="artist", limit=1)
+                    if artist_search['artists']['items']:
+                        artist_images[artist_name] = artist_search['artists']['items'][0]['images'][0]['url'] if artist_search['artists']['items'][0]['images'] else None
+                except Exception as e:
+                    print(f"Error fetching artist image for {artist_name}: {str(e)}")
+                    artist_images[artist_name] = None
+        
+        # Format songs with covers
+        formatted_songs = [
+            {
+                "track_name": song.track_name,
+                "artist_name": song.artist_name,
+                "album_name": song.album_name,
+                "play_count": song.play_count,
+                "image_url": album_covers.get((song.album_name, song.artist_name)) or 
+                            url_for('static', filename='images/default-song.jpg')
+            }
+            for song in top_songs
+        ]
+        
+        # Format artists with images
+        formatted_artists = [
+            {
+                "artist_name": artist.artist_name,
+                "play_count": artist.play_count,
+                "image_url": artist_images.get(artist.artist_name) or 
+                            url_for('static', filename='images/default-artist.jpg')
+            }
+            for artist in top_artists
+        ]
+        
+        # Format top album
+        # Format top album
+        formatted_album = None
+        if top_album:
+            formatted_album = {
+                "album_name": top_album.album_name,
+                "artist_name": top_album.artist_name,
+                "play_count": top_album.play_count,
+                "image_url": album_covers.get((top_album.album_name, top_album.artist_name)) or 
+                         url_for('static', filename='images/default-album.jpg')
+            }
+        else:
+            formatted_album = {
+                'album_name': 'No albums played',
+                'artist_name': '',
+                'play_count': 0,
+                'image_url': url_for('static', filename='images/default-album.jpg')
+            }
+
+
+
+        return render_template('review_statistics.html',
+                            top_songs=formatted_songs,
+                            top_artists=formatted_artists,
+                            top_album=top_album,
+                            start_date=start_date.date(),
+                            end_date=(end_date - timedelta(days=1)).date())
+        
+    except Exception as e:
+        flash('Error processing your request: ' + str(e), 'error')
+        return redirect(url_for('select_interval'))
+
+# @app.route('/custom_stats', methods=['GET', 'POST'])
+# @login_required
+# def custom_stats():
+#     if request.method == 'POST':
+#         start_date = request.form.get('start_date')
+#         end_date = request.form.get('end_date')
+        
+#         # Convert to datetime objects
+#         start_date = datetime.strptime(start_date, '%Y-%m-%d')
+#         end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        
+#         # Query listening history within the date range
+#         history = ListeningHistory.query.filter(
+#             ListeningHistory.user_id == current_user.id,
+#             ListeningHistory.played_at >= start_date,
+#             ListeningHistory.played_at <= end_date
+#         ).all()
+
+#         if not history:
+#             return render_template('custom_stats.html', 
+#                                  error="No listening data found for selected period")
+
+#         # Calculate statistics
+#         track_counts = Counter()
+#         artist_counts = Counter()
+#         album_counts = Counter()
+
+#         for entry in history:
+#             track_counts[(entry.track_name, entry.artist_name)] += 1
+#             artist_counts[entry.artist_name] += 1
+#             album_counts[(entry.album_name, entry.artist_name)] += 1
+
+#         # Get top 5 tracks
+#         top_tracks = track_counts.most_common(5)
+#         top_tracks = [{'track': track[0][0], 'artist': track[0][1], 'plays': track[1]} 
+#                      for track in top_tracks]
+
+#         # Get top 3 artists
+#         top_artists = artist_counts.most_common(3)
+#         top_artists = [{'artist': artist[0], 'plays': artist[1]} 
+#                       for artist in top_artists]
+
+#         # Get top album
+#         top_album = album_counts.most_common(1)
+#         if top_album:
+#             top_album = {'album': top_album[0][0][0], 
+#                         'artist': top_album[0][0][1], 
+#                         'plays': top_album[0][1]}
+#         else:
+#             top_album = None
+
+#         # Get Spotify images
+#         sp = spotify.get_spotify_client()
+        
+#         # Add album covers to tracks
+#         for track in top_tracks:
+#             try:
+#                 search = sp.search(q=f"track:{track['track']} artist:{track['artist']}", 
+#                                  type='track', limit=1)
+#                 if search['tracks']['items']:
+#                     track['cover'] = search['tracks']['items'][0]['album']['images'][0]['url']
+#                 else:
+#                     track['cover'] = None
+#             except:
+#                 track['cover'] = None
+
+#         # Add artist images
+#         for artist in top_artists:
+#             try:
+#                 search = sp.search(q=f"artist:{artist['artist']}", 
+#                                  type='artist', limit=1)
+#                 if search['artists']['items']:
+#                     artist['image'] = search['artists']['items'][0]['images'][0]['url']
+#                 else:
+#                     artist['image'] = None
+#             except:
+#                 artist['image'] = None
+
+#         # Add album cover
+#         if top_album:
+#             try:
+#                 search = sp.search(q=f"album:{top_album['album']} artist:{top_album['artist']}", 
+#                                  type='album', limit=1)
+#                 if search['albums']['items']:
+#                     top_album['cover'] = search['albums']['items'][0]['images'][0]['url']
+#                 else:
+#                     top_album['cover'] = None
+#             except:
+#                 top_album['cover'] = None
+
+#         return render_template('custom_stats.html',
+#                              top_tracks=top_tracks,
+#                              top_artists=top_artists,
+#                              top_album=top_album,
+#                              start_date=start_date.strftime('%Y-%m-%d'),
+#                              end_date=end_date.strftime('%Y-%m-%d'))
+
+#     return render_template('custom_stats.html')
+
+# @app.route('/custom_stats_input')
+# @login_required
+# def custom_stats_input():
+#     """Render the date selection page"""
+#     return render_template('custom_stats_input.html')
+
+# @app.route('/custom_stats_results', methods=['POST'])
+# @login_required
+# def custom_stats_results():
+#     """Process date range and display statistics"""
+#     try:
+#         # Get and validate dates
+#         start_date_str = request.form['start_date']
+#         end_date_str = request.form['end_date']
+        
+#         start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+#         end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+        
+#         if start_date > end_date:
+#             return render_template('custom_stats_results.html',
+#                                 error="End date must be after start date",
+#                                 start_date=start_date_str,
+#                                 end_date=end_date_str)
+
+#         # Query listening history
+#         history = ListeningHistory.query.filter(
+#             ListeningHistory.user_id == current_user.id,
+#             ListeningHistory.played_at >= start_date,
+#             ListeningHistory.played_at <= end_date + timedelta(days=1)  # Include full end day
+#         ).all()
+
+#         if not history:
+#             return render_template('custom_stats_results.html',
+#                                 stats={'total_listens': 0},
+#                                 start_date=start_date_str,
+#                                 end_date=end_date_str)
+
+#         # Calculate statistics
+#         track_counts = Counter()
+#         artist_counts = Counter()
+#         album_counts = Counter()
+
+#         for entry in history:
+#             track_key = (entry.track_name, entry.artist_name)
+#             album_key = (entry.album_name, entry.artist_name)
+            
+#             track_counts[track_key] += 1
+#             artist_counts[entry.artist_name] += 1
+#             album_counts[album_key] += 1
+
+#         # Prepare stats dictionary
+#         stats = {
+#             'total_listens': len(history),
+#             'top_tracks': [{
+#                 'track': track[0], 
+#                 'artist': track[1], 
+#                 'plays': count
+#             } for track, count in track_counts.most_common(5)],
+#             'top_artists': [{
+#                 'artist': artist[0], 
+#                 'plays': artist[1]
+#             } for artist in artist_counts.most_common(3)],
+#             'top_album': None
+#         }
+
+#         # Get top album if available
+#         if album_counts:
+#             top_album = album_counts.most_common(1)[0][0]
+#             stats['top_album'] = {
+#                 'album': top_album[0],
+#                 'artist': top_album[1],
+#                 'plays': album_counts.most_common(1)[0][1]
+#             }
+
+#         # Get Spotify images if available
+#         sp = spotify.get_spotify_client()
+#         if sp:
+#             try:
+#                 # Add album covers to tracks
+#                 for track in stats['top_tracks']:
+#                     results = sp.search(
+#                         q=f"track:{track['track']} artist:{track['artist']}",
+#                         type='track',
+#                         limit=1
+#                     )
+#                     if results['tracks']['items']:
+#                         track['cover'] = results['tracks']['items'][0]['album']['images'][0]['url']
+
+#                 # Add artist images
+#                 for artist in stats['top_artists']:
+#                     results = sp.search(
+#                         q=f"artist:{artist['artist']}",
+#                         type='artist',
+#                         limit=1
+#                     )
+#                     if results['artists']['items']:
+#                         artist['image'] = results['artists']['items'][0]['images'][0]['url']
+
+#                 # Add album cover if available
+#                 if stats['top_album']:
+#                     results = sp.search(
+#                         q=f"album:{stats['top_album']['album']} artist:{stats['top_album']['artist']}",
+#                         type='album',
+#                         limit=1
+#                     )
+#                     if results['albums']['items']:
+#                         stats['top_album']['cover'] = results['albums']['items'][0]['images'][0]['url']
+
+#             except Exception as e:
+#                 print(f"Error fetching Spotify data: {str(e)}")
+
+#         return render_template('custom_stats_results.html',
+#                             stats=stats,
+#                             start_date=start_date_str,
+#                             end_date=end_date_str)
+
+#     except ValueError:
+#         return render_template('custom_stats_results.html',
+#                             error="Invalid date format",
+#                             start_date="",
+#                             end_date="")
 
 
 

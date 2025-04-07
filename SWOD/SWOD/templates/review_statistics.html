@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Review</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(201, 219, 186);
+        }
+
+        .header-container {
+            background-color: rgb(153, 193, 185);
+            padding: 10px 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .right-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-link, .menu-link {
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+        }
+
+            .profile-link:hover, .menu-link:hover {
+                color: lightgray;
+            }
+
+        .line {
+            width: 100%;
+            background-color: rgb(153, 193, 185);
+        }
+
+        .content {
+            background-color: rgb(201, 219, 186);
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stats-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .stat-box {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            width: 70%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-title {
+            color: rgb(153, 193, 185);
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+            .stat-item:last-child {
+                border-bottom: none;
+            }
+
+        .song-info, .artist-info {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .album-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .song-image, .artist-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .album-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .song-text, .artist-text {
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .song-name, .artist-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .song-artist, .album-artist {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .play-count {
+            font-weight: bold;
+            color: rgb(153, 193, 185);
+            min-width: 80px;
+        }
+
+        .period-info {
+            margin-bottom: 20px;
+            font-style: italic;
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        .album-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .album-play-count {
+            font-size: 1.1em;
+            color: rgb(153, 193, 185);
+            font-weight: bold;
+        }
+        .album-display {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .album-cover {
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            margin-bottom: 15px;
+            background-color: rgb(201, 219, 186);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgb(153, 193, 185);
+            font-weight: bold;
+            margin: 0 auto;
+        }
+
+            .album-cover.no-image::after {
+                content: "No cover available";
+            }
+
+        .album-info {
+            margin-top: 15px;
+        }
+
+        .album-title {
+            font-size: 1.4rem;
+            color: rgb(153, 193, 185);
+            margin-bottom: 5px;
+        }
+
+        .album-artist {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .album-plays {
+            font-size: 1rem;
+            color: rgb(129, 163, 157);
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header-container">
+        <div class="header">
+            <h1 style="color: white;">S.W.O.D.</h1>
+            <div class="right-container">
+                <a href="menu" class="menu-link">Menu</a>
+                <a href="profile" class="profile-link">Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="line">
+        <svg height="10" width="100%">
+            <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2" />
+        </svg>
+    </div>
+
+    <div class="content">
+        <h2>Your Listening Statistics</h2>
+        <p class="period-info">From {{ start_date }} to {{ end_date }}</p>
+
+        <div class="stats-container">
+            <div class="stat-box">
+                <h3 class="stat-title">Top 5 Songs</h3>
+                {% for song in top_songs %}
+                <div class="stat-item">
+                    <div class="song-info">
+                        <img src="{{ song.image_url }}"
+                             alt="{{ song.track_name }}" class="song-image">
+                        <div class="song-text">
+                            <div class="song-name">{{ song.track_name }}</div>
+                            <div class="song-artist">{{ song.artist_name }}</div>
+                        </div>
+                    </div>
+                    <div class="play-count">{{ song.play_count }} plays</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="stat-box">
+                <h3 class="stat-title">Top 3 Artists</h3>
+                {% for artist in top_artists %}
+                <div class="stat-item">
+                    <div class="artist-info">
+                        <img src="{{ artist.image_url }}"
+                             alt="{{ artist.artist_name }}" class="artist-image">
+                        <div class="artist-text">
+                            <div class="artist-name">{{ artist.artist_name }}</div>
+                        </div>
+                    </div>
+                    <div class="play-count">{{ artist.play_count }} plays</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="stat-box">
+                <h3 class="stat-title">Top Album</h3>
+                <div class="album-info">
+                    {% if top_album.image_url %}
+                    <img src="{{ top_album.image_url }}"
+                         alt="{{ top_album.album_name }}" class="album-image">
+                    {% else %}
+                    <div class="album-image no-image"></div>
+                    {% endif %}
+                    <div class="album-name">{{ top_album.album_name }}</div>
+                    {% if top_album.artist_name %}
+                    <div class="album-artist">{{ top_album.artist_name }}</div>
+                    {% endif %}
+                    <div class="album-play-count">{{ top_album.play_count }} plays</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</body>
+
+</html>
+

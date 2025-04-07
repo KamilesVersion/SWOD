@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Stats | SWOD</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(201, 219, 186);
+        }
+
+        /* Header - exact match to your other pages */
+        .header-container {
+            background-color: rgb(153, 193, 185);
+            padding: 10px 20px;
+            height: 60px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 100%;
+        }
+
+        .profile-link {
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+            padding: 5px 15px;
+        }
+
+        .divider-line {
+            height: 2px;
+            background-color: white;
+            width: 100%;
+        }
+
+        /* Date Picker Content */
+        .content-container {
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .date-picker-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .date-input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .date-input-group label {
+                margin-bottom: 8px;
+                font-weight: bold;
+                color: #2c3e50;
+                font-size: 14px;
+            }
+
+            .date-input-group input {
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 14px;
+            }
+
+        .submit-btn {
+            padding: 12px;
+            background-color: rgb(153, 193, 185);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 5px;
+        }
+
+            .submit-btn:hover {
+                background-color: rgb(133, 173, 165);
+                transform: translateY(-2px);
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+    </style>
+</head>
+<body>
+    <!-- Header - identical to other pages -->
+    <div class="header-container">
+        <div class="header">
+            <h1 style="color: white; margin: 0;">S.W.O.D.</h1>
+            <a href="/profile" class="profile-link">Profile</a>
+        </div>
+    </div>
+    <div class="divider-line"></div>
+
+    <!-- Date Picker Form -->
+    <div class="content-container">
+        <h1 class="page-title">Select Date Range</h1>
+        <form method="POST" action="/custom_stats_results" class="date-picker-form">
+            <div class="date-input-group">
+                <label for="start-date">Start Date</label>
+                <input type="date" id="start-date" name="start_date" required>
+            </div>
+            <div class="date-input-group">
+                <label for="end-date">End Date</label>
+                <input type="date" id="end-date" name="end_date" required>
+            </div>
+            <button type="submit" class="submit-btn">Get Stats</button>
+        </form>
+    </div>
+
+    <script>
+        // Set default dates (last 7 days)
+        document.addEventListener('DOMContentLoaded', function() {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(endDate.getDate() - 7);
+
+            function formatDate(date) {
+                const d = new Date(date);
+                let month = '' + (d.getMonth() + 1);
+                let day = '' + d.getDate();
+                const year = d.getFullYear();
+
+                if (month.length < 2) month = '0' + month;
+                if (day.length < 2) day = '0' + day;
+
+                return [year, month, day].join('-');
+            }
+
+            document.getElementById('start-date').value = formatDate(startDate);
+            document.getElementById('end-date').value = formatDate(endDate);
+        });
+    </script>
+</body>
+</html>

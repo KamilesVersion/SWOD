@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu Page</title>
+
     <style>
         body {
             margin: 0;
@@ -154,6 +155,7 @@
         <a href="top_10_listened_albums" class="menu-button-large">Top 10 Albums</a>
         <a href="top_50_songs" class="menu-button-large">Top 50 Songs</a>
         <a href="genres" class="menu-button-large">Your genres</a>
+        <a href="select_interval" class="menu-button-large">Custom Interval</a>
     </div>
 
     <!-- Most listened song -->
@@ -188,6 +190,8 @@
         <p>Most Listened Spotify Genre:</p>
         <p id="genre-info">Loading...</p>
     </div>
+
+
 
     <script>
         function fetchMostListenedSong() {

@@ -48,6 +48,18 @@
     <Content Include=".env">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="static\styles.css">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="templates\custom_stats.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="templates\custom_stats_input.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="templates\custom_stats_results.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="templates\edit_profile.html">
       <SubType>Code</SubType>
     </Content>
@@ -58,9 +70,6 @@
     </Content>
     <Content Include="templates\last_week.html" />
     <Content Include="templates\login.html" />
-    <Content Include="templates\meniu.html">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="templates\menuPage.html">
       <SubType>Code</SubType>
     </Content>
@@ -72,6 +81,12 @@
     </Content>
     <Content Include="templates\recap_page.html" />
     <Content Include="templates\register.html" />
+    <Content Include="templates\review_statistics.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="templates\select_interval.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="templates\todays_recap.html" />
     <Content Include="templates\top_50_songs.html" />
     <Content Include="templates\top_albums.html">

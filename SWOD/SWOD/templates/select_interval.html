@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Time Interval - S.W.O.D.</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        :root {
+            --primary-green: rgb(153, 193, 185);
+            --light-green: rgb(201, 219, 186);
+            --dark-green: rgb(129, 163, 157);
+            --white: #ffffff;
+            --text-dark: #333333;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: var(--light-green);
+            color: var(--text-dark);
+        }
+
+        .header-container {
+            background-color: var(--primary-green);
+            padding: 10px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--white);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .right-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .menu-link, .profile-link {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+            .menu-link:hover, .profile-link:hover {
+                color: var(--light-green);
+                background-color: rgba(255,255,255,0.1);
+            }
+
+        .line {
+            width: 100%;
+            background-color: var(--primary-green);
+            height: 2px;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: var(--primary-green);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 0 auto 20px;
+            max-width: 500px;
+            display: none;
+            text-align: center;
+            font-weight: bold;
+            border-left: 4px solid #d32f2f;
+        }
+
+        .calendar-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .date-selector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .date-label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-green);
+            font-size: 1.1rem;
+        }
+
+        .calendar-input {
+            padding: 12px 15px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--primary-green);
+            background-color: var(--white);
+            color: var(--text-dark);
+            width: 200px;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+            .calendar-input:focus {
+                outline: none;
+                border-color: var(--dark-green);
+                box-shadow: 0 0 0 3px rgba(153, 193, 185, 0.3);
+            }
+
+        .submit-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .submit-button {
+            background-color: var(--primary-green);
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            color: var(--white);
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+            .submit-button:hover {
+                background-color: var(--dark-green);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            }
+
+            .submit-button:active {
+                transform: translateY(0);
+            }
+
+        /* Flatpickr Calendar Customization */
+        .flatpickr-calendar {
+            background: var(--light-green);
+            border: 2px solid var(--primary-green);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.selected:hover {
+            background: var(--primary-green);
+            border-color: var(--primary-green);
+            color: var(--white);
+        }
+
+        .flatpickr-day.today {
+            border-color: var(--dark-green);
+        }
+
+        .flatpickr-day:hover {
+            background: var(--primary-green);
+            color: var(--white);
+        }
+
+        .flatpickr-weekday {
+            color: var(--primary-green);
+            font-weight: bold;
+        }
+
+        .flatpickr-monthDropdown-months,
+        .flatpickr-current-month input.cur-year {
+            color: var(--primary-green);
+            font-weight: bold;
+        }
+
+        .flatpickr-prev-month:hover svg,
+        .flatpickr-next-month:hover svg {
+            fill: var(--dark-green);
+        }
+
+        @media (max-width: 600px) {
+            .calendar-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .content {
+                margin: 20px 15px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="header">
+            <h1>S.W.O.D.</h1>
+            <div class="right-container">
+                <a href="{{ url_for('menu') }}" class="menu-link">Menu</a>
+                <a href="{{ url_for('profile') }}" class="profile-link">Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="line"></div>
+
+    <div class="content">
+        <h2>Select Your Listening Period</h2>
+
+        <div id="errorMessage" class="error-message">
+            <i class="fas fa-exclamation-circle"></i> Please select both start and end dates before submitting.
+        </div>
+
+        <form id="intervalForm" action="{{ url_for('review_statistics') }}" method="POST">
+            <div class="calendar-container">
+                <div class="date-selector">
+                    <label for="start_date" class="date-label">Start Date</label>
+                    <input type="text" class="calendar-input" id="start_date" name="start_date" placeholder="Click to select" required>
+                </div>
+                <div class="date-selector">
+                    <label for="end_date" class="date-label">End Date</label>
+                    <input type="text" class="calendar-input" id="end_date" name="end_date" placeholder="Click to select" required>
+                </div>
+            </div>
+
+            <div class="submit-container">
+                <button type="submit" class="submit-button">
+                    <i class="fas fa-chart-bar"></i> View Statistics
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        // Initialize calendars with green theme
+        const startPicker = flatpickr("#start_date", {
+            dateFormat: "Y-m-d",
+            maxDate: "today",
+            theme: "light",
+            onReady: function (selectedDates, dateStr, instance) {
+                instance.calendarContainer.style.background = "rgb(201, 219, 186)";
+                instance.calendarContainer.style.borderColor = "rgb(153, 193, 185)";
+                instance.calendarContainer.style.borderRadius = "8px";
+                instance.calendarContainer.style.overflow = "hidden";
+            }
+        });
+
+        const endPicker = flatpickr("#end_date", {
+            dateFormat: "Y-m-d",
+            minDate: document.getElementById("start_date").value,
+            maxDate: "today",
+            theme: "light",
+            onReady: function (selectedDates, dateStr, instance) {
+                instance.calendarContainer.style.background = "rgb(201, 219, 186)";
+                instance.calendarContainer.style.borderColor = "rgb(153, 193, 185)";
+                instance.calendarContainer.style.borderRadius = "8px";
+                instance.calendarContainer.style.overflow = "hidden";
+            }
+        });
+
+        // Update end date minimum when start date changes
+        document.getElementById("start_date").addEventListener("change", function () {
+            endPicker.set("minDate", this.value);
+            if (!document.getElementById("end_date").value) {
+                endPicker.open();
+            }
+        });
+
+        // Form validation
+        document.getElementById("intervalForm").addEventListener("submit", function (e) {
+            const startDate = document.getElementById("start_date").value;
+            const endDate = document.getElementById("end_date").value;
+            const errorElement = document.getElementById("errorMessage");
+
+            if (!startDate || !endDate) {
+                e.preventDefault();
+                errorElement.style.display = "block";
+
+                // Add shake animation to empty fields
+                if (!startDate) {
+                    document.getElementById("start_date").classList.add("shake");
+                    setTimeout(() => {
+                        document.getElementById("start_date").classList.remove("shake");
+                    }, 500);
+                }
+                if (!endDate) {
+                    document.getElementById("end_date").classList.add("shake");
+                    setTimeout(() => {
+                        document.getElementById("end_date").classList.remove("shake");
+                    }, 500);
+                }
+
+                // Hide error after 5 seconds
+                setTimeout(() => {
+                    errorElement.style.display = "none";
+                }, 5000);
+            }
+        });
+
+        // Add shake animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    20%, 60% { transform: translateX(-5px); }
+                    40%, 80% { transform: translateX(5px); }
+                }
+                .shake {
+                    animation: shake 0.5s ease-in-out;
+                    border-color: #d32f2f !important;
+                }
+            `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
