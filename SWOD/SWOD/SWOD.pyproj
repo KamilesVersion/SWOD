@@ -51,15 +51,6 @@
     <Content Include="static\styles.css">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="templates\custom_stats.html">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="templates\custom_stats_input.html">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="templates\custom_stats_results.html">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="templates\edit_profile.html">
       <SubType>Code</SubType>
     </Content>
