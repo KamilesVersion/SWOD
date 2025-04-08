@@ -923,25 +923,52 @@ def genres():
 
 
 # ---------------------------------- ARTISTS BY GENRE ----------------------------------
+# @app.route('/genre/<genre>')
+# @login_required
+# def genre_artists(genre):
+#     user_id = current_user.id
+
+#     # Get distinct artist names for this user and genre
+#     artists = (
+#         db.session.query(ListeningHistory.artist_name)
+#         .filter(
+#             ListeningHistory.user_id == user_id,
+#             ListeningHistory.genre == genre
+#         )
+#         .distinct()
+#         .all()
+#     )
+
+#     artist_list = [artist[0] for artist in artists]
+
+#     return render_template('genre_artists.html', genre=genre, artists=artist_list)
+
 @app.route('/genre/<genre>')
 @login_required
 def genre_artists(genre):
     user_id = current_user.id
 
-    # Get distinct artist names for this user and genre
-    artists = (
+    # Get all artist_name values for the user and genre
+    artists_raw = (
         db.session.query(ListeningHistory.artist_name)
         .filter(
             ListeningHistory.user_id == user_id,
             ListeningHistory.genre == genre
         )
-        .distinct()
         .all()
     )
 
-    artist_list = [artist[0] for artist in artists]
+    # Flatten, split by ", ", and remove duplicates using a set
+    artist_set = set()
+    for entry in artists_raw:
+        for artist in entry[0].split(", "):
+            artist_set.add(artist.strip())
+
+    # Convert back to sorted list for display
+    artist_list = sorted(artist_set)
 
     return render_template('genre_artists.html', genre=genre, artists=artist_list)
+
 
 # ---------------------------------- CUSTOM DATE RANGE STATS ----------------------------------
 @app.route('/select_interval')
