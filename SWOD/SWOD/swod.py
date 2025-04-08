@@ -795,7 +795,6 @@ def top_10_most_listened_albums_json():
     except Exception as e:
         return jsonify({"error": f"Error fetching data: {str(e)}"}), 500
 
-
 # ---------------------------------- TOP ARTISTS ----------------------------------
 @app.route("/top_10_listened_artists")
 @login_required  # <-- kad prie sito kelio galetu eiti tik prisijunge vartotojai
