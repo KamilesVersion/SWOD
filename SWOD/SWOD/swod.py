@@ -923,26 +923,6 @@ def genres():
 
 
 # ---------------------------------- ARTISTS BY GENRE ----------------------------------
-# @app.route('/genre/<genre>')
-# @login_required
-# def genre_artists(genre):
-#     user_id = current_user.id
-
-#     # Get distinct artist names for this user and genre
-#     artists = (
-#         db.session.query(ListeningHistory.artist_name)
-#         .filter(
-#             ListeningHistory.user_id == user_id,
-#             ListeningHistory.genre == genre
-#         )
-#         .distinct()
-#         .all()
-#     )
-
-#     artist_list = [artist[0] for artist in artists]
-
-#     return render_template('genre_artists.html', genre=genre, artists=artist_list)
-
 @app.route('/genre/<genre>')
 @login_required
 def genre_artists(genre):
