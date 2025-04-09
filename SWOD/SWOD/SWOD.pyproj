@@ -48,6 +48,12 @@
     <Content Include=".env">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="static\app.css">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="static\index.css">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="static\styles.css">
       <SubType>Code</SubType>
     </Content>
@@ -59,12 +65,18 @@
     <Content Include="templates\home.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="templates\index.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="templates\last_week.html" />
     <Content Include="templates\login.html" />
     <Content Include="templates\menuPage.html">
       <SubType>Code</SubType>
     </Content>
     <Content Include="templates\profile.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="templates\profile1.html">
       <SubType>Code</SubType>
     </Content>
     <Content Include="templates\recent.html">

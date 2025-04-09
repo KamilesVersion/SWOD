@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 25 53% 90%; /* beige background */
+        --foreground: 345 38% 25%; /* dark text */
+
+        --primary: 345 65% 55%; /* pink */
+        --primary-foreground: 0 0% 100%;
+        --secondary: 29 100% 61%; /* orange */
+        --secondary-foreground: 0 0% 100%;
+        --muted: 345 38% 25% / 0.1;
+        --muted-foreground: 345 38% 40%;
+        --accent: 345 65% 55% / 0.2;
+        --accent-foreground: 345 65% 55%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 345 65% 55% / 0.2;
+        --input: 345 65% 55% / 0.2;
+        --ring: 345 65% 55%;
+        --radius: 1.5rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-app-beige text-app-dark font-sans;
+    }
+
+    h1, h2, h3, h4 {
+        @apply font-bold;
+    }
+}
+
+.swod-logo {
+    font-family: 'Arial', sans-serif;
+    font-weight: 900;
+    letter-spacing: -1px;
+    transform: skew(-10deg);
+    display: inline-block;
+}
+
+.card-container {
+    @apply relative overflow-hidden rounded-[30px] bg-app-pink text-white p-4 flex flex-col items-center justify-center transition-all duration-300;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.menu-button {
+    @apply bg-app-pink text-white font-bold py-3 px-6 rounded-xl w-full mb-4 transition-all duration-300 hover:bg-app-red hover:shadow-lg text-center;
+}

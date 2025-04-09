@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SWOD</title>
+    <meta name="description" content="Music Statistics App" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-logo">
+                <span class="swod-logo text-app-red">S</span>
+                <span class="swod-logo text-app-orange">W</span>
+                <span class="swod-logo text-app-dark">O</span>
+                <span class="swod-logo text-app-orange">D</span>
+            </div>
+        </header>
+
+        <!-- Side Menu -->
+        <div id="sideMenu" class="side-menu">
+            <div class="side-menu-content">
+                <div class="profile-button-container">
+                    <a href="profile1" class="profile-button">
+                        <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="collapse-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+                </div>
+
+                <div class="menu-content">
+                    <div class="menu-header">
+                        <a href="menu" class="back-to-menu">
+                            back2menu
+                        </a>
+                    </div>
+
+                    <a href="#" class="menu-button">top 10 artists</a>
+                    <a href="#" class="menu-button">top 50 songs</a>
+                    <a href="#" class="menu-button">your recaps</a>
+                    <a href="#" class="menu-button">custom interval</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-container">
+            <div class="favorites-grid">
+                <!-- Album Card -->
+                <div class="card-section">
+                    <h2 class="card-title">fav album</h2>
+                    <div class="card-container aspect-square">
+                        <div class="w-full h-3/5 overflow-hidden mb-2">
+                            <img src="/lovable-uploads/d86933fc-dc50-4d50-ac15-991d4b4a6bf8.png"
+                                 alt="Preacher's Daughter"
+                                 class="card-image" />
+                        </div>
+                        <div class="card-text">
+                            <h3 class="card-content-title">Preacher's Daughter</h3>
+                            <p class="card-content-subtitle">Ethel Cain</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Song Card -->
+                <div class="card-section">
+                    <h2 class="card-title">fav song</h2>
+                    <div class="card-container aspect-square">
+                        <div class="w-full h-3/5 overflow-hidden mb-2">
+                            <img src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=300&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY4MTcxNjE2OA&ixlib=rb-4.0.3&q=80&w=300"
+                                 alt="Uzp... velnias"
+                                 class="card-image" />
+                        </div>
+                        <div class="card-text">
+                            <h3 class="card-content-title">Uzp... velnias</h3>
+                            <p class="card-content-subtitle">Liv@</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Genre Card -->
+                <div class="card-section">
+                    <h2 class="card-title">fav genre</h2>
+                    <div class="card-container card-no-image aspect-square">
+                        <div class="card-text-center">
+                            <h3 class="card-content-title large-text">hyperpop</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Artist Card -->
+                <div class="card-section">
+                    <h2 class="card-title">fav artist</h2>
+                    <div class="card-container aspect-square">
+                        <div class="w-full h-3/5 overflow-hidden mb-2">
+                            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=300&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY4MTcxNjE3MQ&ixlib=rb-4.0.3&q=80&w=300"
+                                 alt="Jeffree Star"
+                                 class="card-image" />
+                        </div>
+                        <div class="card-text">
+                            <h3 class="card-content-title">Jeffree Star</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Required for Select functionality -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const collapseButton = document.querySelector(".collapse-button");
+            const sideMenu = document.querySelector(".side-menu");
+
+            collapseButton.addEventListener("click", function () {
+                sideMenu.classList.toggle("collapsed");
+            });
+        });
+    </script>
+
+</body>
+</html>

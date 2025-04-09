@@ -259,36 +259,71 @@ def recent():
 
 
 # ---------------------------------- ALL PROFILE PAGES ----------------------------------
-@app.route('/profile')
+# @app.route('/profile1')
+# @login_required
+# def profile1():
+#     if not current_user.is_authenticated:
+#         return redirect(url_for('login'))
+     
+#     token_info = session.get("token_info", None)
+#     if not token_info:
+#         return redirect(url_for("connect_spotify", next=url_for("profile1")))
+#     # Refresh token if expired
+#     sp_oauth = spotify.create_spotify_oauth()
+#     if sp_oauth.is_token_expired(token_info):
+#         token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
+#         session["token_info"] = token_info # Save the new token
+
+#     # Use the access token to fetch user details
+#     # sp = spotipy.Spotify(auth=token_info["access_token"])
+#     # user_info = sp.current_user()
+
+#     sp = spotify.get_spotify_client()  # Naudojame get_spotify_client funkcij 
+#     if sp:
+#         user_info = sp.current_user()
+#     else:
+#         return redirect(url_for("connect_spotify", next=url_for("profile1")))  # Jei n ra galiojan io tokeno
+
+@app.route('/profile1')
 @login_required
-def profile():
+def profile1():
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
-     
+
     token_info = session.get("token_info", None)
     if not token_info:
-        return redirect(url_for("connect_spotify", next=url_for("profile")))
-    # Refresh token if expired
+        return redirect(url_for("connect_spotify", next=url_for("profile1")))
+
     sp_oauth = spotify.create_spotify_oauth()
     if sp_oauth.is_token_expired(token_info):
         token_info = sp_oauth.refresh_access_token(token_info["refresh_token"])
-        session["token_info"] = token_info # Save the new token
+        session["token_info"] = token_info
 
-    # Use the access token to fetch user details
-    # sp = spotipy.Spotify(auth=token_info["access_token"])
-    # user_info = sp.current_user()
+    sp = spotify.get_spotify_client()
+    spotify_logged_in = False
+    profile_pic = None
+    user = None
 
-    sp = spotify.get_spotify_client()  # Naudojame get_spotify_client funkcij 
     if sp:
         user_info = sp.current_user()
-    else:
-        return redirect(url_for("connect_spotify", next=url_for("profile")))  # Jei n ra galiojan io tokeno
+        spotify_logged_in = True
+        user = user_info.get("display_name")
+        images = user_info.get("images")
+        if images:
+            profile_pic = images[0].get("url")
 
-    
+    return render_template(
+        "profile1.html",
+        username=current_user.username,
+        spotify_logged_in=spotify_logged_in,
+        user=user,
+        profile_pic=profile_pic
+    )
+   
 
 
 
-    return render_template('profile.html', 
+    return render_template('profile1.html', 
                            user=user_info["display_name"], # spotify name
                            profile_pic=user_info["images"][0]["url"] if user_info["images"] else None,
                            username=current_user.username,
@@ -321,6 +356,8 @@ def logout():
     logout_user()
     session.clear()
     return redirect(url_for('home'))
+
+
 
 @app.route('/remove', methods=['GET', 'POST'])
 @login_required
@@ -1116,6 +1153,15 @@ def review_statistics():
     except Exception as e:
         flash('Error processing your request: ' + str(e), 'error')
         return redirect(url_for('select_interval'))
+    
+#----------------------------------TEST---------------------------------------------------
+
+@app.route('/index')
+def index():
+    return render_template('index.html')
+
+
+
 
 # ----------------------- IDK KAS CIA BET TURI LIKT GALE ---------------------------------
 if(__name__) == '__main__':
