@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 import pytz
 from datetime import datetime, timedelta
 from flask_migrate import Migrate
-from collections import Counter
+from collections import Counter, defaultdict
 from models import db, User, ListeningHistory
 from sqlalchemy.sql import func, desc
 from spotify import SpotifyService
@@ -507,6 +507,18 @@ def yesterday_recap():
     song_durations = {}  # Store accumulated time per song
     total_minutes = 0
 
+    # Day periods
+    time_periods = {
+        "Early Morning": (4, 7), # 04:00–07:59
+        "Morning": (8, 11),
+        "Afternoon": (12, 15),
+        "Evening": (16, 19),
+        "Night": (20, 23),
+        "Late Night": (0, 3)
+    }
+
+    time_of_day_counter = defaultdict(int)
+
     for track in yesterday_tracks:
         key = (track.track_name, track.artist_name)
         song_counter[key] += 1
@@ -519,6 +531,14 @@ def yesterday_recap():
             song_durations[key] = track.duration_ms
 
         total_minutes += track.duration_ms
+        
+        # covert UTC to LT
+        played_time_lt = track.played_at.astimezone(lithuanian_tz)
+        hour = played_time_lt.hour
+        for label, (start_hour, end_hour) in time_periods.items():
+            if start_hour <= hour <= end_hour:
+                time_of_day_counter[label] += 1 
+                break
 
     # Get top artist and top song
     top_artist, top_artist_count = artist_counter.most_common(1)[0] if artist_counter else ("No data", 0)
@@ -546,12 +566,24 @@ def yesterday_recap():
         song_cover = song_search[0]["album"]["images"][0]["url"] if song_search and song_search[0]["album"]["images"] else None
     except:
         song_cover = None
+        
+    # Most active time of the day
+    most_active_time, time_play_count = max(time_of_day_counter.items(), key=lambda x: x[1]) if time_of_day_counter else ("No data", 0)
+
+    # Convert time_of_day_counter to list for chart
+    time_labels = list(time_of_day_counter.keys())
+    time_counts = list(time_of_day_counter.values())
 
     return render_template('yesterday_recap.html',
                            top_artist={"name": top_artist, "plays": top_artist_count, "image": artist_image},
                            top_song={"name": top_song, "artist": top_song_artist, "plays": top_song_count, "cover": song_cover},
                            total_minutes=total_minutes,
-                           song_durations=song_durations)
+                           song_durations=song_durations,
+                           most_active_time=most_active_time,
+                           time_play_count=time_play_count,
+                           time_labels=time_labels,
+                           time_counts=time_counts 
+   )
 
 # TODAY RECAP
 @app.route('/todays_recap')
