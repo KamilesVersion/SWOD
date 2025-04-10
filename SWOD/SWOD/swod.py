@@ -284,7 +284,7 @@ def recent():
 #     else:
 #         return redirect(url_for("connect_spotify", next=url_for("profile1")))  # Jei n ra galiojan io tokeno
 
-@app.route('/profile')
+@app.route('/profile1')
 @login_required
 def profile():
     if not current_user.is_authenticated:
@@ -312,17 +312,14 @@ def profile():
         if images:
             profile_pic = images[0].get("url")
 
-    return render_template(
-        "profile.html",
-        username=current_user.username,
-        spotify_logged_in=spotify_logged_in,
-        user=user,
-        profile_pic=profile_pic
-    )
+    # return render_template(
+    #     "profile.html",
+    #     username=current_user.username,
+    #     spotify_logged_in=spotify_logged_in,
+    #     user=user,
+    #     profile_pic=profile_pic
+    # )
    
-
-
-
     return render_template('profile1.html', 
                            user=user_info["display_name"], # spotify name
                            profile_pic=user_info["images"][0]["url"] if user_info["images"] else None,
@@ -1146,7 +1143,7 @@ def review_statistics():
         return render_template('review_statistics.html',
                             top_songs=formatted_songs,
                             top_artists=formatted_artists,
-                            top_album=top_album,
+                            top_album=formatted_album,
                             start_date=start_date.date(),
                             end_date=(end_date - timedelta(days=1)).date())
         
