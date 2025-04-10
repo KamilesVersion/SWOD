@@ -189,9 +189,10 @@ h1, h2, h3, h4 {
 
 .favorites-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); 
-    gap: 1rem; 
-    margin-left: 1rem;
+    grid-template-columns: repeat(2, minmax(50px, 500px));
+    gap: 0.1rem;
+    margin-left: 0rem;
+    padding: 0 1rem;
 }
 
 
@@ -208,9 +209,9 @@ h1, h2, h3, h4 {
 }
 
 .card-container {
-    width: 100%;
-    height: 0;
-    padding-bottom: 90%; /* Creates a square aspect ratio */
+    width: 450px;
+    height: 450px;
+    padding-bottom: 50%; /* Creates a square aspect ratio */
     position: relative;
     background-color: white;
     border-radius: 1rem;
@@ -228,6 +229,7 @@ h1, h2, h3, h4 {
 .card-text {
     padding: 0.75rem;
     text-align: center;
+    font-size: 0.875rem;
 }
 
 .w-full {
@@ -391,6 +393,7 @@ h1, h2, h3, h4 {
 
     .favorites-grid {
         grid-template-columns: 1fr;
+
     }
 
     /*.main-container {
@@ -400,6 +403,7 @@ h1, h2, h3, h4 {
     .main-container {
         padding-right: 22rem;
         transition: padding-right 0.3s ease;
+
     }
 
     .side-menu.collapsed ~ .main-container {
@@ -414,6 +418,9 @@ h1, h2, h3, h4 {
     display: none;
 }
 
+.side-menu.collapsed ~ .main-container .favorites-grid {
+    padding-right: 0; 
+}
 
 /* Aspect ratio utility */
 .aspect-square {
