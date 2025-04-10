@@ -529,8 +529,23 @@ def yesterday_recap():
         ListeningHistory.played_at <= yesterday_end
     ).all()
 
+    # if not yesterday_tracks:
+    #     return render_template('yesterday_recap.html', message="No listening data found for yesterday")
+    
     if not yesterday_tracks:
-        return render_template('yesterday_recap.html', message="No listening data found for yesterday")
+        return render_template(
+            'yesterday_recap.html',
+               message="No listening data found for yesterday",
+            top_artist={"name": "No data", "plays": 0, "image": None},
+            top_song={"name": "No data", "artist": "Unknown", "plays": 0, "cover": None},
+            total_minutes=0,
+            song_durations={},
+            most_active_time="No data",
+            time_play_count=0,
+            time_labels=[],
+            time_counts=[]
+    )
+
 
     # Count occurrences of songs and artists
     song_counter = Counter()
