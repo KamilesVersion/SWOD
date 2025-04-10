@@ -396,10 +396,20 @@ def last_week_recap():
     total_minutes = 0
     artist_images = {}
     song_details = {}
+    time_of_day_counter = defaultdict(int)
+    # Day periods
+    time_periods = {
+        "Early Morning": (4, 7), # 04:00–07:59
+        "Morning": (8, 11),
+        "Afternoon": (12, 15),
+        "Evening": (16, 19),
+        "Night": (20, 23),
+        "Late Night": (0, 3)
+    }
     
     sp = spotify.get_spotify_client()
     if not sp:
-        return redirect(url_for("connect_spotify", next=url_for("last_week_recap")))
+        return redirect(url_for("connect_spotify", next=url_for("last_week_recap")))    
     
     for track in last_week_tracks:
         song_counter[track.track_name, track.artist_name] += 1
@@ -412,6 +422,13 @@ def last_week_recap():
         song_durations[key] = song_durations.get(key, 0) + track.duration_ms
         album_durations[track.album_name] = album_durations.get(track.album_name, 0) + track.duration_ms
     
+        # covert time
+        played_time_lt = to_lithuanian_time(track.played_at)
+        hour = played_time_lt.hour
+        for label, (start_hour, end_hour) in time_periods.items():
+            if start_hour <= hour <= end_hour:
+                time_of_day_counter[label] += 1 
+                break
 
     song_durations = {key: round(value / (1000 * 60)) for key, value in song_durations.items()}
     album_durations = {key: round(value / (1000 * 60)) for key, value in album_durations.items()}
@@ -470,15 +487,29 @@ def last_week_recap():
         "cover": album_details.get("cover", None),
         "total_minutes": album_durations.get(most_played_album_name, 0),
     }
+
+    most_active_time, time_play_count = max(time_of_day_counter.items(), key=lambda x: x[1]) if time_of_day_counter else ("No data", 0)
+    # for chart
+    time_labels = list(time_of_day_counter.keys())
+    time_counts = list(time_of_day_counter.values())
     
     return render_template(
         'last_week.html',
         top_artists=top_artists,
         top_songs=top_songs,
         most_played_album=most_played_album,
-        total_minutes=total_minutes
+        total_minutes=total_minutes,
+        most_active_time=most_active_time,
+        time_play_count=time_play_count,
+        time_labels=time_labels,
+        time_counts=time_counts
     )
 
+# UTC time to LT 
+def to_lithuanian_time(dt):
+    if dt.tzinfo is None:
+        dt = pytz.UTC.localize(dt)
+    return dt.astimezone(pytz.timezone("Europe/Vilnius"))    
 # YESTERDAY RECAP
 @app.route('/yesterday_recap')
 @login_required
@@ -533,7 +564,7 @@ def yesterday_recap():
         total_minutes += track.duration_ms
         
         # covert UTC to LT
-        played_time_lt = track.played_at.astimezone(lithuanian_tz)
+        played_time_lt = to_lithuanian_time(track.played_at)
         hour = played_time_lt.hour
         for label, (start_hour, end_hour) in time_periods.items():
             if start_hour <= hour <= end_hour:
