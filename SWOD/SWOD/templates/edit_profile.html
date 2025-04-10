@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -105,5 +105,65 @@
 
         <a href="{{ url_for('profile') }}">Back to Profile</a>
     </div>
+</body>
+</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="profile-container">
+    <div class="profile-card">
+        <button onclick="window.location.href='{{ url_for('profile') }}'" class="back-button">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Profile
+        </button>
+
+        <div class="profile-content">
+            <h1 class="profile-heading">Edit Your Profile</h1>
+            <p id="success-message" class="flash-messages">Changes saved successfully! Redirecting to login...</p>
+
+            <form action="{{ url_for('edit_profile') }}" method="POST" class="profile-info" onsubmit="showSuccessMessage()">
+                {{ form.hidden_tag() }}
+
+                <div class="profile-section">
+                    <label for="new_username" class="profile-section-label">New Username</label>
+                    <input type="text" name="new_username" id="new_username" placeholder="Change your username" class="input-style">
+                    {% for error in form.new_username.errors %}
+                    <p style="color: red;">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="profile-section">
+                    <label for="new_password" class="profile-section-label">New Password</label>
+                    <input type="password" name="new_password" id="new_password" placeholder="Change your password" class="input-style">
+                    {% for error in form.new_password.errors %}
+                    <p style="color: red;">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="menu-button">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    function showSuccessMessage() {
+      const messageBox = document.getElementById("success-message");
+      messageBox.style.display = "block";
+      setTimeout(function () {
+        window.location.href = "{{ url_for('login') }}";
+      }, 3000);
+    }
+    </script>
 </body>
 </html>

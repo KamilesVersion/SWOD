@@ -426,3 +426,31 @@ h1, h2, h3, h4 {
 .aspect-square {
     position: relative;
 }
+
+.input-style {
+    padding: 0.75rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    width: 100%;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+    .input-style:focus {
+        outline: none;
+        border-color: var(--app-pink);
+        box-shadow: 0 0 0 3px rgba(228, 52, 110, 0.2);
+    }
+
+.flash-messages {
+    background-color: var(--app-pink);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    display: none;
+}
+
