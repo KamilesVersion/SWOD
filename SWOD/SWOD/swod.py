@@ -284,15 +284,15 @@ def recent():
 #     else:
 #         return redirect(url_for("connect_spotify", next=url_for("profile1")))  # Jei n ra galiojan io tokeno
 
-@app.route('/profile1')
+@app.route('/profile')
 @login_required
-def profile1():
+def profile():
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
 
     token_info = session.get("token_info", None)
     if not token_info:
-        return redirect(url_for("connect_spotify", next=url_for("profile1")))
+        return redirect(url_for("connect_spotify", next=url_for("profile")))
 
     sp_oauth = spotify.create_spotify_oauth()
     if sp_oauth.is_token_expired(token_info):
@@ -313,7 +313,7 @@ def profile1():
             profile_pic = images[0].get("url")
 
     return render_template(
-        "profile1.html",
+        "profile.html",
         username=current_user.username,
         spotify_logged_in=spotify_logged_in,
         user=user,
