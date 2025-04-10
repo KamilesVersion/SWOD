@@ -190,7 +190,7 @@
         <!-- chart-->
         <div class="section">
             <h3>Listening Distribution by Time of Day</h3>
-            {% if time_counts and time counts|sum > 0 %}
+            {% if time_counts and time_counts|sum > 0 %}
                 <canvas id="timeOfDayChart" width="400" height="400" style="margin: 0 auto;"></canvas>
             {% else %}
                 <p class="highlight">No data</p>
