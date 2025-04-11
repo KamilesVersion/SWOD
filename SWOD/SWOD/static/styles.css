@@ -1,4 +1,463 @@
 /* Base Styles */
+/*:root {
+    --app-beige: #F6E3D4;
+    --app-orange: #FF8C42;
+    --app-red: #DB3056;
+    --app-dark: #532B30;
+    --app-pink: #E4346E;
+    --menu-orange: #F7893E;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--app-beige);
+    color: var(--app-dark);
+    min-height: 100vh;
+}*/
+
+/* Typography */
+/*h1, h2, h3, h4 {
+    font-weight: bold;
+}*/
+
+/* Layout */
+/*.app {
+    position: relative;
+    min-height: 100vh;
+}*/
+
+/* Header */
+/*.header {
+    width: 100%;
+    padding: 1rem 1rem 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.header-logo {
+    display: flex;
+}
+
+.swod-logo {
+    font-family: 'Arial', sans-serif;
+    font-weight: 900;
+    letter-spacing: -1px;
+    transform: skew(-10deg);
+    display: inline-block;
+    font-size: 1.875rem;
+}
+
+.text-app-red {
+    color: var(--app-red);
+}
+
+.text-app-orange {
+    color: var(--app-orange);
+}
+
+.text-app-dark {
+    color: var(--app-dark);
+}*/
+
+/* Side Menu */
+/*.side-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 20rem;
+    background-color: var(--menu-orange);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+}
+
+    .side-menu.collapsed {
+        width: 4rem;
+    }
+
+.side-menu-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+
+.profile-button-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.profile-button {
+    border-radius: 9999px;
+    padding: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    .profile-button:hover {
+        background-color: rgba(229, 231, 235, 0.5);
+    }
+
+.user-icon {
+    width: 40px;
+    height: 40px;
+    color: #4B5563;
+}
+
+.collapse-button {
+    position: absolute;
+    top: 5rem;
+    left: 1rem;
+    padding: 0.5rem;
+    background-color: white;
+    border-radius: 9999px;
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+}
+
+    .collapse-button:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+.menu-content {
+    width: 100%;
+    margin-top: 2.5rem;
+}
+
+.menu-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.back-to-menu {
+    background: none;
+    border: none;
+    font-size: 2.25rem;
+    font-weight: bold;
+    color: var(--app-pink);
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+    .back-to-menu:hover {
+        color: rgba(228, 52, 110, 0.8);
+    }
+
+.menu-button {
+    background-color: var(--app-pink);
+    color: white;
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    width: 100%;
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+    .menu-button:hover {
+        background-color: var(--app-red);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+.menu-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; 
+    width: 100%;
+    gap: 1rem; 
+    margin-top: 2.5rem;
+}
+
+
+.favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(50px, 500px));
+    gap: 0.1rem;
+    margin-left: 0rem;
+    padding: 0 1rem;
+}
+
+
+.card-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--app-dark);
+    text-align: center;
+    width: 100%;
+    margin-left: -1.5rem;
+}
+
+
+.card-container {
+    width: 450px;
+    height: 450px;
+    padding-bottom: 50%;*/ /* Creates a square aspect ratio */
+    /*position: relative;
+    background-color: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.card-text {
+    padding: 0.75rem;
+    text-align: center;
+    font-size: 0.875rem;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.h-3\/5 {
+    height: 60%;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.card-no-image {
+    background-color: var(--app-pink);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.card-text-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+
+.card-content-title {
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: var(--app-dark);
+}
+
+.large-text {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.card-content-subtitle {
+    font-size: 0.875rem;
+    color: #6B7280;
+}*/
+
+/* Profile page styling */
+/*.profile-container {
+    min-height: 100vh;
+    background-color: var(--app-beige);
+    padding: 1.5rem 1rem;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    color: var(--app-dark);
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 2rem;
+}
+
+    .back-button svg {
+        margin-right: 0.5rem;
+    }
+
+.profile-card {
+    background-color: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    max-width: 32rem;
+    margin: 0 auto;
+}
+
+.profile-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-avatar {
+    width: 8rem;
+    height: 8rem;
+    border-radius: 9999px;
+    background-color: #E5E7EB;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .profile-avatar svg {
+        width: 4rem;
+        height: 4rem;
+        color: #9CA3AF;
+    }
+
+.profile-heading {
+    font-size: 1.875rem;
+    font-weight: bold;
+    color: var(--app-dark);
+    margin-bottom: 0.5rem;
+}
+
+.profile-subheading {
+    color: #6B7280;
+    margin-bottom: 2rem;
+}
+
+.profile-info {
+    width: 100%;
+}
+
+.profile-section {
+    border-top: 1px solid #E5E7EB;
+    padding-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-section-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--app-dark);
+    margin-bottom: 1rem;
+}
+
+.profile-section-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.profile-section-label {
+    color: #6B7280;
+}
+
+.profile-section-value {
+    font-weight: 500;
+    color: var(--app-dark);
+}*/
+
+/* Responsive */
+/*@media (max-width: 768px) {
+    .side-menu {
+        width: 4rem;
+    }
+
+    .menu-content {
+        display: none;
+    }
+
+    .favorites-grid {
+        grid-template-columns: 1fr;
+
+    }*/
+
+    /*.main-container {
+        padding-right: 5rem;
+    }*/
+
+    /*.main-container {
+        padding-right: 22rem;
+        transition: padding-right 0.3s ease;
+
+    }
+
+    .side-menu.collapsed ~ .main-container {
+        padding-right: 6rem; 
+    }
+
+}
+
+
+.side-menu.collapsed .menu-content,
+.side-menu.collapsed .menu-header {
+    display: none;
+}
+
+.side-menu.collapsed ~ .main-container .favorites-grid {
+    padding-right: 0; 
+}*/
+
+/* Aspect ratio utility */
+/*.aspect-square {
+    position: relative;
+}
+
+.input-style {
+    padding: 0.75rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    width: 100%;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+    .input-style:focus {
+        outline: none;
+        border-color: var(--app-pink);
+        box-shadow: 0 0 0 3px rgba(228, 52, 110, 0.2);
+    }
+
+.flash-messages {
+    background-color: var(--app-pink);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    display: none;
+}*/
+
+/* Base Styles */
 :root {
     --app-beige: #F6E3D4;
     --app-orange: #FF8C42;
@@ -180,9 +639,9 @@ h1, h2, h3, h4 {
 .menu-content {
     display: flex;
     flex-direction: column;
-    align-items: stretch; 
+    align-items: stretch;
     width: 100%;
-    gap: 1rem; 
+    gap: 1rem;
     margin-top: 2.5rem;
 }
 
@@ -206,6 +665,9 @@ h1, h2, h3, h4 {
     font-size: 1.25rem;
     font-weight: bold;
     color: var(--app-dark);
+    text-align: center;
+    width: 100%;
+    margin-left: -1.5rem;
 }
 
 .card-container {
@@ -257,21 +719,55 @@ h1, h2, h3, h4 {
     height: 100%;
 }
 
-.card-text-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
+.card-text-bottom {
     position: absolute;
-    top: 0;
-    left: 0;
+    bottom: 2.5rem;
+    left: 1rem;
+    right: 1rem;
+    text-align: center;
+    color: white;
+}
+
+.card-text-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+.genre-card {
+    background-color: var(--app-pink);
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+}
+
+.image-wrapper {
+    width: 450px;
+    height: 450px;
+    margin-top: -20px; /* PAKELIA paveiksliukà á virðø, bet NEUÞ KORTELËS */
+}
+
+.card-image {
+    width: 100%;
+    height: 80%;
+    border-radius: 0.75rem;
+    object-fit: cover;
 }
 
 .card-content-title {
     font-weight: bold;
     font-size: 1.25rem;
-    color: var(--app-dark);
+    color: white;
 }
 
 .large-text {
@@ -393,7 +889,6 @@ h1, h2, h3, h4 {
 
     .favorites-grid {
         grid-template-columns: 1fr;
-
     }
 
     /*.main-container {
@@ -403,13 +898,11 @@ h1, h2, h3, h4 {
     .main-container {
         padding-right: 22rem;
         transition: padding-right 0.3s ease;
-
     }
 
     .side-menu.collapsed ~ .main-container {
-        padding-right: 6rem; 
+        padding-right: 6rem;
     }
-
 }
 
 
@@ -419,7 +912,7 @@ h1, h2, h3, h4 {
 }
 
 .side-menu.collapsed ~ .main-container .favorites-grid {
-    padding-right: 0; 
+    padding-right: 0;
 }
 
 /* Aspect ratio utility */

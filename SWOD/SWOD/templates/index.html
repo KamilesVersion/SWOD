@@ -25,10 +25,14 @@
             <div class="side-menu-content">
                 <div class="profile-button-container">
                     <a href="profile1" class="profile-button">
+                        {% if profile_pic %}
+                        <img src="{{ profile_pic }}" alt="Profile Picture" class="user-icon" style="border-radius: 50%; width: 50px; height: 50px;" />
+                        {% else %}
                         <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
+                        {% endif %}
                     </a>
                 </div>
 
@@ -61,11 +65,11 @@
                 <!-- Album Card (dynamic) -->
                 <div class="card-section">
                     <h2 class="card-title">fav album</h2>
-                    <div class="card-container aspect-square">
-                        <div class="w-full h-3/5 overflow-hidden mb-2">
+                    <div class="card-container genre-card">
+                        <div class="image-wrapper">
                             <img id="album-cover" src="" alt="Album Cover" class="card-image" style="display: none;" />
                         </div>
-                        <div class="card-text">
+                        <div class="card-text-bottom">
                             <h3 id="album-info" class="card-content-title">Loading...</h3>
                         </div>
                     </div>
@@ -74,11 +78,11 @@
                 <!-- Song Card (dynamic) -->
                 <div class="card-section">
                     <h2 class="card-title">fav song</h2>
-                    <div class="card-container aspect-square">
-                        <div class="w-full h-3/5 overflow-hidden mb-2">
+                    <div class="card-container genre-card">
+                        <div class="image-wrapper">
                             <img id="song-cover" src="" alt="Song Cover" class="card-image" style="display: none;" />
                         </div>
-                        <div class="card-text">
+                        <div class="card-text-bottom">
                             <h3 id="song-info" class="card-content-title">Loading...</h3>
                         </div>
                     </div>
@@ -97,11 +101,11 @@
                 <!-- Artist Card (dynamic) -->
                 <div class="card-section">
                     <h2 class="card-title">fav artist</h2>
-                    <div class="card-container aspect-square">
-                        <div class="w-full h-3/5 overflow-hidden mb-2">
+                    <div class="card-container genre-card">
+                        <div class="image-wrapper">
                             <img id="artist-image" src="" alt="Artist Image" class="card-image" style="display: none;" />
                         </div>
-                        <div class="card-text">
+                        <div class="card-text-bottom">
                             <h3 id="artist-info" class="card-content-title">Loading...</h3>
                         </div>
                     </div>
