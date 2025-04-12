@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home - SWOD</title>
+    <meta name="description" content="Home Page" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 
 <body>
-    <h1>Welcome to S.W.O.D.</h1>
-    <a href="{{ url_for('login') }}">Login Page</a><br>
-    <a href="{{ url_for('register') }}">Register Page</a><br>
+    <div class="home-container">
+        <div class="home-card">
+            <div class="home-header">
+                <h1 class="home-title">Welcome to</h1>
+                <img src="{{ url_for('static', filename='SWOD_LOGO.png') }}" alt="Logo" class="home-logo" />
+            </div>
+            <p class="home-subtitle">Your Spotify Wrapped On Demand</p>
 
+            <div class="home-buttons">
+                <a class="menu-button" href="{{ url_for('login') }}">Login</a>
+                <a class="menu-button" href="{{ url_for('register') }}">Register</a>
+            </div>
+        </div>
+    </div>
 </body>
-
 </html>

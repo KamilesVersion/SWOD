@@ -57,6 +57,7 @@
     <Content Include="static\styles.css">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="static\SWOD_LOGO.png" />
     <Content Include="templates\artist_top_tracks.html">
       <SubType>Code</SubType>
     </Content>
