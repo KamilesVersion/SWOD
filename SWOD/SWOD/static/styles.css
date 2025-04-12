@@ -749,3 +749,28 @@ input:-webkit-autofill {
 .song-title {
     color: orange; /* Optional: Change the song title color to orange */
 }
+
+.recap-button-container {
+    margin-top: 20px;
+    display: flex;
+    /*justify-content: center;*/
+    margin-left: 300px;
+    margin-top:50px;
+    gap: 20px;
+}
+
+.recap-button {
+    background-color: #FF8C42;
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    color: #E4346E;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+    .recap-button:hover {
+        background-color: #532B30;
+    }
