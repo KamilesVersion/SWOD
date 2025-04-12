@@ -712,3 +712,40 @@ input:-webkit-autofill {
     width: 200px; /* Adjust this size to your preference */
     height: auto; /* Maintain aspect ratio */
 }
+
+.song-list-horizontal {
+    display: block; /* Stack the song cards vertically */
+}
+
+.song-card-horizontal {
+    display: flex;
+    margin: 10px 0;
+    align-items: center;
+    background-color: white;
+    padding: 20px; /* Increased padding for longer height */
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 1000px; /* Make it take up full width of its container */
+    margin-bottom: 20px; /* Increase space between cards */
+}
+
+.song-cover-small {
+    width: 100px; /* Increase size of the cover image */
+    height: 100px;
+    margin-right: 20px;
+    border-radius: 8px;
+}
+
+.song-details {
+    flex: 1;
+}
+
+.card-title-50 {
+    color: #532B30;
+    margin-bottom: 20px;
+    margin-left: 8px;
+}
+
+.song-title {
+    color: orange; /* Optional: Change the song title color to orange */
+}
