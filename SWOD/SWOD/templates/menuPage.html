@@ -250,6 +250,175 @@
     </script>
 </body>
 </html>-->
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SWOD</title>
+    <meta name="description" content="Music Statistics App" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <div class="app">-->
+<!-- Header -->
+<!--<header class="header">
+    <div class="header-logo">
+        <span class="swod-logo text-app-red">S</span>
+        <span class="swod-logo text-app-orange">W</span>
+        <span class="swod-logo text-app-dark">O</span>
+        <span class="swod-logo text-app-orange">D</span>
+    </div>
+</header>-->
+<!-- Side Menu -->
+<!--<div id="sideMenu" class="side-menu">
+    <div class="side-menu-content">
+        <div class="profile-button-container">
+            <a href="profile1" class="profile-button">
+                {% if profile_pic %}
+                <img src="{{ profile_pic }}" alt="Profile Picture" class="user-icon" style="border-radius: 50%; width: 50px; height: 50px;" />
+                {% else %}
+                <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                {% endif %}
+            </a>
+        </div>
+
+
+
+        <div class="menu-content">
+            <div class="menu-header">
+                <a href="menu" class="back-to-menu">back2menu</a>
+            </div>-->
+<!-- Buttons from menuPage.html -->
+<!--<a href="recent" class="menu-button">Recent Tracks</a>
+            <a href="recap" class="menu-button">Your Recaps</a>
+            <a href="top_10_listened_artists" class="menu-button">Top 10 Artists</a>
+            <a href="top_10_listened_albums" class="menu-button">Top 10 Albums</a>
+            <a href="top_50_songs" class="menu-button">Top 50 Songs</a>
+            <a href="genres" class="menu-button">Your Genres</a>
+            <a href="select_interval" class="menu-button">Custom Interval</a>
+            <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">Ieškoti atlikėjo dainų</a>
+        </div>
+    </div>
+</div>-->
+<!-- Main Content -->
+<!--<main class="main-container">
+    <div class="favorites-grid">-->
+<!-- Album Card (dynamic) -->
+<!--<div class="card-section">
+    <h2 class="card-title">fav album</h2>
+    <div class="card-container genre-card">
+        <div class="image-wrapper">
+            <img id="album-cover" src="" alt="Album Cover" class="card-image" style="display: none;" />
+        </div>
+        <div class="card-text-bottom">
+            <h3 id="album-info" class="card-content-title">Loading...</h3>
+        </div>
+    </div>
+</div>-->
+<!-- Song Card (dynamic) -->
+<!--<div class="card-section">
+    <h2 class="card-title">fav song</h2>
+    <div class="card-container genre-card">
+        <div class="image-wrapper">
+            <img id="song-cover" src="" alt="Song Cover" class="card-image" style="display: none;" />
+        </div>
+        <div class="card-text-bottom">
+            <h3 id="song-info" class="card-content-title">Loading...</h3>
+        </div>
+    </div>
+</div>-->
+<!-- Genre Card (dynamic) -->
+<!--<div class="card-section">
+    <h2 class="card-title">fav genre</h2>
+    <div class="card-container card-no-image aspect-square">
+        <div class="card-text-center">
+            <h3 id="genre-info" class="card-content-title large-text">Loading...</h3>
+        </div>
+    </div>
+</div>-->
+<!-- Artist Card (dynamic) -->
+<!--<div class="card-section">
+                <h2 class="card-title">fav artist</h2>
+                <div class="card-container genre-card">
+                    <div class="image-wrapper">
+                        <img id="artist-image" src="" alt="Artist Image" class="card-image" style="display: none;" />
+                    </div>
+                    <div class="card-text-bottom">
+                        <h3 id="artist-info" class="card-content-title">Loading...</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>-->
+<!-- JavaScript -->
+<!--<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Toggle side menu
+            const collapseButton = document.querySelector(".collapse-button");
+            const sideMenu = document.querySelector(".side-menu");
+
+            collapseButton.addEventListener("click", function () {
+                sideMenu.classList.toggle("collapsed");
+            });
+
+            // Fetch Spotify data
+            fetch("/most_listened_song_json")
+                .then(res => res.json())
+                .then(data => {
+                    const songInfo = document.getElementById("song-info");
+                    const songCover = document.getElementById("song-cover");
+                    if (data.song && data.artist) {
+                        songInfo.innerText = `${data.song} by ${data.artist}`;
+                        if (data.album_cover) {
+                            songCover.src = data.album_cover;
+                            songCover.style.display = "block";
+                        }
+                    }
+                });
+
+            fetch("/most_listened_artist_json")
+                .then(res => res.json())
+                .then(data => {
+                    const artistInfo = document.getElementById("artist-info");
+                    const artistImage = document.getElementById("artist-image");
+                    if (data.artist) {
+                        artistInfo.innerText = data.artist;
+                        if (data.artist_image) {
+                            artistImage.src = data.artist_image;
+                            artistImage.style.display = "block";
+                        }
+                    }
+                });
+
+            fetch("/most_listened_album_json")
+                .then(res => res.json())
+                .then(data => {
+                    const albumInfo = document.getElementById("album-info");
+                    const albumCover = document.getElementById("album-cover");
+                    if (data.album && data.artist) {
+                        albumInfo.innerText = `"${data.album}" by ${data.artist}`;
+                        if (data.album_cover) {
+                            albumCover.src = data.album_cover;
+                            albumCover.style.display = "block";
+                        }
+                    }
+                });
+
+            fetch("/most_listened_genre_json")
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("genre-info").innerText = data.genre || "No genre data available!";
+                });
+        });
+    </script>
+</body>
+</html>-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -288,7 +457,11 @@
                     </a>
                 </div>
 
-               
+                <div class="collapse-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+                </div>
 
                 <div class="menu-content">
                     <div class="menu-header">
@@ -303,7 +476,6 @@
                     <a href="top_50_songs" class="menu-button">Top 50 Songs</a>
                     <a href="genres" class="menu-button">Your Genres</a>
                     <a href="select_interval" class="menu-button">Custom Interval</a>
-                    <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">Ieškoti atlikėjo dainų</a>
                 </div>
             </div>
         </div>

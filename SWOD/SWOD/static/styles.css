@@ -296,7 +296,7 @@ h1, h2, h3, h4 {
 .image-wrapper {
     width: 450px;
     height: 450px;
-    margin-top: -20px; /* PAKELIA paveiksliukà á virðø, bet NEUÞ KORTELËS */
+    margin-top: -20px; 
 }
 
 .card-image {
