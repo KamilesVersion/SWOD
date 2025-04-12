@@ -2,7 +2,7 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <title>Selected artists top 10 songs</title>
+    <title>search by artist</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
@@ -10,10 +10,7 @@
         <!-- Header -->
         <header class="header">
             <div class="header-logo">
-                <span class="swod-logo text-app-red">S</span>
-                <span class="swod-logo text-app-orange">W</span>
-                <span class="swod-logo text-app-dark">O</span>
-                <span class="swod-logo text-app-orange">D</span>
+                <img src="static/SWOD_LOGO.png" alt="Logo" class="logo-img">
             </div>
         </header>
 
@@ -33,11 +30,11 @@
                     </a>
                 </div>
 
-                <div class="collapse-button">
+                <!--<div class="collapse-button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="m15 18-6-6 6-6"></path>
                     </svg>
-                </div>
+                </div>-->
 
                 <div class="menu-content">
                     <div class="menu-header">
@@ -45,14 +42,14 @@
                     </div>
 
                     <!-- Buttons from menu.html -->
-                    <a href="recent" class="menu-button">Recent Tracks</a>
-                    <a href="recap" class="menu-button">Your Recaps</a>
-                    <a href="top_10_listened_artists" class="menu-button">Top 10 Artists</a>
-                    <a href="top_10_listened_albums" class="menu-button">Top 10 Albums</a>
-                    <a href="top_50_songs" class="menu-button">Top 50 Songs</a>
-                    <a href="genres" class="menu-button">Your Genres</a>
+                    <a href="recent" class="menu-button">recent tracks</a>
+                    <a href="recap" class="menu-button">ur recaps</a>
+                    <a href="top_10_listened_artists" class="menu-button">ur top rtists</a>
+                    <a href="top_10_listened_albums" class="menu-button">ur top albums</a>
+                    <a href="top_50_songs" class="menu-button">ur top songs</a>
+                    <a href="genres" class="menu-button">ur top genres</a>
                     <!--<a href="select_interval" class="menu-button">Custom Interval</a>-->
-                    <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">Search top 10 songs by artist</a>
+                    <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">search by artist</a>
                 </div>
             </div>
         </div>
@@ -97,12 +94,12 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Toggle side menu
-            const collapseButton = document.querySelector(".collapse-button");
-            const sideMenu = document.querySelector(".side-menu");
+            //const collapseButton = document.querySelector(".collapse-button");
+            //const sideMenu = document.querySelector(".side-menu");
 
-            collapseButton.addEventListener("click", function () {
-                sideMenu.classList.toggle("collapsed");
-            });
+            //collapseButton.addEventListener("click", function () {
+            //    sideMenu.classList.toggle("collapsed");
+            //});
         });
     </script>
 </body>
