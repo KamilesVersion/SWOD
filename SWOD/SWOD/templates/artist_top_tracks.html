@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>Selected artists top 10 songs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-logo">
+                <span class="swod-logo text-app-red">S</span>
+                <span class="swod-logo text-app-orange">W</span>
+                <span class="swod-logo text-app-dark">O</span>
+                <span class="swod-logo text-app-orange">D</span>
+            </div>
+        </header>
+
+        <!-- Side Menu -->
+        <div id="sideMenu" class="side-menu">
+            <div class="side-menu-content">
+                <div class="profile-button-container">
+                    <a href="profile1" class="profile-button">
+                        {% if profile_pic %}
+                        <img src="{{ profile_pic }}" alt="Profile Picture" class="user-icon" style="border-radius: 50%; width: 50px; height: 50px;" />
+                        {% else %}
+                        <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        {% endif %}
+                    </a>
+                </div>
+
+                <!--<div class="collapse-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+                </div>-->
+
+                <div class="menu-content">
+                    <div class="menu-header">
+                        <a href="menu" class="back-to-menu">back2menu</a>
+                    </div>
+
+                    <!-- Buttons from menu.html -->
+                    <a href="recent" class="menu-button">Recent Tracks</a>
+                    <a href="recap" class="menu-button">Your Recaps</a>
+                    <a href="top_10_listened_artists" class="menu-button">Top 10 Artists</a>
+                    <a href="top_10_listened_albums" class="menu-button">Top 10 Albums</a>
+                    <a href="top_50_songs" class="menu-button">Top 50 Songs</a>
+                    <a href="genres" class="menu-button">Your Genres</a>
+                    <a href="select_interval" class="menu-button">Custom Interval</a>
+                    <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">Search top 10 songs by artist</a>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Main Content -->
+        <main class="main-container">
+            <form method="GET" action="{{ url_for('artist_top_tracks') }}">
+                <label for="artist_name" style="margin-left: 10px;">Type in the artist:</label>
+                <input type="text" class="input-style" name="artist_name" id="artist_name" required value="{{ request.args.get('artist_name', '') }}">
+                <button class="search-button" type="submit">Search</button>
+            </form>
+
+            {% if top_tracks %}
+            <h2 style="margin-top: 2rem; margin-left: 10px;">Top 10 artist songs: <strong>{{ artist_name }}</strong></h2>
+            <div class="track-list">
+                {% for track in top_tracks %}
+                <div class="track-item">
+                    {% if track.album_cover_url %}
+                    <img src="{{ track.album_cover_url }}" alt="Album Cover">
+                    {% else %}
+                    <div class="no-image-placeholder"></div>
+                    {% endif %}
+                    <div>
+                        <p>{{ loop.index }}. {{ track.track_name }}</p>
+                        <p>Listened: {{ track.listen_count }} times</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% elif request.args.get('artist_name') %}
+            <p style="margin-top: 2rem;">Artist not found, sorry :(.</p>
+            {% endif %}
+        </main>
+
+
+
+
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Toggle side menu
+            const collapseButton = document.querySelector(".collapse-button");
+            const sideMenu = document.querySelector(".side-menu");
+
+            collapseButton.addEventListener("click", function () {
+                sideMenu.classList.toggle("collapsed");
+            });
+        });
+    </script>
+</body>
+</html>

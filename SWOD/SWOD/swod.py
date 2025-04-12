@@ -1229,6 +1229,50 @@ def review_statistics():
         flash('Error processing your request: ' + str(e), 'error')
         return redirect(url_for('select_interval'))
     
+
+@app.route('/artist_top_tracks', methods=['GET'])
+def artist_top_tracks():
+    artist_name = request.args.get('artist_name', '').strip()
+    top_tracks = []
+    sp = spotify.get_spotify_client()
+
+    if artist_name:
+        # Užklausa į duomenų bazę norint gauti populiariausias dainas
+        results = (
+            db.session.query(
+                ListeningHistory.track_name,
+                db.func.count(ListeningHistory.track_name).label('listen_count'),
+                ListeningHistory.artist_name  # Pridedame atlikėjo pavadinimą
+            )
+            .filter(ListeningHistory.artist_name.ilike(f'%{artist_name}%'))
+            .group_by(ListeningHistory.track_name, ListeningHistory.artist_name)
+            .order_by(desc('listen_count'))
+            .limit(10)
+            .all()
+        )
+
+        # Užklausa Spotify API, kad gautume albumo viršelius
+        for track in results:
+            track_name = track.track_name
+            artist_name = track.artist_name
+            
+            # Ieškome dainos Spotify pagal atlikėją ir dainos pavadinimą
+            search_result = sp.search(q=f"track:{track_name} artist:{artist_name}", type='track', limit=1)
+            
+            # Tikriname, ar yra daina
+            if search_result['tracks']['items']:
+                album_cover_url = search_result['tracks']['items'][0]['album']['images'][0]['url']
+            else:
+                album_cover_url = None  # Jei nerandame viršelio, paliekame None
+            
+            top_tracks.append({
+                'track_name': track_name,
+                'listen_count': track.listen_count,
+                'album_cover_url': album_cover_url  # Pridedame albumo viršelio nuorodą
+            })
+
+    return render_template('artist_top_tracks.html', top_tracks=top_tracks, artist_name=artist_name)
+
 #----------------------------------TEST---------------------------------------------------
 
 # @app.route('/index')

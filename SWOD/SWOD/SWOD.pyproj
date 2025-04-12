@@ -57,6 +57,9 @@
     <Content Include="static\styles.css">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="templates\artist_top_tracks.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="templates\edit_profile.html">
       <SubType>Code</SubType>
     </Content>
