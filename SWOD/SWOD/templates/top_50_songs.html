@@ -14,10 +14,7 @@
         <!-- Header -->
         <header class="header">
             <div class="header-logo">
-                <span class="swod-logo text-app-red">S</span>
-                <span class="swod-logo text-app-orange">W</span>
-                <span class="swod-logo text-app-dark">O</span>
-                <span class="swod-logo text-app-orange">D</span>
+                <img src="static/SWOD_LOGO.png" alt="Logo" class="logo-img">
             </div>
         </header>
 
@@ -45,18 +42,18 @@
 
                 <div class="menu-content">
                     <div class="menu-header">
-                        <a href="menu" class="back-to-menu">back2menu</a>
+                        <a href="menu" class="back-to-menu">back2main</a>
                     </div>
 
                     <!-- Buttons from menu.html -->
-                    <a href="recent" class="menu-button">Recent Tracks</a>
-                    <a href="recap" class="menu-button">Your Recaps</a>
-                    <a href="top_10_listened_artists" class="menu-button">Top 10 Artists</a>
-                    <a href="top_10_listened_albums" class="menu-button">Top 10 Albums</a>
-                    <a href="top_50_songs" class="menu-button">Top 50 Songs</a>
-                    <a href="genres" class="menu-button">Your Genres</a>
+                    <a href="recent" class="menu-button">recent tracks</a>
+                    <a href="recap" class="menu-button">ur recaps</a>
+                    <a href="top_10_listened_artists" class="menu-button">ur top artists</a>
+                    <a href="top_10_listened_albums" class="menu-button">ur top albums</a>
+                    <a href="top_50_songs" class="menu-button">ur top songs</a>
+                    <a href="genres" class="menu-button">ur top genres</a>
                     <!--<a href="select_interval" class="menu-button">Custom Interval</a>-->
-                    <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">Search top 10 songs by artist</a>
+                    <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">search by artist</a>
                 </div>
             </div>
         </div>

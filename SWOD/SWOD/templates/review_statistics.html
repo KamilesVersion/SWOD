@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -154,6 +154,7 @@
             color: rgb(153, 193, 185);
             font-weight: bold;
         }
+
         .album-display {
             text-align: center;
             margin-top: 30px;
@@ -286,5 +287,228 @@
 
 </body>
 
-</html>
+</html>-->
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Custom</title>
+    <meta name="description" content="Custom statistics - S.W.O.D." />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 
+</head>
+
+<body>
+    <div class="app">-->
+<!-- Header -->
+<!--<header class="header">
+    <div class="header-logo">
+        <span class="swod-logo text-app-red">S</span>
+        <span class="swod-logo text-app-orange">W</span>
+        <span class="swod-logo text-app-dark">O</span>
+        <span class="swod-logo text-app-orange">D</span>
+    </div>
+</header>-->
+<!-- Side Menu -->
+<!--<div id="sideMenu" class="side-menu">
+    <div class="side-menu-content">
+        <div class="profile-button-container">
+            <a href="profile1" class="profile-button">
+                {% if profile_pic %}
+                <img src="{{ profile_pic }}" alt="Profile Picture" class="user-icon" style="border-radius: 50%; width: 50px; height: 50px;" />
+                {% else %}
+                <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                {% endif %}
+            </a>
+        </div>
+
+        <div class="menu-content">
+            <div class="menu-header">
+                <a href="menu" class="back-to-menu">back2menu</a>
+            </div>-->
+<!-- Buttons from menu.html -->
+<!--<a href="recent" class="menu-button">Recent Tracks</a>
+<a href="recap" class="menu-button">Your Recaps</a>
+<a href="top_10_listened_artists" class="menu-button">Top 10 Artists</a>
+<a href="top_10_listened_albums" class="menu-button">Top 10 Albums</a>
+<a href="top_50_songs" class="menu-button">Top 50 Songs</a>
+<a href="genres" class="menu-button">Your Genres</a>-->
+<!--<a href="select_interval" class="menu-button">Custom Interval</a>-->
+<!--<a href="{{ url_for('artist_top_tracks') }}" class="menu-button">Search top 10 songs by artist</a>
+        </div>
+    </div>
+</div>-->
+<!-- Main Content -->
+<!--<div class="main-container">
+            <h2>Your Listening Statistics</h2>
+            <p class="period-info">From {{ start_date }} to {{ end_date }}</p>
+
+            <div class="stats-container">
+                <div class="stat-box">
+                    <h3 class="stat-title">Top 5 Songs</h3>
+                    {% for song in top_songs %}
+                    <div class="song-card-horizontal">
+                        <div class="song-info">
+                            <img src="{{ song.image_url }}"
+                                 alt="{{ song.track_name }}" class="song-image">
+                            <div class="song-text">
+                                <div class="song-name">{{ song.track_name }}</div>
+                                <div class="song-artist">{{ song.artist_name }}</div>
+                            </div>
+                        </div>
+                        <div class="play-count">{{ song.play_count }} plays</div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="stat-box">
+                    <h3 class="stat-title">Top 3 Artists</h3>
+                    {% for artist in top_artists %}
+                    <div class="stat-item">
+                        <div class="artist-info">
+                            <img src="{{ artist.image_url }}"
+                                 alt="{{ artist.artist_name }}" class="artist-image">
+                            <div class="artist-text">
+                                <div class="artist-name">{{ artist.artist_name }}</div>
+                            </div>
+                        </div>
+                        <div class="play-count">{{ artist.play_count }} plays</div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="stat-box">
+                    <h3 class="stat-title">Top Album</h3>
+                    <div class="album-info">
+                        {% if top_album.image_url %}
+                        <img src="{{ top_album.image_url }}"
+                             alt="{{ top_album.album_name }}" class="album-image">
+                        {% else %}
+                        <div class="album-image no-image"></div>
+                        {% endif %}
+                        <div class="album-name">{{ top_album.album_name }}</div>
+                        {% if top_album.artist_name %}
+                        <div class="album-artist">{{ top_album.artist_name }}</div>
+                        {% endif %}
+                        <div class="album-play-count">{{ top_album.play_count }} plays</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Custom</title>
+    <meta name="description" content="Custom statistics - S.W.O.D." />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-logo">
+                <img src="static/SWOD_LOGO.png" alt="Logo" class="logo-img">
+            </div>
+        </header>
+
+        <!-- Side Menu -->
+        <div id="sideMenu" class="side-menu">
+            <div class="side-menu-content">
+                <div class="profile-button-container">
+                    <a href="profile1" class="profile-button">
+                        {% if profile_pic %}
+                        <img src="{{ profile_pic }}" alt="Profile Picture" class="user-icon" style="border-radius: 50%; width: 50px; height: 50px;" />
+                        {% else %}
+                        <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        {% endif %}
+                    </a>
+                </div>
+
+                <div class="menu-content">
+                    <div class="menu-header">
+                        <a href="menu" class="back-to-menu">back2main</a>
+                    </div>
+
+                    <!-- Buttons from menu.html -->
+                    <a href="recent" class="menu-button">recent tracks</a>
+                    <a href="recap" class="menu-button">ur recaps</a>
+                    <a href="top_10_listened_artists" class="menu-button">ur top artists</a>
+                    <a href="top_10_listened_albums" class="menu-button">ur top albums</a>
+                    <a href="top_50_songs" class="menu-button">ur top songs</a>
+                    <a href="genres" class="menu-button">ur top genres</a>
+                    <!--<a href="select_interval" class="menu-button">Custom Interval</a>-->
+                    <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">search by artist</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-container">
+            <h2>Your Listening Statistics</h2>
+            <p class="period-info">From {{ start_date }} to {{ end_date }}</p>
+
+            <div class="stats-container" style="width: 1200px">
+                <div class="stat-box">
+                    <h3 class="stat-title" style ="color: #E4346E">Top 5 Songs</h3>
+                    <div class="song-list-horizontal">
+                        {% for song in top_songs %}
+                        <div class="song-card-horizontal">
+                            <img src="{{ song.image_url }}" alt="{{ song.track_name }}" class="song-cover-small">
+                            <div class="song-details">
+                                <p class="song-title">{{ song.track_name }}</p>
+                                <p>{{ song.artist_name }}</p>
+                                <p>{{ song.play_count }} plays</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="stat-box">
+                    <h3 class="stat-title" style ="color: #E4346E">Top 3 Artists</h3>
+                    {% for artist in top_artists %}
+                    <div class="stat-item">
+                        <img src="{{ artist.image_url }}" alt="{{ artist.artist_name }}" class="song-cover-small">
+                        <div class="song-details">
+                            <p class="song-title">{{ artist.artist_name }}</p>
+                            <p>{{ artist.play_count }} plays</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="stat-box"style="text-align: center;">
+                    <h3 class="stat-title" style ="color: #E4346E"; >Top Album</h3>
+                    <div class="album-display">
+                        {% if top_album.image_url %}
+                        <img src="{{ top_album.image_url }}" alt="{{ top_album.album_name }}" class="album-cover">
+                        {% else %}
+                        <div class="album-cover no-image">{{ top_album.album_name }}</div>
+                        {% endif %}
+                        <h3>{{ top_album.album_name }}</h3>
+                        {% if top_album.artist_name %}
+                        <p>{{ top_album.artist_name }}</p>
+                        {% endif %}
+                        <p>{{ top_album.play_count }} plays</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

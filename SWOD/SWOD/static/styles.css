@@ -727,7 +727,7 @@ input:-webkit-autofill {
     padding: 20px; /* Increased padding for longer height */
     border-radius: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    width: 1000px; /* Make it take up full width of its container */
+    width: 800px; /* Make it take up full width of its container */
     margin-bottom: 20px; /* Increase space between cards */
 }
 
@@ -876,4 +876,74 @@ input:-webkit-autofill {
 .logo-img {
     height: 50px;
     width: auto;
+}
+
+
+
+.stats-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.stat-box {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    width: 70%;
+    /*box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);*/
+}
+
+.stat-title {
+    color: rgb(153, 193, 185);
+    margin-bottom: 15px;
+    font-size: 1.5em;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+
+.period-info {
+    margin-bottom: 20px;
+    font-style: italic;
+    color: #555;
+    font-size: 1.1em;
+}
+.album-cover {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    margin-bottom: 15px;
+    background-color: rgb(201, 219, 186);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(153, 193, 185);
+    font-weight: bold;
+    margin: 0 auto;
+}
+
+    .album-cover.no-image::after {
+        content: "No cover available";
+    }
+
+.album-display {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
