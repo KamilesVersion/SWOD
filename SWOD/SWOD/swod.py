@@ -359,12 +359,19 @@ def logout():
 @app.route('/remove', methods=['GET', 'POST'])
 @login_required
 def remove():
-    #deleting from database
+    user_id = current_user.id
+    
+    # First, delete associated listening history records
+    ListeningHistory.query.filter_by(user_id=user_id).delete()
+    
+    # Then delete the user
     db.session.delete(current_user)
+    
+    # Commit all changes at once
     db.session.commit()
     
     logout_user()
-    session.clear() # Clear any remaining session data
+    session.clear()  # Clear any remaining session data
     return redirect(url_for('home'))
 
 
