@@ -4,202 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yesterday's Recap</title>
+    <meta name="description" content="Yesterday's Recap - S.W.O.D." />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: rgb(201, 219, 186);
-        }
-
-        .header-container {
-            background-color: rgb(153, 193, 185);
-            padding: 10px 20px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .right-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .nav-button {
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            font-weight: bold;
-        }
-
-            .nav-button:hover {
-                color: lightgray;
-            }
-
-        .line {
-            width: 100%;
-            background-color: rgb(153, 193, 185);
-        }
-
-        .content {
-            min-height: 100vh;
-            padding: 20px;
-            text-align: center; /* Centers "Yesterday's Recap" */
-        }
-
-        .section {
-            display: flex;
-            flex-direction: column;
-            align-items: start; /* Aligns content to the left */
-            gap: 10px;
-            margin: 20px auto;
-            padding: 15px;
-            max-width: 800px;
-            background-color: rgb(173, 199, 170);
-            border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            font-size: 28px;
-            text-align: center; /* Centers "Yesterday's Recap" */
-        }
-
-        h3 {
-            margin: 0; /* Removes default margin */
-            font-size: 22px;
-            text-align: left; /* Makes box titles left-aligned */
-        }
-
-        .highlight {
-            font-weight: bold;
-            color: rgb(60, 80, 60);
-        }
-
-        .song-img {
-            width: 100px;
-            height: 100px;
-            border-radius: 2px; /* Square cover */
-            object-fit: cover;
-            margin-top: 10px;
-        }
-
-        .artist-img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%; /* Makes it round */
-            object-fit: cover;
-            margin-top: 10px;
-        }
-
-        .time-count {
-            font-size: 22px; /* Same size as song titles */
-        }
-
-        .left-align {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-            .left-align div {
-                text-align: left;
-            }
-
-        /* Style for the "Go Back to Recap Tracks" button */
-        .recap-button {
-            background-color: rgb(153, 193, 185);
-            border: none;
-            padding: 10px 20px;
-            font-size: 18px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-bottom: 60px; /* Adds space below the button */
-            margin-top: 60px;
-        }
-
-            .recap-button:hover {
-                background-color: rgb(129, 163, 157);
-            }
-    </style>
 </head>
 <body>
-    <div class="header-container">
-        <div class="header">
-            <h1 style="color: white;">S.W.O.D.</h1>
-            <div class="right-container">
-                <a href="{{ url_for('menu') }}" class="nav-button">Menu</a>
-                <a href="{{ url_for('profile') }}" class="nav-button">Profile</a>
+
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-logo">
+                <img src="static/SWOD_LOGO.png" alt="Logo" class="logo-img">
             </div>
-        </div>
-    </div>
+        </header>
+        <!-- Side Menu -->
+        <div id="sideMenu" class="side-menu">
+            <div class="side-menu-content">
+                <div class="profile-button-container">
+                    <a href="profile1" class="profile-button">
+                        {% if profile_pic %}
+                        <img src="{{ profile_pic }}" alt="Profile Picture" class="user-icon" style="border-radius: 50%; width: 50px; height: 50px;" />
+                        {% else %}
+                        <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        {% endif %}
+                    </a>
+                </div>
 
-    <div class="line">
-        <svg height="10" width="100%">
-            <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2" />
-        </svg>
-    </div>
+                <div class="collapse-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+                </div>
 
-    <div class="content">
-        <h2>Yesterday's Recap</h2>
-
-        <div class="section">
-            <h3>Top Artist</h3>
-            <div class="left-align">
-                {% if top_artist.image %}
-                <img src="{{ top_artist.image }}" alt="Artist Image" class="artist-img">
-                {% endif %}
-                <div>
-                    <p class="highlight">{{ top_artist.name }}</p>
-                    <p>Times played: {{ top_artist.plays }}</p>
+                <div class="menu-content">
+                    <div class="menu-header">
+                        <a href="menu" class="back-to-menu">back2menu</a>
+                    </div>
+                    <a href="recent" class="menu-button">Recent Tracks</a>
+                    <a href="recap" class="menu-button">Your Recaps</a>
+                    <a href="top_10_listened_artists" class="menu-button">Top 10 Artists</a>
+                    <a href="top_10_listened_albums" class="menu-button">Top 10 Albums</a>
+                    <a href="top_50_songs" class="menu-button">Top 50 Songs</a>
+                    <a href="genres" class="menu-button">Your Genres</a>
+                    <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">Search top 10 songs by artist</a>
                 </div>
             </div>
         </div>
+        <!-- Main Content -->
+        <main class="main-container">
+            <h2 class="card-title-50" style="color: #532B30; text-align:center;">Yesterday's Recap</h2>
 
-        <div class="section">
-            <h3>Top Song</h3>
-            <div class="left-align">
-                {% if top_song.cover %}
-                <img src="{{ top_song.cover }}" alt="Song Cover" class="song-img">
-                {% endif %}
-                <div>
-                    <p class="highlight">{{ top_song.name }}</p>
-                    <p>by {{ top_song.artist }} | Times played: {{ top_song.plays }} | Total time: {{ song_durations[(top_song.name, top_song.artist)] }} min</p>
+            <!-- Top Artist -->
+            <div class="recap-card">
+                <h3 class="recap-subtitle-center">Top Artist</h3>
+                <div class="recap-info">
+                    {% if top_artist.image %}
+                    <img src="{{ top_artist.image }}" alt="Artist Image" class="recap-image">
+                    {% endif %}
+                    <div class="recap-text">
+                        <p class="recap-highlight">{{ top_artist.name }}</p>
+                        <p>Times played: {{ top_artist.plays }}</p>
+                    </div>
                 </div>
             </div>
-        </div>
+            <!-- Top Song -->
+            <div class="recap-card">
+                <h3 class="recap-subtitle-center">Top Song</h3>
+                <div class="recap-info">
+                    {% if top_song.cover %}
+                    <img src="{{ top_song.cover }}" alt="Song Cover" class="recap-image-square" />
+                    {% endif %}
+                    <div class="recap-text">
+                        <p class="recap-highlight">{{ top_song.name }}</p>
+                        <p>by {{ top_song.artist }} | Times played: {{ top_song.plays }} | Total time: {{ song_durations[(top_song.name, top_song.artist)] }} min</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Total Listening Time -->
+            <div class="recap-card">
+                <h3 class="recap-subtitle-center">Total Listening Time</h3>
+                <p class="recap-highlight-center">{{ total_minutes }} minutes</p>
 
-        <div class="section">
-            <h3>Total Listening Time</h3>
-            <p class="highlight">{{ total_minutes }} minutes</p>
-        </div>
-
-        <div class="section">
-            <h3>Most Active Listening Time</h3>
-            <p class="highlight">{{ most_active_time }}</p>
-            <p>Tracks played: {{ time_play_count }}</p>
-        </div>
-
-        <!-- chart-->
-        <div class="section">
-            <h3>Listening Distribution by Time of Day</h3>
-            {% if time_counts and time_counts|sum > 0 %}
+            </div>
+            <!-- Most Active Listening Time -->
+            <div class="recap-card">
+                <h3 class="recap-subtitle-center">Most Active Listening Time</h3>
+                <p class="recap-highlight-center">{{ most_active_time }}</p>
+                <p class="recap-highlight-center">Tracks played: {{ time_play_count }}</p>
+            </div>
+            <!-- Chart -->
+            <div class="recap-card">
+                <h3 class="recap-subtitle-center">Listening Distribution by Time of Day</h3>
+                {% if time_counts and time_counts|sum > 0 %}
                 <canvas id="timeOfDayChart" width="400" height="400" style="margin: 0 auto;"></canvas>
-            {% else %}
-                <p class="highlight">No data</p>
-            {% endif %}
-        </div>
+                {% else %}
+                <p class="recap-highlight-center">No data</p>
+                {% endif %}
+            </div>
+            <div class="horizontal-center">
+                <a href="/recap" class="recap-button-back">Back to Recaps</a>
+            </div>
 
-        <a href="/recap" class="recap-button">Back to Recaps</a>
 
+        </main>
     </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -211,9 +123,9 @@
             datasets: [{
                 label: 'Tracks played',
                 data: {{ time_counts | tojson }},
-                backgroundColor: [ 
-                    '#f94144', '#f3722c', '#f9844a', '#f9c74f',
-                    '#90be6d', '#43aa8b', '#577590'
+                backgroundColor: [
+                    '#F6E3D4', '#DB3056', '#532B30', '#FFC1B4',
+                    '#FEBA17', '#D29F80', '#F5EEDC'
                 ],
                 borderWidth: 1
             }]
@@ -221,6 +133,11 @@
         options: {
             responsive: true
         }
+        });
+    </script>
+    <script>
+        document.querySelector(".collapse-button").addEventListener("click", () => {
+            document.getElementById("sideMenu").classList.toggle("collapsed");
         });
     </script>
 </body>

@@ -58,7 +58,7 @@
 
             <!-- Top Artist -->
             <div class="recap-card">
-                <h3 class="recap-subtitle">Top Artist</h3>
+                <h3 class="recap-subtitle-center">Top Artist</h3>
                 <div class="recap-info">
                     {% if top_artist.image %}
                     <img src="{{ top_artist.image }}" alt="Artist Image" class="recap-image">
@@ -71,10 +71,10 @@
             </div>
             <!-- Top Song -->
             <div class="recap-card">
-                <h3 class="recap-subtitle">Top Artist</h3>
+                <h3 class="recap-subtitle-center">Top Song</h3>
                 <div class="recap-info">
                     {% if top_song.cover %}
-                    <img src="{{ top_song.cover }}" alt="Song Cover" class="recap-image" />
+                    <img src="{{ top_song.cover }}" alt="Song Cover" class="recap-image-square" />
                     {% endif %}
                     <div class="recap-text">
                         <p class="recap-highlight">{{ top_song.name }}</p>
@@ -84,8 +84,8 @@
             </div>
             <!-- Total Listening Time -->
             <div class="recap-card">
-                <h3 class="recap-subtitle">Total Listening Time</h3>
-                <p class="recap-highlight">{{ total_minutes }} minutes</p>
+                <h3 class="recap-subtitle-center">Total Listening Time</h3>
+                <p class="recap-highlight-center">{{ total_minutes }} minutes</p>
                
             </div>
             <div class="horizontal-center">

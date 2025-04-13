@@ -782,7 +782,7 @@ input:-webkit-autofill {
     border-radius: 12px;
     padding: 20px;
     margin: 20px auto;
-    max-width: 700px;
+    max-width: 800px;
     box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -800,6 +800,12 @@ input:-webkit-autofill {
     object-fit: cover;
 }
 
+.recap-image-square {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
 .recap-text {
     font-size: 18px;
     text-align: left;
@@ -810,11 +816,22 @@ input:-webkit-autofill {
     font-weight: bold;
     color: var(--app-dark);
 }
+.recap-highlight-center {
+    font-weight: bold;
+    color: var(--app-dark);
+    text-align:center;
+}
 
 .recap-subtitle {
     font-size: 22px;
     color: var(--app-dark);
     margin-bottom: 10px;
+}
+.recap-subtitle-center {
+    font-size: 22px;
+    color: var(--app-dark);
+    margin-bottom: 10px;
+    text-align: center;
 }
 .recap-button-back {
     background-color: var(--app-dark);
@@ -837,7 +854,25 @@ input:-webkit-autofill {
     align-items: center;
     height: 100px;
 }
-/* ----------RECAPS------------- */
+.list-recap {
+    list-style-type: none;
+    padding: 0;
+}
+
+    .list-recap li {
+        font-size: 18px;
+        padding: 5px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 5px;
+    }
+
+.image-center {
+    display: block;
+    margin: auto;
+}
+/* ----------LOGO------------- */
 .logo-img {
     height: 50px;
     width: auto;

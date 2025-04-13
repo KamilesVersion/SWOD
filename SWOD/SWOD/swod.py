@@ -490,8 +490,17 @@ def last_week_recap():
 
     most_active_time, time_play_count = max(time_of_day_counter.items(), key=lambda x: x[1]) if time_of_day_counter else ("No data", 0)
     # for chart
-    time_labels = list(time_of_day_counter.keys())
-    time_counts = list(time_of_day_counter.values())
+    # Define your desired logical order
+    ordered_labels = ["Early Morning", "Morning", "Afternoon", "Evening", "Night", "Late Night"]
+
+    # Use the ordered labels to create labels and counts
+    time_labels = []
+    time_counts = []
+
+    for label in ordered_labels:
+        if label in time_of_day_counter:
+            time_labels.append(label)
+            time_counts.append(time_of_day_counter[label])
     
     return render_template(
         'last_week.html',
@@ -617,8 +626,17 @@ def yesterday_recap():
     most_active_time, time_play_count = max(time_of_day_counter.items(), key=lambda x: x[1]) if time_of_day_counter else ("No data", 0)
 
     # Convert time_of_day_counter to list for chart
-    time_labels = list(time_of_day_counter.keys())
-    time_counts = list(time_of_day_counter.values())
+    # Define your desired logical order
+    ordered_labels = ["Early Morning", "Morning", "Afternoon", "Evening", "Night", "Late Night"]
+
+    # Use the ordered labels to create labels and counts
+    time_labels = []
+    time_counts = []
+
+    for label in ordered_labels:
+        if label in time_of_day_counter:
+            time_labels.append(label)
+            time_counts.append(time_of_day_counter[label])
 
     return render_template('yesterday_recap.html',
                            top_artist={"name": top_artist, "plays": top_artist_count, "image": artist_image},
