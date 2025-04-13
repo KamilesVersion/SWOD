@@ -1,66 +1,3 @@
-<!-- templates/genre_artists.html -->
-<!--<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Artists from {{ genre }}</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 2rem;
-            background-color: #f9f9f9;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        li {
-            background: #fff;
-            margin-bottom: 10px;
-            padding: 10px 15px;
-            border-left: 6px solid #2196F3;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .back-button {
-            margin-top: 20px;
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #555;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
-            .back-button:hover {
-                background-color: #333;
-            }
-    </style>
-</head>
-<body>
-    <h1>Artists You Listen to in "{{ genre }}"</h1>
-
-    {% if artists %}
-    <ul>
-        {% for artist in artists %}
-        <li>{{ artist }}</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>No artists found in this genre yet.</p>
-    {% endif %}-->
-<!-- Back to Genres -->
-<!--<a href="{{ url_for('genres') }}" class="back-button">← Back to Genres</a>
-</body>
-</html>-->
-<!-- templates/genre_artists.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,48 +7,45 @@
 </head>
 <body>
     <div class="app">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-logo">
-                <img src="{{ url_for('static', filename='SWOD_LOGO.png') }}" alt="Logo" class="logo-img">
-            </div>
-        </header>
-
-        <!-- Side Menu -->
-        <div id="sideMenu" class="side-menu">
-            <div class="side-menu-content">
-                <div class="profile-button-container">
-                    <a href="profile1" class="profile-button">
-                        {% if profile_pic %}
-                        <img src="{{ profile_pic }}" alt="Profile Picture" class="user-icon" style="border-radius: 50%; width: 50px; height: 50px;" />
-                        {% else %}
-                        <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        {% endif %}
-                    </a>
-                </div>
-
-                <div class="menu-content">
-                    <div class="menu-header">
-                        <a href="menu" class="back-to-menu">back2menu</a>
-                    </div>
-
-                    <!-- Buttons from menu.html -->
-                    <a href="{{ url_for('recent') }}" class="menu-button">recent tracks</a>
-                    <a href="{{ url_for('recap') }}" class="menu-button">ur recaps</a>
-                    <a href="{{ url_for('top_10_listened_artists') }}" class="menu-button">ur top rtists</a>
-                    <a href="{{ url_for('top_10_most_listened_albums_json') }}" class="menu-button">ur top albums</a>
-                    <a href="{{ url_for('top_50_songs') }}" class="menu-button">ur top songs</a>
-                    <a href="{{ url_for('genres') }}" class="menu-button">ur top genres</a>
-                    <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">search by artist</a>
-                </div>
-            </div>
+ Header 
+<header class="header">
+    <div class="header-logo">
+        <img src="{{ url_for('static', filename='SWOD_LOGO.png') }}" alt="Logo" class="logo-img">
+    </div>
+</header>
+ Side Menu 
+<div id="sideMenu" class="side-menu">
+    <div class="side-menu-content">
+        <div class="profile-button-container">
+            <a href="profile1" class="profile-button">
+                {% if profile_pic %}
+                <img src="{{ profile_pic }}" alt="Profile Picture" class="user-icon" style="border-radius: 50%; width: 50px; height: 50px;" />
+                {% else %}
+                <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                {% endif %}
+            </a>
         </div>
 
-        <!-- Main Content -->
-        <main class="main-container">
+        <div class="menu-content">
+            <div class="menu-header">
+                <a href="menu" class="back-to-menu">back2menu</a>
+            </div>
+ Buttons from menu.html 
+<a href="{{ url_for('recent') }}" class="menu-button">recent tracks</a>
+            <a href="{{ url_for('recap') }}" class="menu-button">ur recaps</a>
+            <a href="{{ url_for('top_10_listened_artists') }}" class="menu-button">ur top rtists</a>
+            <a href="{{ url_for('top_10_most_listened_albums_json') }}" class="menu-button">ur top albums</a>
+            <a href="{{ url_for('top_50_songs') }}" class="menu-button">ur top songs</a>
+            <a href="{{ url_for('genres') }}" class="menu-button">ur top genres</a>
+            <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">search by artist</a>
+        </div>
+    </div>
+</div>
+ Main Content 
+<main class="main-container">
             <h1 class="card-title-50" style="margin-bottom: 10px;">Artists You Listen to in "{{ genre }}"</h1>
 
             {% if artists %}
