@@ -1307,15 +1307,16 @@ def review_statistics():
 def artist_top_tracks():
     artist_name = request.args.get('artist_name', '').strip()
     top_tracks = []
+    total_minutes_listened = 0  # <-- naujas kintamasis
     sp = spotify.get_spotify_client()
 
     if artist_name:
-        # Uzklausa i duomenu baze norint gauti populiariausias dainas
         results = (
             db.session.query(
                 ListeningHistory.track_name,
                 db.func.count(ListeningHistory.track_name).label('listen_count'),
-                ListeningHistory.artist_name  # Pridedame atlikejo pavadinima
+                ListeningHistory.artist_name,
+                db.func.max(ListeningHistory.duration_ms).label('duration_ms')  # <-- pridėta trukmė
             )
             .filter_by(user_id=current_user.id)
             .filter(ListeningHistory.artist_name.ilike(f'%{artist_name}%'))
@@ -1325,27 +1326,30 @@ def artist_top_tracks():
             .all()
         )
 
-        # Uzklausa Spotify API, kad gautume albumo virselius
         for track in results:
             track_name = track.track_name
             artist_name = track.artist_name
-            
-            # Ieskome dainos Spotify pagal atlikeja ir dainos pavadinima
+            duration_ms = track.duration_ms or 0
+            total_minutes_listened += (duration_ms * track.listen_count) / 60000  # konvertuojam į minutes
+
             search_result = sp.search(q=f"track:{track_name} artist:{artist_name}", type='track', limit=1)
-            
-            # Tikriname, ar yra daina
             if search_result['tracks']['items']:
                 album_cover_url = search_result['tracks']['items'][0]['album']['images'][0]['url']
             else:
-                album_cover_url = None  # Jei nerandame virselio, paliekame None
-            
+                album_cover_url = None
+
             top_tracks.append({
                 'track_name': track_name,
                 'listen_count': track.listen_count,
-                'album_cover_url': album_cover_url  # Pridedame albumo virselio nuoroda
+                'album_cover_url': album_cover_url
             })
 
-    return render_template('artist_top_tracks.html', top_tracks=top_tracks, artist_name=artist_name)
+    return render_template(
+        'artist_top_tracks.html',
+        top_tracks=top_tracks,
+        artist_name=artist_name,
+        total_minutes_listened=round(total_minutes_listened)
+    )
 
 
 

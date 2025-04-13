@@ -65,6 +65,7 @@
 
             {% if top_tracks %}
             <h2 style="margin-top: 2rem; margin-left: 10px;">Top 10 artist songs: <strong>{{ artist_name }}</strong></h2>
+            <p style="margin-left: 10px;">Total minutes listened: <strong>{{ total_minutes_listened }}</strong> min.</p>
             <div class="track-list">
                 {% for track in top_tracks %}
                 <div class="track-item">

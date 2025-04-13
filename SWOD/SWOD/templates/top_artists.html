@@ -1,157 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Top 10 Most Listened Artists</title>
-    
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: rgb(201, 219, 186);
-        }
-
-        .header-container {
-            background-color: rgb(153, 193, 185);
-            padding: 10px 20px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .right-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .nav-button {
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            font-weight: bold;
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-
-            .nav-button:hover {
-                color: lightgray;
-            }
-
-        .line {
-            width: 100%;
-            background-color: rgb(153, 193, 185);
-        }
-
-        .content {
-            min-height: 100vh;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        h2 {
-            font-size: 28px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .artist-list {
-            width: 90%;
-            max-width: 800px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .artist {
-            display: flex;
-            align-items: center;
-            background-color: rgb(173, 199, 170);
-            padding: 15px;
-            border-radius: 10px;
-            color: black;
-            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-            .artist img {
-                width: 70px;
-                height: 70px;
-                margin-right: 15px;
-                border-radius: 50%;
-            }
-
-        .artist-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-            .artist-info strong {
-                font-size: 20px;
-            }
-
-            .artist-info small {
-                font-size: 14px;
-                color: rgb(60, 80, 60);
-            }
-
-        .artist-number {
-            font-weight: bold;
-            font-size: 20px;
-            margin-right: 15px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-
 <body>
-
-    <div class="header-container">
-        <div class="header">
-            <h1 style="color: white;">S.W.O.D.</h1>
-
-            <div class="right-container">
-                <a href="{{ url_for('menu') }}" class="nav-button">Menu</a>
-                <a href="{{ url_for('profile') }}" class="nav-button">Profile</a>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-logo">
+                <img src="{{ url_for('static', filename='SWOD_LOGO.png') }}" alt="Logo" class="logo-img">
             </div>
-        </div>
-    </div>
+        </header>
 
-    <div class="line">
-        <svg height="10" width="100%">
-            <line x1="0" y1="5" x2="100%" y2="5" stroke="white" stroke-width="2" />
-        </svg>
-    </div>
+        <!-- Side Menu -->
+        <div id="sideMenu" class="side-menu">
+            <div class="side-menu-content">
+                <div class="profile-button-container">
+                    <a href="profile1" class="profile-button">
+                        {% if profile_pic %}
+                        <img src="{{ profile_pic }}" alt="Profile Picture" class="user-icon" style="border-radius: 50%; width: 50px; height: 50px;" />
+                        {% else %}
+                        <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        {% endif %}
+                    </a>
+                </div>
 
-    <div class="content">
-        <h2>Top 10 Most Listened Artists</h2>
+                <div class="menu-content">
+                    <div class="menu-header">
+                        <a href="{{ url_for('menu') }}" class="back-to-menu">back2menu</a>
+                    </div>
 
-        {% if artists %}
-        <div class="artist-list">
-            {% for artist in artists %}
-            <div class="artist">
-                <div class="artist-number">{{ loop.index }}.</div>
-                {% if artist.artist_image %}
-                <img src="{{ artist.artist_image }}" alt="Artist Image">
-                {% endif %}
-                <div class="artist-info">
-                    <strong>{{ artist.artist }}</strong>
-                    <small>Played {{ artist.play_count }} times</small>
+                    <a href="{{ url_for('recent') }}" class="menu-button">recent tracks</a>
+                    <a href="{{ url_for('recap') }}" class="menu-button">ur recaps</a>
+                    <a href="{{ url_for('top_10_listened_artists') }}" class="menu-button">ur top rtists</a>
+                    <a href="{{ url_for('top_10_most_listened_albums_json') }}" class="menu-button">ur top albums</a>
+                    <a href="{{ url_for('top_50_songs') }}" class="menu-button">ur top songs</a>
+                    <a href="{{ url_for('genres') }}" class="menu-button">ur top genres</a>
+                    <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">search by artist</a>
                 </div>
             </div>
-            {% endfor %}
         </div>
-        {% else %}
-        <p>No data available.</p>
-        {% endif %}
+
+        <!-- Main Content -->
+        <main class="main-container">
+            <h1 class="card-title-50" style="margin-bottom: 10px;">Top 10 Most Listened Artists</h1>
+
+            {% if artists %}
+            <div class="track-list">
+                {% for artist in artists %}
+                <div class="track-item">
+                    {% if artist.artist_image %}
+                    <img src="{{ artist.artist_image }}" alt="Artist Image" style="width: 70px; height: 70px; margin-right: 10px; border-radius: 50%;">
+                    {% endif %}
+                    <div>
+                        <p style="font-weight: bold; font-size: 18px;">{{ loop.index }}. {{ artist.artist }}</p>
+                        <small style="color: var(--app-dark);">Played {{ artist.play_count }} times</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="margin-left: 10px; color: var(--app-dark);">No data available.</p>
+            {% endif %}
+        </main>
     </div>
-
 </body>
-
 </html>
