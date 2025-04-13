@@ -412,8 +412,11 @@ def last_week_recap():
         return redirect(url_for("connect_spotify", next=url_for("last_week_recap")))    
     
     for track in last_week_tracks:
+        # split artists by comma
+        artists = [artist.strip() for artist in track.artist_name.split(',')]
+        for artist in artists:
+            artist_counter[artist] += 1
         song_counter[track.track_name, track.artist_name] += 1
-        artist_counter[track.artist_name] += 1
         album_counter[track.album_name] += 1
         total_minutes += track.duration_ms
 
@@ -577,7 +580,10 @@ def yesterday_recap():
     for track in yesterday_tracks:
         key = (track.track_name, track.artist_name)
         song_counter[key] += 1
-        artist_counter[track.artist_name] += 1
+        # split artists by comma
+        artists = [artist.strip() for artist in track.artist_name.split(',')]
+        for artist in artists:
+            artist_counter[artist] += 1
 
         # Calculate total time for each song
         if key in song_durations:
@@ -683,7 +689,10 @@ def today_recap():
     for track in today_tracks:
         key = (track.track_name, track.artist_name)
         song_counter[key] += 1
-        artist_counter[track.artist_name] += 1
+        # split artists by comma
+        artists = [artist.strip() for artist in track.artist_name.split(',')]
+        for artist in artists:
+            artist_counter[artist] += 1
 
         # Calculate total time for each song
         if key in song_durations:
@@ -932,18 +941,48 @@ def top_10_listened_artists():
     try:
         sp = spotify.get_spotify_client()
 
-        # Imame tik dabartinio vartotojo klausymosi istorija
-        top_artists = db.session.query(
+        # First, get aggregated results from the database
+        # This will handle most cases efficiently
+        artist_counts = db.session.query(
             ListeningHistory.artist_name,
             db.func.count().label('play_count')
         ).filter(
             ListeningHistory.user_id == current_user.id
         ).group_by(
             ListeningHistory.artist_name
-        ).order_by(
-            db.func.count().desc()
-        ).limit(10).all()
+        ).all()
+        # # Imame tik dabartinio vartotojo klausymosi istorija
+        # top_artists = db.session.query(
+        #     ListeningHistory.artist_name,
+        #     db.func.count().label('play_count')
+        # ).filter(
+        #     ListeningHistory.user_id == current_user.id
+        # ).group_by(
+        #     ListeningHistory.artist_name
+        # ).order_by(
+        #     db.func.count().desc()
+        # ).limit(10).all()
 
+         # Process artists with commas
+        artist_counter = Counter()
+        artists_with_commas = ["Tyler, The Creator", "Earth, Wind & Fire"]
+        
+        for artist_name, count in artist_counts:
+            # Check if this is a multi-artist entry or contains special artists
+            needs_splitting = "," in artist_name and not any(special in artist_name for special in artists_with_commas)
+            
+            if needs_splitting:
+                # Split and count individually
+                for split_artist in artist_name.split(","):
+                    split_artist = split_artist.strip()
+                    if split_artist:
+                        artist_counter[split_artist] += count
+            else:
+                # Keep as is
+                artist_counter[artist_name] += count
+                
+        # Get top 10 artists
+        top_artists = artist_counter.most_common(10)
         artist_data = []
         
         for artist_name, play_count in top_artists:
