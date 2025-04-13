@@ -1,5 +1,5 @@
 <!-- templates/genre_artists.html -->
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -55,9 +55,79 @@
     </ul>
     {% else %}
     <p>No artists found in this genre yet.</p>
-    {% endif %}
+    {% endif %}-->
+<!-- Back to Genres -->
+<!--<a href="{{ url_for('genres') }}" class="back-button">← Back to Genres</a>
+</body>
+</html>-->
+<!-- templates/genre_artists.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Artists from {{ genre }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-logo">
+                <img src="{{ url_for('static', filename='SWOD_LOGO.png') }}" alt="Logo" class="logo-img">
+            </div>
+        </header>
 
-    <!-- Back to Genres -->
-    <a href="{{ url_for('genres') }}" class="back-button">← Back to Genres</a>
+        <!-- Side Menu -->
+        <div id="sideMenu" class="side-menu">
+            <div class="side-menu-content">
+                <div class="profile-button-container">
+                    <a href="profile1" class="profile-button">
+                        {% if profile_pic %}
+                        <img src="{{ profile_pic }}" alt="Profile Picture" class="user-icon" style="border-radius: 50%; width: 50px; height: 50px;" />
+                        {% else %}
+                        <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        {% endif %}
+                    </a>
+                </div>
+
+                <div class="menu-content">
+                    <div class="menu-header">
+                        <a href="menu" class="back-to-menu">back2menu</a>
+                    </div>
+
+                    <!-- Buttons from menu.html -->
+                    <a href="{{ url_for('recent') }}" class="menu-button">recent tracks</a>
+                    <a href="{{ url_for('recap') }}" class="menu-button">ur recaps</a>
+                    <a href="{{ url_for('top_10_listened_artists') }}" class="menu-button">ur top rtists</a>
+                    <a href="{{ url_for('top_10_most_listened_albums_json') }}" class="menu-button">ur top albums</a>
+                    <a href="{{ url_for('top_50_songs') }}" class="menu-button">ur top songs</a>
+                    <a href="{{ url_for('genres') }}" class="menu-button">ur top genres</a>
+                    <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">search by artist</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-container">
+            <h1 class="card-title-50" style="margin-bottom: 10px;">Artists You Listen to in "{{ genre }}"</h1>
+
+            {% if artists %}
+            <div class="track-list">
+                {% for artist in artists %}
+                <div class="track-item">
+                    <div>
+                        <p style="font-weight: bold; font-size: 18px;">{{ artist }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="margin-left: 10px; color: var(--app-dark);">No artists found in this genre yet.</p>
+            {% endif %}
+        </main>
+    </div>
 </body>
 </html>
