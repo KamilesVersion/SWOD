@@ -795,19 +795,39 @@ def most_listened_artist_json():
     try:
         sp = spotify.get_spotify_client()
         
-        # Query most listened artist for the logged-in user
-        artist_name = db.session.query(
-            ListeningHistory.artist_name
-        ).filter_by(
-            user_id=current_user.id
+         # First, get aggregated results from the database
+        artist_counts = db.session.query(
+            ListeningHistory.artist_name,
+            db.func.count().label('play_count')
+        ).filter(
+            ListeningHistory.user_id == current_user.id
         ).group_by(
             ListeningHistory.artist_name
-        ).order_by(
-            db.func.count().desc()
-        ).limit(1).scalar()
+        ).all()
+        
+        # Process artists with commas
+        artist_counter = Counter()
+        artists_with_commas = ["Tyler, The Creator", "Earth, Wind & Fire"]
+        
+        for artist_name, count in artist_counts:
+            # Check if this is a multi-artist entry or contains special artists
+            needs_splitting = "," in artist_name and not any(special in artist_name for special in artists_with_commas)
+            
+            if needs_splitting:
+                # Split and count individually
+                for split_artist in artist_name.split(","):
+                    split_artist = split_artist.strip()
+                    if split_artist:
+                        artist_counter[split_artist] += count
+            else:
+                # Keep as is
+                artist_counter[artist_name] += count
 
-        if not artist_name:
+        # Get the most listened artist
+        if not artist_counter:
             return jsonify({"artist": None, "artist_image": None})
+            
+        artist_name, _ = artist_counter.most_common(1)[0]
 
         # Search for artist on Spotify
         search_results = sp.search(q=f"artist:{artist_name}", type="artist", limit=1)
@@ -951,17 +971,6 @@ def top_10_listened_artists():
         ).group_by(
             ListeningHistory.artist_name
         ).all()
-        # # Imame tik dabartinio vartotojo klausymosi istorija
-        # top_artists = db.session.query(
-        #     ListeningHistory.artist_name,
-        #     db.func.count().label('play_count')
-        # ).filter(
-        #     ListeningHistory.user_id == current_user.id
-        # ).group_by(
-        #     ListeningHistory.artist_name
-        # ).order_by(
-        #     db.func.count().desc()
-        # ).limit(10).all()
 
          # Process artists with commas
         artist_counter = Counter()
