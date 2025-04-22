@@ -805,7 +805,8 @@ def most_listened_artist_json():
          # First, get aggregated results from the database
         artist_counts = db.session.query(
             ListeningHistory.artist_name,
-            db.func.count().label('play_count')
+            db.func.count().label('play_count'),
+            db.func.sum(ListeningHistory.duration_ms).label('total_duration_ms')
         ).filter(
             ListeningHistory.user_id == current_user.id
         ).group_by(
@@ -815,8 +816,9 @@ def most_listened_artist_json():
         # Process artists with commas
         artist_counter = Counter()
         artists_with_commas = ["Tyler, The Creator", "Earth, Wind & Fire"]
+        duration_tracker = {}
         
-        for artist_name, count in artist_counts:
+        for artist_name, count, duration in artist_counts:
             # Check if this is a multi-artist entry or contains special artists
             needs_splitting = "," in artist_name and not any(special in artist_name for special in artists_with_commas)
             
@@ -826,15 +828,22 @@ def most_listened_artist_json():
                     split_artist = split_artist.strip()
                     if split_artist:
                         artist_counter[split_artist] += count
+                        duration_tracker.setdefault(split_artist, 0)
+                        duration_tracker[split_artist] += duration
             else:
                 # Keep as is
                 artist_counter[artist_name] += count
+                duration_tracker.setdefault(artist_name, 0)
+                duration_tracker[artist_name] += duration
 
         # Get the most listened artist
         if not artist_counter:
-            return jsonify({"artist": None, "artist_image": None})
+            return jsonify({"artist": None, "artist_image": None, "minutes_listened": 0})
             
-        artist_name, _ = artist_counter.most_common(1)[0]
+        artist_name, play_count = artist_counter.most_common(1)[0]
+        
+        #milisecs to minutes
+        minutes_listened = round(duration_tracker[artist_name]/60000)
 
         # Search for artist on Spotify
         search_results = sp.search(q=f"artist:{artist_name}", type="artist", limit=1)
@@ -844,7 +853,7 @@ def most_listened_artist_json():
         else:
             artist_image = None
 
-        return jsonify({"artist": artist_name, "artist_image": artist_image})
+        return jsonify({"artist": artist_name, "artist_image": artist_image, "minutes_listened":minutes_listened})
 
     except Exception as e:
         return jsonify({"error": f"Error fetching data: {str(e)}"}), 500

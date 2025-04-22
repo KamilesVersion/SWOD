@@ -566,7 +566,7 @@
                     const artistInfo = document.getElementById("artist-info");
                     const artistImage = document.getElementById("artist-image");
                     if (data.artist) {
-                        artistInfo.innerText = data.artist;
+                        artistInfo.innerText = `${data.artist} - ${data.minutes_listened} minutes`;
                         if (data.artist_image) {
                             artistImage.src = data.artist_image;
                             artistImage.style.display = "block";
