@@ -43,22 +43,37 @@
     </div>
 </div>
 <main class="main-container">
-            <h1 class="card-title-50" style="margin-bottom: 10px;">Artists You Listen to in "{{ genre }}"</h1>
+    <h1 class="card-title-50" style="margin-bottom: 10px;">Artists You Listen to in "{{ genre }}"</h1>
 
-            {% if artists %}
-            <div class="track-list">
-                {% for artist in artists %}
-                <div class="track-item">
-                    <div>
-                        <p style="font-weight: bold; font-size: 18px;">{{ artist }}</p>
-                    </div>
-                </div>
-                {% endfor %}
+    {% if artists %}
+    <div class="track-list">
+        {% for artist in artists %}
+        <div class="track-item">
+            <div>
+                <p style="font-weight: bold; font-size: 18px;">{{ artist }}</p>
             </div>
-            {% else %}
-            <p style="margin-left: 10px; color: var(--app-dark);">No artists found in this genre yet.</p>
-            {% endif %}
-        </main>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="margin-left: 10px; color: var(--app-dark);">No artists found in this genre yet.</p>
+    {% endif %}
+
+    <div style="text-align: left; margin: 30px 0 40px 10px;">
+        <a href="{{ url_for('genres') }}" style="
+        text-decoration: none;
+        color: #333;
+        font-size: 20px;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background-color 0.2s ease, font-weight 0.2s ease;
+    " onmouseover="this.style.fontWeight='bold';"
+           onmouseout="this.style.backgroundColor=''; this.style.fontWeight='normal';">
+            ← back to genres
+        </a>
+    </div>
+
+</main>
     </div>
 </body>
 </html>
