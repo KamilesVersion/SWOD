@@ -34,11 +34,11 @@
                     </a>
                 </div>
 
-                <div class="collapse-button">
+                <!--<div class="collapse-button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="m15 18-6-6 6-6"></path>
                     </svg>
-                </div>
+                </div>-->
 
                 <div class="menu-content">
                     <div class="menu-header">
@@ -62,19 +62,21 @@
         <main class="main-container">
             <h2 class="card-title-50" style="color: #532B30; margin-left: 540px;">Your Recaps</h2>
             <div class="recap-button-container">
-                <a href="{{ url_for('today_recap') }}" class="recap-button">Today's Recap</a>
-                <a href="{{ url_for('yesterday_recap') }}" class="recap-button">Yesterday's Recap</a>
-                <a href="last-week-recap" class="recap-button">Last Week's Recap</a>
-                <a href="{{ url_for('select_interval') }}" class="recap-button">Custom interval</a>
+            <a href="{{ url_for('today_recap') }}" class="recap-button">Today's Recap</a>
+            <a href="{{ url_for('yesterday_recap') }}" class="recap-button">Yesterday's Recap</a>
+            <a href="last-week-recap" class="recap-button">Last Week's Recap</a>
+            <a href="last-month-recap" class="recap-button">Last Months's Recap</a>
+            <a href="{{ url_for('select_interval') }}" class="recap-button">Custom interval</a>
             </div>
+
 
         </main>
     </div>
 
-    <script>
+    <!--<script>
         document.querySelector(".collapse-button").addEventListener("click", () => {
             document.getElementById("sideMenu").classList.toggle("collapsed");
         });
-    </script>
+    </script>-->
 </body>
 </html>

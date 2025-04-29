@@ -529,6 +529,7 @@ def to_lithuanian_time(dt):
     if dt.tzinfo is None:
         dt = pytz.UTC.localize(dt)
     return dt.astimezone(pytz.timezone("Europe/Vilnius"))    
+
 # YESTERDAY RECAP
 @app.route('/yesterday_recap')
 @login_required
@@ -755,6 +756,148 @@ def today_recap():
                            top_song={"name": top_song, "artist": top_song_artist, "plays": top_song_count, "cover": song_cover},
                            total_minutes=total_minutes,
                            song_durations=song_durations)
+
+
+# LAST 30 DAYS RECAP
+@app.route('/last-month-recap')
+@login_required
+def last_month_recap():
+    thirty_days_ago_utc = datetime.utcnow() - timedelta(days=30)
+
+    last_month_tracks = ListeningHistory.query.filter(
+        ListeningHistory.user_id == current_user.id,
+        ListeningHistory.played_at >= thirty_days_ago_utc
+    ).all()
+
+    if not last_month_tracks:
+        return render_template('last_month.html', message="No listening data found for the last 30 days")
+
+    song_counter = Counter()
+    artist_counter = Counter()
+    album_counter = Counter()
+    song_durations = {} 
+    album_durations = {}  
+    total_minutes = 0
+    artist_images = {}
+    song_details = {}
+    time_of_day_counter = defaultdict(int)
+
+    time_periods = {
+        "Early Morning": (4, 7),
+        "Morning": (8, 11),
+        "Afternoon": (12, 15),
+        "Evening": (16, 19),
+        "Night": (20, 23),
+        "Late Night": (0, 3)
+    }
+
+    sp = spotify.get_spotify_client()
+    if not sp:
+        return redirect(url_for("connect_spotify", next=url_for("last_month_recap")))    
+
+    for track in last_month_tracks:
+        artists = [artist.strip() for artist in track.artist_name.split(',')]
+        for artist in artists:
+            artist_counter[artist] += 1
+        song_counter[track.track_name, track.artist_name] += 1
+        album_counter[track.album_name] += 1
+        total_minutes += track.duration_ms
+
+        key = (track.track_name, track.artist_name)
+        song_durations[key] = song_durations.get(key, 0) + track.duration_ms
+        album_durations[track.album_name] = album_durations.get(track.album_name, 0) + track.duration_ms
+
+        played_time_lt = to_lithuanian_time(track.played_at)
+        hour = played_time_lt.hour
+        for label, (start_hour, end_hour) in time_periods.items():
+            if start_hour <= hour <= end_hour:
+                time_of_day_counter[label] += 1 
+                break
+
+    song_durations = {key: round(value / (1000 * 60)) for key, value in song_durations.items()}
+    album_durations = {key: round(value / (1000 * 60)) for key, value in album_durations.items()}
+    total_minutes = round(total_minutes / (1000 * 60))
+
+    top_artists = artist_counter.most_common(5)
+    top_songs = song_counter.most_common(10)
+    most_played_album_name, most_played_album_count = album_counter.most_common(1)[0] if album_counter else ("No data", 0)
+
+    for artist, _ in top_artists:
+        try:
+            artist_search = sp.search(q=f"artist:{artist}", type="artist", limit=1)['artists']['items']
+            artist_images[artist] = artist_search[0]['images'][0]['url'] if artist_search[0]['images'] else None
+        except:
+            artist_images[artist] = None
+
+    for (song, artist), _ in top_songs:
+        try: 
+            song_search = sp.search(q=f"track:{song} artist:{artist}", type="track", limit=1)['tracks']['items']
+            if song_search:
+                song_details[(song, artist)] = {
+                    "cover": song_search[0]["album"]["images"][0]["url"] if song_search[0]["album"]["images"] else None
+                }
+            else:
+                song_details[(song, artist)] = {"cover": None}
+        except:
+            song_details[(song, artist)] = {"cover": None}
+
+    album_details = {"artist": "Unknown", "cover": None}
+    if most_played_album_name != "No data":
+        try:
+            album_search = sp.search(q=f"album:{most_played_album_name}", type="album", limit=1)['albums']['items']
+            if album_search:
+                album_info = album_search[0]
+                album_details = {
+                    "artist": album_info["artists"][0]["name"],
+                    "cover": album_info["images"][0]["url"] if album_info["images"] else None
+                }
+        except:
+            album_details = {"artist": "Unknown", "cover": None}
+
+    top_artists = [(artist, count, artist_images.get(artist)) for artist, count in top_artists]
+    top_songs = [
+        (song, artist, count, song_details.get((song, artist), {}).get("cover"), song_durations.get((song, artist), 0))
+        for (song, artist), count in top_songs
+    ]
+
+    most_played_album = {
+        "name": most_played_album_name,
+        "plays": most_played_album_count,
+        "artist": album_details.get("artist", "Unknown"),
+        "cover": album_details.get("cover", None),
+        "total_minutes": album_durations.get(most_played_album_name, 0),
+    }
+
+    most_active_time, time_play_count = max(time_of_day_counter.items(), key=lambda x: x[1]) if time_of_day_counter else ("No data", 0)
+
+    ordered_labels = ["Early Morning", "Morning", "Afternoon", "Evening", "Night", "Late Night"]
+    time_labels = []
+    time_counts = []
+
+    for label in ordered_labels:
+        if label in time_of_day_counter:
+            time_labels.append(label)
+            time_counts.append(time_of_day_counter[label])
+
+    return render_template(
+        'last_month.html',  # Optional: rename to 'last_month.html' if you want
+        top_artists=top_artists,
+        top_songs=top_songs,
+        most_played_album=most_played_album,
+        total_minutes=total_minutes,
+        most_active_time=most_active_time,
+        time_play_count=time_play_count,
+        time_labels=time_labels,
+        time_counts=time_counts
+    )
+
+
+# UTC time to LT 
+def to_lithuanian_time(dt):
+    if dt.tzinfo is None:
+        dt = pytz.UTC.localize(dt)
+    return dt.astimezone(pytz.timezone("Europe/Vilnius"))
+
 
 
 # ---------------------------------- STATISTICS IN MENU PAGE ----------------------------------

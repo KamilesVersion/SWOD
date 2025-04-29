@@ -72,6 +72,7 @@
     <Content Include="templates\index.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="templates\last_month.html" />
     <Content Include="templates\last_week.html" />
     <Content Include="templates\login.html" />
     <Content Include="templates\menuPage.html">
