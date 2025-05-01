@@ -1362,6 +1362,32 @@ def review_statistics():
             .first()
         )
         
+        # TIME OF DAY
+        interval_tracks = ListeningHistory.query.filter(
+            ListeningHistory.user_id == current_user.id, 
+            ListeningHistory.played_at >= start_date,
+            ListeningHistory.played_at <= end_date
+        ).all()
+        
+        time_of_day_counter = defaultdict(int);
+        #Day periods
+        time_periods = {
+            "Early Morning": (4, 7),
+            "Morning": (8, 11),
+            "Afternoon": (12, 15),
+            "Evening": (16, 19),
+            "Night": (20, 23),
+            "Late Night": (0, 3)
+        }
+        
+        for track in interval_tracks:
+            played_time_lt = to_lithuanian_time(track.played_at)
+            hour = played_time_lt.hour
+            for label, (start_hour, end_hour) in time_periods.items():
+                if start_hour <= hour <= end_hour:
+                    time_of_day_counter[label] += 1
+                    break
+        
         # Get Spotify client
         sp = spotify.get_spotify_client()
         album_covers = {}
@@ -1441,14 +1467,27 @@ def review_statistics():
                 'image_url': url_for('static', filename='images/default-album.jpg')
             }
 
-
+        # for times (chart)
+        most_active_time, time_play_count = max(time_of_day_counter.items(), key=lambda x: x[1]) if time_of_day_counter else ("No data", 0)
+        ordered_labels = ["Early Morning", "Morning", "Afternoon", "Evening", "Night", "Late night"]
+        time_labels = []
+        time_counts = []
+        for label in ordered_labels:
+            if label in time_of_day_counter:
+                time_labels.append(label)
+                time_counts.append(time_of_day_counter[label])
 
         return render_template('review_statistics.html',
                             top_songs=formatted_songs,
                             top_artists=formatted_artists,
                             top_album=formatted_album,
                             start_date=start_date.date(),
-                            end_date=(end_date - timedelta(days=1)).date())
+                            end_date=(end_date - timedelta(days=1)).date(),
+                            most_active_time=most_active_time,
+                            time_play_count=time_play_count,
+                            time_labels=time_labels,
+                            time_counts=time_counts
+        )
         
     except Exception as e:
         flash('Error processing your request: ' + str(e), 'error')

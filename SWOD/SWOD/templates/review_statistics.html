@@ -507,8 +507,46 @@
                         <p>{{ top_album.play_count }} plays</p>
                     </div>
                 </div>
+
+                <div class="stat-box"style="text-align: center;">
+                    <h3 class="stat-title" style="color: #E4346E";>Most Active Listening Time</h3>
+                    <h3>{{ most_active_time }}</h3>
+                    <p>Tracks played: {{ time_play_count }}</p>
+                </div>
+
+                <div class="stat-box" style="text-align: center;">
+                    <h3 class="stat-title" style="color: #E4346E" ;>Listening Distribution by Time of Day</h3>
+                    {% if time_counts and time_counts|sum > 0 %}
+                    <canvas id="timeOfDayChart" width="400" height="400" style="margin: 0 auto;"></canvas>
+                    {% else %}
+                    <p>No data</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('timeOfDayChart').getContext('2d');
+    const timeOfDayChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ time_labels | tojson }},
+            datasets: [{
+                label: 'Tracks played',
+                data: {{ time_counts | tojson }},
+                backgroundColor: [
+                    '#F6E3D4', '#DB3056', '#532B30', '#FFC1B4',
+                    '#FEBA17', '#D29F80', '#F5EEDC'
+                ],
+                borderWidth: 1
+            }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
 </body>
 </html>
