@@ -947,3 +947,25 @@ input:-webkit-autofill {
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+
+/* Chart-specific container styles */
+.chart-container {
+    width: 450px;
+    height: 325px;
+    background-color: var(--app-dark);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 15px;
+}
+
+/* Create a wrapper for the canvas to ensure proper sizing */
+.chart-wrapper {
+    width: 90%;
+    height: 90%;
+    position: relative;
+}

@@ -1067,6 +1067,50 @@ def most_listened_genre_json():
     # If no genres found
     return jsonify({'genre': 'No data available, listen to more music!'})
     
+# MOST ACTIVE TIME OF DAY
+@app.route("/most_active_time_json")
+@login_required
+def most_active_time_json():
+    all_tracks = ListeningHistory.query.filter(
+        ListeningHistory.user_id == current_user.id
+    ).all()
+    
+    time_of_day_counter = defaultdict(int)
+    periods = {
+        "Early Morning": (4, 7),
+        "Morning": (8, 11),
+        "Afternoon": (12, 15),
+        "Evening": (16, 19),
+        "Night": (20, 23),
+        "Late Night": (0, 3)
+    }
+    
+    for track in all_tracks:
+        played_time_lt = to_lithuanian_time(track.played_at)
+        hour = played_time_lt.hour
+        for label, (start_hour, end_hour) in periods.items():
+            if start_hour <= hour <= end_hour:
+                time_of_day_counter[label] += 1
+                break
+            
+    most_active_time, time_count = max(time_of_day_counter.items(), key=lambda x: x[1]) if time_of_day_counter else ("No data", 0)
+    ordered_labels = ["Early Morning", "Morning", "Afternoon", "Evening", "Night", "Late Night"]
+    time_labels = []
+    time_counts = []
+    for label in ordered_labels:
+        if label in time_of_day_counter:
+            time_labels.append(label)
+            time_counts.append(time_of_day_counter[label])
+            
+    if most_active_time:
+        return jsonify({
+            'time_of_day': most_active_time,
+            'time_labels': time_labels,
+            'time_counts': time_counts
+    })
+    
+    return jsonify({'time_of_day': 'No data available, listen to more music!'})
+    
 
 # ---------------------------------- TOP ALBUMS ----------------------------------
 @app.route("/top_10_listened_albums")
