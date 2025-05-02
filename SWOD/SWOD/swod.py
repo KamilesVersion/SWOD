@@ -424,13 +424,14 @@ def last_week_recap():
         for artist in artists:
             artist_counter[artist] += 1
         song_counter[track.track_name, track.artist_name] += 1
-        album_counter[track.album_name] += 1
+        album_counter[track.album_name, track.artist_name] += 1
         total_minutes += track.duration_ms
 
 
-        key = (track.track_name, track.artist_name)
-        song_durations[key] = song_durations.get(key, 0) + track.duration_ms
-        album_durations[track.album_name] = album_durations.get(track.album_name, 0) + track.duration_ms
+        key1 = (track.track_name, track.artist_name)
+        key2 = (track.album_name, track.artist_name)
+        song_durations[key1] = song_durations.get(key1, 0) + track.duration_ms
+        album_durations[key2] = album_durations.get(key2, 0) + track.duration_ms
     
         # covert time
         played_time_lt = to_lithuanian_time(track.played_at)
@@ -447,7 +448,7 @@ def last_week_recap():
 
     top_artists = artist_counter.most_common(5)
     top_songs = song_counter.most_common(10)
-    most_played_album_name, most_played_album_count = album_counter.most_common(1)[0] if album_counter else ("No data", 0)
+    most_played_album_info, most_played_album_count = album_counter.most_common(1)[0] if album_counter else ("No data", 0)
     
 
     for artist, _ in top_artists:
@@ -471,9 +472,9 @@ def last_week_recap():
     
 
     album_details = {"artist": "Unknown", "cover": None}
-    if most_played_album_name != "No data":
+    if most_played_album_info != "No data":
         try:
-            album_search = sp.search(q=f"album:{most_played_album_name}", type="album", limit=1)['albums']['items']
+            album_search = sp.search(q=f"album:{most_played_album_info}", type="album", limit=1)['albums']['items']
             if album_search:
                 album_info = album_search[0]
                 album_details = {
@@ -490,12 +491,14 @@ def last_week_recap():
         for (song, artist), count in top_songs
     ]
     
+    most_played_album_name = most_played_album_info[0]
+    
     most_played_album = {
         "name": most_played_album_name,
         "plays": most_played_album_count,
         "artist": album_details.get("artist", "Unknown"),
         "cover": album_details.get("cover", None),
-        "total_minutes": album_durations.get(most_played_album_name, 0),
+        "total_minutes": album_durations.get(most_played_album_info, 0),
     }
 
     most_active_time, time_play_count = max(time_of_day_counter.items(), key=lambda x: x[1]) if time_of_day_counter else ("No data", 0)
@@ -800,12 +803,13 @@ def last_month_recap():
         for artist in artists:
             artist_counter[artist] += 1
         song_counter[track.track_name, track.artist_name] += 1
-        album_counter[track.album_name] += 1
+        album_counter[track.album_name, track.artist_name] += 1
         total_minutes += track.duration_ms
 
-        key = (track.track_name, track.artist_name)
-        song_durations[key] = song_durations.get(key, 0) + track.duration_ms
-        album_durations[track.album_name] = album_durations.get(track.album_name, 0) + track.duration_ms
+        key1 = (track.track_name, track.artist_name)
+        key2 = (track.album_name, track.artist_name)
+        song_durations[key1] = song_durations.get(key1, 0) + track.duration_ms
+        album_durations[key2] = album_durations.get(key2, 0) + track.duration_ms
 
         played_time_lt = to_lithuanian_time(track.played_at)
         hour = played_time_lt.hour
@@ -820,7 +824,7 @@ def last_month_recap():
 
     top_artists = artist_counter.most_common(5)
     top_songs = song_counter.most_common(10)
-    most_played_album_name, most_played_album_count = album_counter.most_common(1)[0] if album_counter else ("No data", 0)
+    most_played_album_info, most_played_album_count = album_counter.most_common(1)[0] if album_counter else ("No data", 0)
 
     for artist, _ in top_artists:
         try:
@@ -842,9 +846,9 @@ def last_month_recap():
             song_details[(song, artist)] = {"cover": None}
 
     album_details = {"artist": "Unknown", "cover": None}
-    if most_played_album_name != "No data":
+    if most_played_album_info != "No data":
         try:
-            album_search = sp.search(q=f"album:{most_played_album_name}", type="album", limit=1)['albums']['items']
+            album_search = sp.search(q=f"album:{most_played_album_info}", type="album", limit=1)['albums']['items']
             if album_search:
                 album_info = album_search[0]
                 album_details = {
@@ -859,13 +863,15 @@ def last_month_recap():
         (song, artist, count, song_details.get((song, artist), {}).get("cover"), song_durations.get((song, artist), 0))
         for (song, artist), count in top_songs
     ]
+    
+    most_played_album_name = most_played_album_info[0]
 
     most_played_album = {
         "name": most_played_album_name,
         "plays": most_played_album_count,
         "artist": album_details.get("artist", "Unknown"),
         "cover": album_details.get("cover", None),
-        "total_minutes": album_durations.get(most_played_album_name, 0),
+        "total_minutes": album_durations.get(most_played_album_info, 0),
     }
 
     most_active_time, time_play_count = max(time_of_day_counter.items(), key=lambda x: x[1]) if time_of_day_counter else ("No data", 0)
