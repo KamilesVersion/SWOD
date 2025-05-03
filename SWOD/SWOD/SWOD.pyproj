@@ -58,6 +58,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="static\SWOD_LOGO.png" />
+    <Content Include="templates\artist_album_tracks.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="templates\artist_top_tracks.html">
       <SubType>Code</SubType>
     </Content>

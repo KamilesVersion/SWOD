@@ -1592,6 +1592,172 @@ def artist_top_tracks():
         total_minutes_listened=round(total_minutes_listened)
     )
 
+#------ALBUMO TRACKU SORTAS---------------------------------------------------------------
+def format_duration(ms):
+    """Converts milliseconds to MM:SS format"""
+    total_seconds = ms // 1000
+    minutes = total_seconds // 60
+    seconds = total_seconds % 60
+    return f"{minutes:02d}:{seconds:02d}"
+
+@app.route('/artist_album_tracks')
+@login_required
+def artist_album_tracks():
+    return render_template('artist_album_tracks.html')
+
+@app.route('/search_artists', methods=['GET'])
+@login_required
+def search_artists():
+    search_query = request.args.get('query', '').strip()
+    
+    # Fetch unique artists dynamically based on the search query
+    raw_artists = db.session.query(ListeningHistory.artist_name).filter_by(
+        user_id=current_user.id
+    ).distinct().all()
+    
+    artist_set = set()
+    for (artist_str,) in raw_artists:
+        for artist in artist_str.split(','):
+            clean_artist = artist.strip()
+            if clean_artist and (not search_query or search_query.lower() in clean_artist.lower()):
+                artist_set.add(clean_artist)
+    
+    return jsonify(sorted(artist_set))
+
+@app.route('/get_albums/<artist>')
+@login_required
+def get_albums(artist):
+    sp = spotify.get_spotify_client()
+    if not sp:
+        return jsonify([])
+    
+    try:
+        # Search for the artist
+        artist_search = sp.search(q=f"artist:{artist}", type="artist", limit=1)
+        if not artist_search['artists']['items']:
+            return jsonify([])
+        
+        artist_id = artist_search['artists']['items'][0]['id']
+        
+        # Fetch all albums for the artist
+        albums_data = []
+        offset = 0
+        while True:
+            response = sp.artist_albums(
+                artist_id,
+                album_type='album',
+                limit=50,
+                offset=offset
+            )
+            albums_data.extend(response['items'])
+            offset += 50
+            if not response['next']:
+                break
+        
+        # Process and deduplicate albums
+        seen = set()
+        albums = []
+        for album in albums_data:
+            name = re.sub(r'\(.*?\)', '', album['name']).strip()
+            if name not in seen:
+                seen.add(name)
+                albums.append({
+                    'name': name,
+                    'release_date': album['release_date']
+                })
+        
+        # Sort albums by release date (newest first)
+        albums_sorted = sorted(albums, key=lambda x: x['release_date'], reverse=True)
+        return jsonify([a['name'] for a in albums_sorted])
+    
+    except Exception as e:
+        print(f"Error fetching albums: {str(e)}")
+        return jsonify([])
+
+@app.route('/get_tracks/<artist>/<album>')
+@login_required
+def get_tracks(artist, album):
+    sp = spotify.get_spotify_client()
+    if not sp:
+        return jsonify([])
+
+    try:
+        # Search for the album by the artist
+        search_query = f"album:{album} artist:{artist}"
+        album_search = sp.search(search_query, type='album', limit=1)
+
+        if not album_search['albums']['items']:
+            return jsonify([])  # Return empty list if no album is found
+
+        album_data = album_search['albums']['items'][0]
+        album_id = album_data['id']
+        album_cover = album_data['images'][0]['url'] if album_data['images'] else '/static/images/default-album.jpg'
+
+        # Get all tracks from the album
+        tracks_data = sp.album_tracks(album_id, limit=50)
+        spotify_tracks = tracks_data['items']
+
+        while tracks_data['next']:
+            tracks_data = sp.next(tracks_data)
+            spotify_tracks.extend(tracks_data['items'])
+
+        # Get user's listening history for these tracks
+        track_names = [track['name'] for track in spotify_tracks]
+        history_records = db.session.query(
+            ListeningHistory.track_name,
+            func.sum(ListeningHistory.duration_ms).label('total_time'),
+            func.count().label('play_count')
+        ).filter(
+            ListeningHistory.user_id == current_user.id,
+            ListeningHistory.artist_name.ilike(f"%{artist}%"),
+            ListeningHistory.album_name.ilike(f"%{album}%"),
+            ListeningHistory.track_name.in_(track_names)
+        ).group_by(ListeningHistory.track_name).all()
+
+        history_dict = {
+            record.track_name: {
+                'total_time': record.total_time or 0,
+                'play_count': record.play_count or 0
+            } for record in history_records
+        }
+
+        # Format milliseconds to MM:SS
+        def format_duration(ms):
+            total_seconds = ms // 1000
+            minutes = total_seconds // 60
+            seconds = total_seconds % 60
+            return f"{minutes:02d}:{seconds:02d}"
+
+        # Prepare track list
+        processed_tracks = []
+        for idx, track in enumerate(spotify_tracks, start=1):
+            track_name = track['name']
+            duration_ms = track['duration_ms']
+
+            # Only main artist (first in list)
+            main_artist = track['artists'][0]['name'] if track['artists'] else artist
+
+            play_count = history_dict.get(track_name, {}).get('play_count', 0)
+            total_time_ms = history_dict.get(track_name, {}).get('total_time', 0)
+
+            processed_tracks.append({
+                'number': idx,
+                'name': track_name,
+                'artists': main_artist,  # Only main artist
+                'album': album_data['name'],
+                'album_cover': album_cover,
+                'duration': format_duration(duration_ms),
+                'total_time': format_duration(total_time_ms),
+                'play_count': play_count
+            })
+
+        return jsonify(processed_tracks)
+
+    except Exception as e:
+        print(f"Error fetching tracks: {str(e)}")
+        return jsonify([])
+
+
 
 
 #----------------------------------TEST---------------------------------------------------

@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recaps</title>
+    <meta name="description" content="Recaps - S.W.O.D." />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-logo">
+                <img src="static/SWOD_LOGO.png" alt="Logo" class="logo-img">
+            </div>
+        </header>
+
+        <!-- Side Menu -->
+        <div id="sideMenu" class="side-menu">
+            <div class="side-menu-content">
+                <div class="profile-button-container">
+                    <a href="profile1" class="profile-button">
+                        {% if profile_pic %}
+                        <img src="{{ profile_pic }}" alt="Profile Picture" class="user-icon" style="border-radius: 50%; width: 50px; height: 50px;" />
+                        {% else %}
+                        <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        {% endif %}
+                    </a>
+                </div>
+
+                <!--<div class="collapse-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"></path>
+                </svg>
+            </div>-->
+
+                <div class="menu-content">
+                    <div class="menu-header">
+                        <a href="menu" class="back-to-menu">back2main</a>
+                    </div>
+                    <a href="recent" class="menu-button">recent tracks</a>
+                    <a href="recap" class="menu-button">ur recaps</a>
+                    <a href="top_10_listened_artists" class="menu-button">ur top artists</a>
+                    <a href="top_10_listened_albums" class="menu-button">ur top albums</a>
+                    <a href="top_50_songs" class="menu-button">ur top songs</a>
+                    <a href="genres" class="menu-button">ur top genres</a>
+                    <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">search by artist</a>
+                </div>
+            </div>
+        </div>
+        <!-- Main Content -->
+        <main class="smain-container">
+            <div class="album-sort-container">
+                <!-- Sorted Section -->
+                <div class="sorted-section">
+                    <h2 class="section-title">Sort Albums by Track Plays</h2>
+                    <div class="search-group">
+                        <input type="text" id="artist-search" list="artists" placeholder="Search artist...">
+                        <datalist id="artists"></datalist>
+                        <select id="album">
+                            <option value="">Select album</option>
+                        </select>
+                    </div>
+                    <div id="header" class="sheader">
+                        <img id="album-cover" src="/static/images/default-album.jpg" alt="Album Cover">
+                        <div class="sheader-info">
+                            <h2 id="album-title">Select an album</h2>
+                            <p id="album-artist"></p>
+                        </div>
+                    </div>
+                    <div id="loading" style="display: none;">Loading...</div>
+                    <div id="sorted-section" style="display: none;">
+                        <div class="section-title">Sorted by Listens</div>
+                        <div id="tracks" class="tracklist"></div>
+                    </div>
+                </div>
+                <!-- Original Section -->
+                <div class="original-section">
+                    <div id="original-section" style="display: none;">
+                        <div class="section-title">Original Album Order</div>
+                        <div id="original-tracklist" class="tracklist"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const artistInput = document.getElementById('artist-search');
+            const albumSelect = document.getElementById('album');
+            const tracksContainer = document.getElementById('tracks');
+            const originalTracklist = document.getElementById('original-tracklist');
+            const headerImage = document.getElementById('album-cover');
+            const headerTitle = document.getElementById('album-title');
+            const headerArtist = document.getElementById('album-artist');
+            const loading = document.getElementById('loading');
+            const header = document.getElementById('header');
+            const sortedSection = document.getElementById('sorted-section');
+            const originalSection = document.getElementById('original-section');
+            // Fetch artists based on search input
+            artistInput.addEventListener('input', async () => {
+                const searchTerm = artistInput.value.trim();
+                if (!searchTerm) return;
+                const res = await fetch(`/search_artists?query=${encodeURIComponent(searchTerm)}`);
+                const artists = await res.json();
+                const datalist = document.getElementById('artists');
+                datalist.innerHTML = '';
+                artists.forEach(artist => {
+                    const option = document.createElement('option');
+                    option.value = artist;
+                    datalist.appendChild(option);
+                });
+            });
+            // Fetch albums for the selected artist
+            artistInput.addEventListener('change', async () => {
+                const artist = artistInput.value.trim();
+                if (!artist) return;
+                albumSelect.innerHTML = '<option value="">Select album</option>';
+                tracksContainer.innerHTML = '';
+                originalTracklist.innerHTML = '';
+                loading.style.display = 'block';
+                sortedSection.style.display = 'none';
+                originalSection.style.display = 'none';
+                const res = await fetch(`/get_albums/${encodeURIComponent(artist)}`);
+                const albums = await res.json();
+                loading.style.display = 'none';
+                if (albums.length) {
+                    albums.forEach(album => {
+                        const option = document.createElement('option');
+                        option.value = album;
+                        option.textContent = album;
+                        albumSelect.appendChild(option);
+                    });
+                } else {
+                    albumSelect.innerHTML = '<option value="">No albums found</option>';
+                }
+            });
+            // Fetch and display tracks for the selected album
+            albumSelect.addEventListener('change', async () => {
+                const artist = artistInput.value.trim();
+                const album = albumSelect.value;
+                if (!artist || !album) return;
+                tracksContainer.innerHTML = '';
+                originalTracklist.innerHTML = '';
+                loading.style.display = 'block';
+                const res = await fetch(`/get_tracks/${encodeURIComponent(artist)}/${encodeURIComponent(album)}`);
+                const tracks = await res.json();
+                loading.style.display = 'none';
+                if (!tracks.length) {
+                    tracksContainer.innerHTML = '<p>No tracks found.</p>';
+                    return;
+                }
+                header.style.display = 'flex';
+                sortedSection.style.display = 'block';
+                originalSection.style.display = 'block';
+                headerImage.src = tracks[0].album_cover;
+                headerTitle.textContent = tracks[0].album;
+                headerArtist.textContent = "by " + tracks[0].artists;
+                // Sort tracks by play count
+                const sortedTracks = [...tracks].sort((a, b) => b.play_count - a.play_count);
+                // Render sorted tracklist
+                sortedTracks.forEach((track, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'track fade-in';
+                    if (index === 0) div.classList.add('gold');
+                    else if (index === 1) div.classList.add('silver');
+                    else if (index === 2) div.classList.add('bronze');
+                    if (track.play_count === 0) div.classList.add('zero-plays');
+                    div.innerHTML =
+                        `<div class="track-info">
+                                        <strong>#${index + 1} ${track.name}</strong>
+                                        <small>${track.duration}</small>
+                                    </div>
+                                    <div class="track-meta">
+                                        <div>Plays: ${track.play_count}</div>
+                                        <div>Time: ${track.total_time}</div>
+                                    </div>`;
+                    tracksContainer.appendChild(div);
+                });
+                // Render original tracklist
+                tracks.forEach((track, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'track';
+                    div.innerHTML =
+                        `<div class="track-info">
+                                        <strong>${index + 1}. ${track.name}</strong>
+                                    </div>`;
+                    originalTracklist.appendChild(div);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

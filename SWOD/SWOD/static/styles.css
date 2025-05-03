@@ -969,3 +969,158 @@ input:-webkit-autofill {
     height: 90%;
     position: relative;
 }
+
+.album-sort-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px;
+    gap: 2rem; /* Reduced gap between sections */
+}
+    /* Original Section */
+    .album-sort-container .original-section {
+        flex: 1; /* Make original section smaller */
+        border-left: 1px solid #ccc; /* Border on the left */
+        padding-left: 20px; /* Add padding to the left */
+        opacity: 0.5; /* Dimmer appearance */
+        font-size: 0.8rem; /* Smaller text */
+        max-width: 300px; /* Limit width */
+    }
+
+.original-section .track {
+    padding: 4px 0; /* Reduced padding for less space between songs */
+    border-bottom: 1px solid #ddd;
+    min-height: 30px; /* Reduced height */
+    align-items: center;
+}
+
+.original-section .track-info {
+    font-size: 0.8rem; /* Smaller font size */
+    color: #888; /* Dimmer color */
+}
+/* Sorted Section */
+.album-sort-container .sorted-section {
+    flex: 2; /* Larger section for sorted tracks */
+    padding-right: 20px; /* Add padding to the right */
+}
+
+.sorted-section .track {
+    padding: 10px 0; /* Slightly reduced padding */
+    border-bottom: 1px solid #ddd;
+    min-height: 50px; /* Maintain consistent height */
+    align-items: center;
+}
+
+.sorted-section .track-info {
+    font-size: 1rem; /* Keep font size slightly larger */
+}
+.track-info {
+    flex: 1;
+}
+
+    .track-info strong {
+        display: block;
+        font-size: 1.05rem;
+    }
+
+.track-meta {
+    text-align: right;
+    min-width: 120px;
+}
+.zero-plays {
+    color: #756b68;
+}
+.tracklist {
+    margin-top: 10px;
+}
+/* Album Sort Styles */
+.search-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+    .search-group input,
+    .search-group select {
+        padding: 10px;
+        font-size: 1rem;
+        flex: 1;
+        min-width: 200px;
+    }
+
+.section-title {
+    margin-top: 40px;
+    font-size: 1.2rem;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+.sheader {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    display: none;
+}
+
+    .sheader img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+.sheader-info h2 {
+    margin: 0 0 10px;
+}
+.smain-container {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    width: 80%; /* Main content takes up 4/5 of the page */
+}
+
+/* Track Container */
+.track {
+    display: flex; /* Use flexbox for alignment */
+    justify-content: space-between; /* Space out the two sections */
+    align-items: center; /* Align items vertically in the center */
+    padding: 8px 0; /* Adjust padding for spacing */
+    border-bottom: 1px solid #ddd; /* Add a bottom border for separation */
+}
+
+/* Track Info Section */
+.track-info {
+    display: flex; /* Use flexbox to align song name and track length */
+    align-items: center; /* Align items vertically in the center */
+    gap: 10px; /* Add spacing between song name and track length */
+    font-size: 0.9rem; /* Adjust font size */
+}
+
+    .track-info strong {
+        font-size: 1rem; /* Slightly larger font for the song name */
+    }
+
+    .track-info small {
+        font-size: 0.8rem; /* Smaller font for the track length */
+        color: #888; /* Dimmer color for the track length */
+    }
+
+/* Track Meta Section */
+/* Track Meta Section */
+.track-meta {
+    display: flex; /* Use flexbox for alignment */
+    flex-direction: column; /* Stack plays and time vertically */
+    align-items: flex-end; /* Align content to the right */
+    font-size: 0.8rem; /* Smaller font for metadata */
+    color: #333; /* Darker color for metadata */
+    min-width: 100px; /* Ensure consistent width */
+}
+
+    /* Specifically Target the Plays Count */
+    .track-meta div:first-child {
+        color: #000; /* Make the play count text darker (black) */
+        font-weight: bold; /* Optionally make it bold for emphasis */
+        font-size:16px;
+    }
+
