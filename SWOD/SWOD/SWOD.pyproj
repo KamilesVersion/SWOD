@@ -81,12 +81,16 @@
     <Content Include="templates\menuPage.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="templates\playlist_link.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="templates\profile.html">
       <SubType>Code</SubType>
     </Content>
     <Content Include="templates\profile1.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="templates\playlists.html" />
     <Content Include="templates\recent.html">
       <SubType>Code</SubType>
     </Content>

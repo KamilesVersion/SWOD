@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="lt">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>search by artist</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recaps</title>
+    <meta name="description" content="Recaps - S.W.O.D." />
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
 </head>
+
 <body>
     <div class="app">
         <!-- Header -->
@@ -38,13 +42,13 @@
 
                 <div class="menu-content">
                     <div class="menu-header">
-                        <a href="menu" class="back-to-menu">back2menu</a>
+                        <a href="menu" class="back-to-menu">back2main</a>
                     </div>
 
                     <!-- Buttons from menu.html -->
-                    <a href="recent" class="menu-button">recent tracks</a>
+                    <a href="recent" class="menu-button">recent Tracks</a>
                     <a href="recap" class="menu-button">ur recaps</a>
-                    <a href="top_10_listened_artists" class="menu-button">ur top rtists</a>
+                    <a href="top_10_listened_artists" class="menu-button">ur top artists</a>
                     <a href="top_10_listened_albums" class="menu-button">ur top albums</a>
                     <a href="top_50_songs" class="menu-button">ur top songs</a>
                     <a href="genres" class="menu-button">ur top genres</a>
@@ -55,54 +59,25 @@
             </div>
         </div>
 
-
         <!-- Main Content -->
         <main class="main-container">
-            <form method="GET" action="{{ url_for('artist_top_tracks') }}">
-                <label for="artist_name" style="margin-left: 10px;">Type in the artist:</label>
-                <input type="text" class="input-style" name="artist_name" id="artist_name" required value="{{ request.args.get('artist_name', '') }}">
-                <button class="search-button" type="submit">Search</button>
-            </form>
-
-            {% if top_tracks %}
-            <h2 style="margin-top: 2rem; margin-left: 10px;">Top 10 artist songs: <strong>{{ artist_name }}</strong></h2>
-            <p style="margin-left: 10px;">Total minutes listened: <strong>{{ total_minutes_listened }}</strong> min.</p>
-            <div class="track-list">
-                {% for track in top_tracks %}
-                <div class="track-item">
-                    {% if track.album_cover_url %}
-                    <img src="{{ track.album_cover_url }}" alt="Album Cover">
-                    {% else %}
-                    <div class="no-image-placeholder"></div>
-                    {% endif %}
-                    <div>
-                        <p>{{ loop.index }}. {{ track.track_name }}</p>
-                        <p>Listened: {{ track.listen_count }} times</p>
-                    </div>
-                </div>
-                {% endfor %}
+            <h2 class="card-title-50" style="color: #532B30; margin-left: 540px; margin-top: 40px;">Generate a Playlist</h2>
+            <div class="recap-button-container">
+                <a href="{{ url_for('generate_playlist', type='top20') }}" class="recap-button">Top 20 Songs</a>
+                <a href="{{ url_for('generate_playlist', type='recent20') }}" class="recap-button">Recent 20 Songs</a>
+                <a href="{{ url_for('generate_playlist', type='weekly_top20') }}" class="recap-button">Top 20 This Week</a>
             </div>
-            {% elif request.args.get('artist_name') %}
-            <p style="margin-top: 2rem;">Artist not found, sorry :(.</p>
-            {% endif %}
+
+</div>
+
+
         </main>
-
-
-
-
     </div>
 
-    <!-- JavaScript -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Toggle side menu
-            //const collapseButton = document.querySelector(".collapse-button");
-            //const sideMenu = document.querySelector(".side-menu");
-
-            //collapseButton.addEventListener("click", function () {
-            //    sideMenu.classList.toggle("collapsed");
-            //});
+    <!--<script>
+        document.querySelector(".collapse-button").addEventListener("click", () => {
+            document.getElementById("sideMenu").classList.toggle("collapsed");
         });
-    </script>
+    </script>-->
 </body>
 </html>

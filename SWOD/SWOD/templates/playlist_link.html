@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Recent Tracks</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generated Playlist</title>
+    <meta name="description" content="Generated Playlist - S.W.O.D." />
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body>
     <div class="app">
         <!-- Header -->
@@ -32,15 +35,15 @@
 
                 <div class="menu-content">
                     <div class="menu-header">
-                        <a href="{{ url_for('menu') }}" class="back-to-menu">back2menu</a>
+                        <a href="menu" class="back-to-menu">back2main</a>
                     </div>
 
-                    <a href="{{ url_for('recent') }}" class="menu-button">recent tracks</a>
-                    <a href="{{ url_for('recap') }}" class="menu-button">ur recaps</a>
-                    <a href="{{ url_for('top_10_listened_artists') }}" class="menu-button">ur top rtists</a>
-                    <a href="{{ url_for('top_10_most_listened_albums_json') }}" class="menu-button">ur top albums</a>
-                    <a href="{{ url_for('top_50_songs') }}" class="menu-button">ur top songs</a>
-                    <a href="{{ url_for('genres') }}" class="menu-button">ur top genres</a>
+                    <a href="recent" class="menu-button">recent Tracks</a>
+                    <a href="recap" class="menu-button">ur recaps</a>
+                    <a href="top_10_listened_artists" class="menu-button">ur top artists</a>
+                    <a href="top_10_listened_albums" class="menu-button">ur top albums</a>
+                    <a href="top_50_songs" class="menu-button">ur top songs</a>
+                    <a href="genres" class="menu-button">ur top genres</a>
                     <a href="{{ url_for('artist_top_tracks') }}" class="menu-button">search by artist</a>
                     <a href="playlists" class="menu-button">generate a playlist</a>
                 </div>
@@ -49,26 +52,11 @@
 
         <!-- Main Content -->
         <main class="main-container">
-            <h1 class="card-title-50" style="margin-bottom: 10px;">Recently Played Tracks</h1>
-
-            {% if tracks %}
-            <div class="track-list">
-                {% for track in tracks %}
-                <div class="track-item">
-                    {% if track.album_cover %}
-                    <img src="{{ track.album_cover }}" alt="Album Cover" style="width: 70px; height: 70px; margin-right: 10px; border-radius: 5px;">
-                    {% endif %}
-                    <div>
-                        <p style="font-weight: bold; font-size: 18px;">{{ track.name }}</p>
-                        <p style="margin: 2px 0;">by {{ track.artist }}</p>
-                        <small style="color: var(--app-dark);">Album: {{ track.album }} | Played at: {{ track.played_at }}</small>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p style="margin-left: 10px; color: var(--app-dark);">No recently played tracks found.</p>
-            {% endif %}
+            <h2 class="card-title-50" style="color: #532B30; margin-top: 40px; margin-left: 20px;">Your Playlist Is Ready!</h2>
+            <p style="margin-top: 20px; margin-left: 20px;">Copy the link below or open it directly in Spotify:</p>
+            <input type="text" value="{{ playlist_url }}" readonly style="width: 60%; padding: 10px; margin-left: 20px;" onclick="this.select();" />
+            <br><br>
+            <a href="{{ playlist_url }}" target="_blank" class="recap-button" style="margin-left: 20px;">Open in Spotify</a>
         </main>
     </div>
 </body>
