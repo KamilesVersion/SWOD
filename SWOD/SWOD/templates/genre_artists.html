@@ -15,7 +15,7 @@
 <div id="sideMenu" class="side-menu">
     <div class="side-menu-content">
         <div class="profile-button-container">
-            <a href="profile1" class="profile-button">
+            <a href="{{ url_for('profile') }}" class="profile-button">
                 {% if profile_pic %}
                 <img src="{{ profile_pic }}" alt="Profile Picture" class="user-icon" style="border-radius: 50%; width: 50px; height: 50px;" />
                 {% else %}
@@ -29,7 +29,7 @@
 
         <div class="menu-content">
             <div class="menu-header">
-                <a href="menu" class="back-to-menu">back2menu</a>
+                <a href="{{ url_for('menu') }}" class="back-to-menu">back2menu</a>
             </div>
 
             <a href="{{ url_for('recent') }}" class="menu-button">recent tracks</a>
