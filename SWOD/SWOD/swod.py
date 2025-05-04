@@ -1674,6 +1674,16 @@ def get_albums(artist):
         print(f"Error fetching albums: {str(e)}")
         return jsonify([])
 
+import re
+from flask import jsonify
+from sqlalchemy import func
+
+def normalize(text):
+    """Lowercase, strip, and remove anything in parentheses"""
+    if not text:
+        return ''
+    return re.sub(r'\(.*?\)', '', text.lower()).strip()
+
 @app.route('/get_tracks/<artist>/<album>')
 @login_required
 def get_tracks(artist, album):
@@ -1687,7 +1697,7 @@ def get_tracks(artist, album):
         album_search = sp.search(search_query, type='album', limit=1)
 
         if not album_search['albums']['items']:
-            return jsonify([])  # Return empty list if no album is found
+            return jsonify([])
 
         album_data = album_search['albums']['items'][0]
         album_id = album_data['id']
@@ -1701,25 +1711,38 @@ def get_tracks(artist, album):
             tracks_data = sp.next(tracks_data)
             spotify_tracks.extend(tracks_data['items'])
 
-        # Get user's listening history for these tracks
-        track_names = [track['name'] for track in spotify_tracks]
-        history_records = db.session.query(
+        # Normalize current album/artist
+        norm_album = normalize(album)
+        norm_artist = normalize(artist)
+
+        # Fetch all listening history and normalize
+        raw_history = db.session.query(
             ListeningHistory.track_name,
+            ListeningHistory.album_name,
+            ListeningHistory.artist_name,
             func.sum(ListeningHistory.duration_ms).label('total_time'),
             func.count().label('play_count')
         ).filter(
-            ListeningHistory.user_id == current_user.id,
-            ListeningHistory.artist_name.ilike(f"%{artist}%"),
-            ListeningHistory.album_name.ilike(f"%{album}%"),
-            ListeningHistory.track_name.in_(track_names)
-        ).group_by(ListeningHistory.track_name).all()
+            ListeningHistory.user_id == current_user.id
+        ).group_by(
+            ListeningHistory.track_name,
+            ListeningHistory.album_name,
+            ListeningHistory.artist_name
+        ).all()
 
-        history_dict = {
-            record.track_name: {
-                'total_time': record.total_time or 0,
-                'play_count': record.play_count or 0
-            } for record in history_records
-        }
+        # Build a normalized lookup dictionary
+        history_dict = {}
+        for record in raw_history:
+            norm_track = normalize(record.track_name)
+            norm_hist_album = normalize(record.album_name)
+            norm_hist_artist = normalize(record.artist_name)
+
+            if norm_album in norm_hist_album and norm_artist in norm_hist_artist:
+                if norm_track not in history_dict:
+                    history_dict[norm_track] = {
+                        'total_time': record.total_time or 0,
+                        'play_count': record.play_count or 0
+                    }
 
         # Format milliseconds to MM:SS
         def format_duration(ms):
@@ -1728,27 +1751,25 @@ def get_tracks(artist, album):
             seconds = total_seconds % 60
             return f"{minutes:02d}:{seconds:02d}"
 
-        # Prepare track list
+        # Prepare final track list
         processed_tracks = []
         for idx, track in enumerate(spotify_tracks, start=1):
             track_name = track['name']
+            norm_track_name = normalize(track_name)
             duration_ms = track['duration_ms']
-
-            # Only main artist (first in list)
             main_artist = track['artists'][0]['name'] if track['artists'] else artist
 
-            play_count = history_dict.get(track_name, {}).get('play_count', 0)
-            total_time_ms = history_dict.get(track_name, {}).get('total_time', 0)
+            stats = history_dict.get(norm_track_name, {'total_time': 0, 'play_count': 0})
 
             processed_tracks.append({
                 'number': idx,
                 'name': track_name,
-                'artists': main_artist,  # Only main artist
+                'artists': main_artist,
                 'album': album_data['name'],
                 'album_cover': album_cover,
                 'duration': format_duration(duration_ms),
-                'total_time': format_duration(total_time_ms),
-                'play_count': play_count
+                'total_time': format_duration(stats['total_time']),
+                'play_count': stats['play_count']
             })
 
         return jsonify(processed_tracks)
