@@ -12,6 +12,7 @@ Projektą kūrė KTU IFA-3/1 grupės nariai:
 # Techninė užduotis 
 
 Šio projekto tikslas yra sukurti "S.W.O.D", Spotify statistikos tinklalapio programą naudojant Python, Visual Studio aplinkoje. Pagrindinė projekto užduotis yra pasinaudojant naudotojo Spotify duomenimis išvesti įvairią klausymosi statistiką.
+Projekto valdymui ir komandos darbui naudota "Jira", bendravimui "Discord" platforma.
 
 # Testavimas
 
@@ -63,13 +64,22 @@ Meniu skiltyje pasirinkus "ur recaps" naudotojas nukreipiamas į apžvalgų pusl
 ### 6 pav. Pasirinktinio intervalo apžvalgos puslapis (rezultatai)
 ![image](https://github.com/user-attachments/assets/23d814c9-cf79-4435-ba5e-80aa776968dd)
 
-Pasirinkus "sort an album" funkciją atidaromas puslapis (7 pav.), kuriame įrašomas atlikėjo pavadinimas ir pasirenkamas norimas albumas iš duotų. Pasirinkus, 
+Pasirinkus "sort an album" funkciją atidaromas puslapis (7 pav.), kuriame įrašomas atlikėjo pavadinimas ir pasirenkamas norimas albumas iš duotų. Pasirinkus, matomas sąrašas albumo dainų, surikiuotų pagal klausymo kiekį (8 pav.)
 
 ### 7 pav. Albumo rikiavimo puslapis (albumo pasirinkimas)
 ![image](https://github.com/user-attachments/assets/bfd8f3e0-e287-4108-a596-e7aa92bc08b2)
 
 ### 8 pav. Albumo rikiavimo puslapis (rezultatas)
 ![image](https://github.com/user-attachments/assets/9432ac4d-d036-428c-9f5c-550ac528f96f)
+
+Kitos funkcijos:
+- "recent tracks" - 20 paskutinių klausytų dainų
+- "ur top artists" - 10 daugiausiai klausytų atlikėjų
+- "ur top albums" - 10 daugiausiai klausytų albumų
+- "ur top songs" - 50 daugiausiai klausytų dainų
+- "ur top genres" - klausytų žanrų sąrašas. Paspaudus ant specifinio žanro parodomas sąrašas su to žanro klausytais atlikėjais
+- "search by artist" - įrašius norimą atlikėją, pateikiamos 10 daugiausiai klausytų to atlikėjų dainų.
+- "generate a playlist" - paspaudus atitinkamą mygtuką, sudaromas viešas grojaraštis Spotify paskyroje. Yra trys pasirinkimo variantai: top 20 dainų, paskutinės 20 dainų, top 20 šios savaitės dainų.
 
 
 
